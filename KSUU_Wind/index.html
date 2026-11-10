@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KSUU Runway Wind — Travis AFB</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+  :root{
+    --bg:#0a0e0c;
+    --panel:#101512;
+    --panel-2:#141b17;
+    --line:#22302a;
+    --green:#4ade80;
+    --green-dim:#2f6b46;
+    --amber:#f5a623;
+    --red:#e5484d;
+    --text:#e7efe9;
+    --text-dim:#8ba396;
+    --text-faint:#5a6e63;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse at 20% -10%, #16261d 0%, transparent 55%),
+      radial-gradient(ellipse at 100% 0%, #131d17 0%, transparent 50%),
+      var(--bg);
+    color:var(--text);
+    font-family:'IBM Plex Mono', monospace;
+    min-height:100vh;
+    padding:20px 16px 60px;
+  }
+  .wrap{max-width:1080px;margin:0 auto;}
+
+  header{
+    display:flex;justify-content:space-between;align-items:flex-end;
+    flex-wrap:wrap;gap:12px;
+    border-bottom:1px solid var(--line);
+    padding-bottom:14px;margin-bottom:18px;
+  }
+  .title-block h1{
+    font-family:'Rajdhani',sans-serif;font-weight:700;
+    font-size:26px;letter-spacing:0.04em;margin:0 0 2px;
+    color:var(--text);text-transform:uppercase;
+  }
+  .title-block .sub{ font-size:12px;color:var(--text-dim);letter-spacing:0.08em; }
+  .status{ text-align:right;font-size:11px;color:var(--text-faint);letter-spacing:0.05em; }
+  .status .dot{
+    display:inline-block;width:7px;height:7px;border-radius:50%;
+    background:var(--green);margin-right:6px;box-shadow:0 0 8px var(--green);
+    animation:pulse 2.2s ease-in-out infinite;
+  }
+  .status.stale .dot{background:var(--amber);box-shadow:0 0 8px var(--amber);animation:none;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.35;}}
+
+  .metar-strip{
+    background:var(--panel);border:1px solid var(--line);border-radius:6px;
+    padding:12px 16px;margin-bottom:18px;
+    display:flex;flex-wrap:wrap;gap:22px;align-items:center;font-size:12.5px;
+  }
+  .metar-strip .raw{
+    color:var(--text-faint);font-size:11px;letter-spacing:0.02em;
+    flex-basis:100%;border-top:1px solid var(--line);padding-top:8px;margin-top:2px;
+    word-break:break-all;
+  }
+  .mchip{display:flex;flex-direction:column;gap:2px;}
+  .mchip .k{color:var(--text-faint);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;}
+  .mchip .v{color:var(--green);font-size:16px;font-weight:600;}
+
+  .refresh-btn{
+    background:var(--panel-2);border:1px solid var(--line);color:var(--text-dim);
+    font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.08em;
+    padding:7px 12px;border-radius:4px;cursor:pointer;text-transform:uppercase;margin-left:auto;
+  }
+  .refresh-btn:hover{border-color:var(--green-dim);color:var(--green);}
+
+  .override{
+    display:flex;flex-wrap:wrap;gap:14px;align-items:center;
+    background:var(--panel);border:1px solid var(--line);border-radius:6px;
+    padding:12px 16px;margin-bottom:22px;font-size:12px;
+  }
+  .override label{color:var(--text-dim);letter-spacing:0.05em;margin-right:6px;}
+  .override input{
+    width:64px;background:var(--bg);border:1px solid var(--line);color:var(--text);
+    font-family:'IBM Plex Mono',monospace;font-size:13px;padding:5px 7px;border-radius:4px;
+  }
+  .override input:focus{outline:none;border-color:var(--green-dim);}
+  .override .field{display:flex;align-items:center;}
+  .override .toggle{margin-left:auto;display:flex;align-items:center;gap:8px;color:var(--text-dim);}
+  .override .toggle input[type=checkbox]{width:auto;accent-color:var(--green);}
+
+  /* combined map panel */
+  .map-panel{
+    position:relative;
+    background:var(--panel);border:1px solid var(--line);border-radius:8px;
+    padding:16px 16px 10px;margin-bottom:22px;overflow:hidden;
+  }
+  .map-panel h2{
+    font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;
+    letter-spacing:0.05em;margin:0 0 10px;color:var(--text);text-transform:uppercase;
+  }
+  .map-stage{ position:relative;width:100%;height:380px; }
+  .map-stage svg, .map-stage canvas{
+    position:absolute;top:0;left:0;width:100%;height:100%;
+  }
+  .map-stage canvas{ pointer-events:none; }
+  .map-caption{
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+    font-size:11px;color:var(--text-faint);letter-spacing:0.04em;margin-top:8px;
+  }
+  .map-caption .wind-now{ color:var(--amber);font-weight:600; }
+
+  /* readouts */
+  .rwy-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  @media(max-width:760px){.rwy-grid{grid-template-columns:1fr;}}
+  .rwy-card{
+    background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px 18px;
+  }
+  .rwy-card h3{
+    font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;
+    letter-spacing:0.03em;margin:0 0 2px;color:var(--text);
+  }
+  .rwy-card .meta{font-size:11px;color:var(--text-faint);letter-spacing:0.04em;margin-bottom:12px;}
+  .readouts{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .readout{ background:var(--panel-2);border:1px solid var(--line);border-radius:6px;padding:10px 12px; }
+  .readout .k{font-size:10px;color:var(--text-faint);letter-spacing:0.1em;text-transform:uppercase;}
+  .readout .v{font-size:22px;font-weight:600;font-family:'IBM Plex Mono',monospace;margin-top:2px;}
+  .readout .v.green{color:var(--green);}
+  .readout .v.amber{color:var(--amber);}
+  .readout .v.red{color:var(--red);}
+  .readout .unit{font-size:12px;color:var(--text-dim);margin-left:3px;}
+  .exceed-banner{
+    margin-top:10px;border:1px solid var(--red);background:rgba(229,72,77,0.08);
+    color:var(--red);font-size:11.5px;letter-spacing:0.03em;padding:7px 10px;border-radius:5px;display:none;
+  }
+  .exceed-banner.show{display:block;}
+
+  footer{ margin-top:26px;text-align:center;color:var(--text-faint);font-size:10.5px;letter-spacing:0.05em; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="title-block">
+      <h1>KSUU Runway Wind</h1>
+      <div class="sub">Travis AFB · Fairfield, CA · 312 AS / 349 AMW</div>
+    </div>
+    <div class="status" id="status"><span class="dot"></span>Loading METAR…</div>
+  </header>
+
+  <div class="metar-strip" id="metarStrip">
+    <div class="mchip"><span class="k">Wind</span><span class="v" id="mWind">—</span></div>
+    <div class="mchip"><span class="k">Altimeter</span><span class="v" id="mAlt">—</span></div>
+    <div class="mchip"><span class="k">Visibility</span><span class="v" id="mVis">—</span></div>
+    <div class="mchip"><span class="k">Temp / Dew</span><span class="v" id="mTemp">—</span></div>
+    <button class="refresh-btn" id="refreshBtn">↻ Refresh</button>
+    <div class="raw" id="mRaw">Fetching current METAR for KSUU…</div>
+  </div>
+
+  <div class="override">
+    <div class="field"><label for="ovDir">Dir°</label><input type="number" id="ovDir" min="0" max="360" placeholder="032"></div>
+    <div class="field"><label for="ovSpd">Spd kt</label><input type="number" id="ovSpd" min="0" placeholder="12"></div>
+    <div class="field"><label for="ovGust">Gust kt</label><input type="number" id="ovGust" min="0" placeholder="—"></div>
+    <div class="field"><label for="ovLimit">X-wind limit kt</label><input type="number" id="ovLimit" min="0" value="25"></div>
+    <div class="toggle"><input type="checkbox" id="ovEnable"><label for="ovEnable">Use manual wind instead of METAR</label></div>
+  </div>
+
+  <div class="map-panel">
+    <h2>Field Diagram — Both Runways</h2>
+    <div class="map-stage">
+      <svg id="mapSvg" viewBox="0 0 420 380" preserveAspectRatio="xMidYMid meet"></svg>
+      <canvas id="windCanvas"></canvas>
+    </div>
+    <div class="map-caption">
+      <span>Parallels 03L/21R &amp; 03R/21L · mag hdg 032°/212°</span>
+      <span class="wind-now" id="mapWindLbl">—</span>
+    </div>
+  </div>
+
+  <div class="rwy-grid" id="rwyGrid"></div>
+
+  <footer>Wind components computed from magnetic runway heading vs. reported wind. Verify against current ATIS/tower winds before use — not a substitute for official weather products.</footer>
+</div>
+
+<script>
+const RUNWAYS = [
+  // offset: lateral separation between the two parallel strips (03L/21R sits to the
+  // west/left when inbound on 03, 03R/21L to the east/right — matches KSUU charting).
+  // stagger: longitudinal shift along the runway heading. Travis's parallels aren't
+  // centered on each other — 03L's threshold sits further SW than 03R's, and 21L's
+  // threshold sits further NE than 21R's (see hot-spot note on the Jeppesen 10-9 taxi
+  // chart: "Twy Golf/Hotel and Rwy 21R/3L intersection... single Rwy 21L/3R entry/exit
+  // point"). Values below are an eyeballed match to that chart's proportions, not a
+  // surveyed distance.
+  { id:"03L/21R", lowEnd:"03L", highEnd:"21R", heading:32, length:11001, width:150, offset:-15, stagger:-18 },
+  { id:"03R/21L", lowEnd:"03R", highEnd:"21L", heading:32, length:10995, width:150, offset:15, stagger:18 },
+];
+
+let currentWind = { dir:null, speed:null, gust:null };
+
+function normDeg(d){ d = d % 360; if(d<0) d+=360; return d; }
+
+function computeComponents(windDir, windSpd, rwyHeading){
+  const diff = normDeg(windDir - rwyHeading);
+  const rad = diff * Math.PI/180;
+  const along = windSpd * Math.cos(rad);
+  const cross = windSpd * Math.sin(rad);
+  return { along, cross, diff };
+}
+
+// ---------- combined SVG field diagram ----------
+const NS = 'http://www.w3.org/2000/svg';
+function svgEl(tag, attrs){
+  const e = document.createElementNS(NS, tag);
+  for(const k in attrs) e.setAttribute(k, attrs[k]);
+  return e;
+}
+function bearingVec(brgDeg){
+  const r = brgDeg * Math.PI/180;
+  return { x: Math.sin(r), y: -Math.cos(r) }; // screen space, up = north
+}
+
+function drawMap(){
+  const svg = document.getElementById('mapSvg');
+  svg.innerHTML = '';
+  const cx=210, cy=190;
+  const dir = bearingVec(32);          // 03->21 direction
+  const perp = { x: -dir.y, y: dir.x }; // perpendicular
+  const halfLen = 145;
+
+  RUNWAYS.forEach(rwy=>{
+    const ox = perp.x * rwy.offset, oy = perp.y * rwy.offset;
+    const sx = dir.x * (rwy.stagger||0), sy = dir.y * (rwy.stagger||0);
+    const x1 = cx - dir.x*halfLen + ox + sx, y1 = cy - dir.y*halfLen + oy + sy; // low end (03)
+    const x2 = cx + dir.x*halfLen + ox + sx, y2 = cy + dir.y*halfLen + oy + sy; // high end (21)
+
+    svg.appendChild(svgEl('line',{
+      x1, y1, x2, y2, stroke:'#1e2a23', 'stroke-width':16, 'stroke-linecap':'round'
+    }));
+    svg.appendChild(svgEl('line',{
+      x1, y1, x2, y2, stroke:'#3a4a41', 'stroke-width':16, 'stroke-linecap':'round', 'fill':'none',
+      'stroke-dasharray':'0', opacity:'0.001'
+    }));
+    // centerline dashes
+    const steps = 16;
+    for(let i=1;i<steps;i++){
+      const t0 = i/steps, t1 = t0 + 0.35/steps;
+      if(t1>1) break;
+      const lx1 = x1 + (x2-x1)*t0, ly1 = y1 + (y2-y1)*t0;
+      const lx2 = x1 + (x2-x1)*t1, ly2 = y1 + (y2-y1)*t1;
+      svg.appendChild(svgEl('line',{x1:lx1,y1:ly1,x2:lx2,y2:ly2,stroke:'#5c7263','stroke-width':2}));
+    }
+    // end labels
+    const lowLbl = svgEl('text',{
+      x: x1 - dir.x*14, y: y1 - dir.y*14 + 4, fill:'#8ba396', 'font-size':13,
+      'font-family':'IBM Plex Mono', 'text-anchor':'middle'
+    });
+    lowLbl.textContent = rwy.lowEnd;
+    svg.appendChild(lowLbl);
+    const highLbl = svgEl('text',{
+      x: x2 + dir.x*14, y: y2 + dir.y*14 + 4, fill:'#8ba396', 'font-size':13,
+      'font-family':'IBM Plex Mono', 'text-anchor':'middle'
+    });
+    highLbl.textContent = rwy.highEnd;
+    svg.appendChild(highLbl);
+  });
+
+  // compass rose, top-left
+  const rx=48, ry=48, rr=26;
+  svg.appendChild(svgEl('circle',{cx:rx,cy:ry,r:rr,fill:'none',stroke:'#22302a','stroke-width':1}));
+  const nTip = svgEl('line',{x1:rx,y1:ry+rr-4,x2:rx,y2:ry-rr+4,stroke:'#3a4a41','stroke-width':1});
+  svg.appendChild(nTip);
+  const nLbl = svgEl('text',{x:rx,y:ry-rr+2,fill:'#8ba396','font-size':10,'text-anchor':'middle','font-family':'IBM Plex Mono'});
+  nLbl.textContent='N';
+  svg.appendChild(nLbl);
+
+  // windsock — mounted off to one side, near the 03 end
+  const anchor = {
+    x: cx + dir.x*-110 + perp.x*72,
+    y: cy + dir.y*-110 + perp.y*72
+  };
+  windsockAnchor = anchor;
+
+  const sockG = svgEl('g', {transform:`translate(${anchor.x},${anchor.y})`});
+  sockG.appendChild(svgEl('line',{x1:0,y1:0,x2:0,y2:18,stroke:'#4a5c50','stroke-width':2.5}));
+  sockG.appendChild(svgEl('circle',{cx:0,cy:18,r:2.5,fill:'#3a4a41'}));
+  const lbl = svgEl('text',{x:0,y:32,fill:'#5a6e63','font-size':8.5,'text-anchor':'middle','font-family':'IBM Plex Mono','letter-spacing':'0.05em'});
+  lbl.textContent='WIND SOCK';
+  sockG.appendChild(lbl);
+
+  const dirG = svgEl('g',{id:'windsockDir'});
+  const colors = ['#e2632a','#eef0e6','#e2632a','#eef0e6','#e2632a'];
+  windsockSegs = [];
+  for(let i=0;i<5;i++){
+    const poly = svgEl('polygon',{points:'0,0 0,0 0,0 0,0', fill:colors[i]});
+    dirG.appendChild(poly);
+    windsockSegs.push(poly);
+  }
+  sockG.appendChild(dirG);
+  sockG.appendChild(svgEl('circle',{cx:0,cy:0,r:3,fill:'#8ba396'}));
+  svg.appendChild(sockG);
+}
+
+// ---------- wind speck canvas ----------
+const canvas = document.getElementById('windCanvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+let travelAngle = null; // radians, screen space, direction wind blows TOWARD
+let speckSpeed = 0;     // px/frame baseline
+let windsockAnchor = null;
+let windsockSegs = [];
+let lastBearingDeg = 0; // holds last known heading so the sock doesn't snap to 0 when data drops
+
+function resizeCanvas(){
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * devicePixelRatio;
+  canvas.height = rect.height * devicePixelRatio;
+  ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+}
+window.addEventListener('resize', resizeCanvas);
+
+function initParticles(){
+  const rect = canvas.getBoundingClientRect();
+  const n = 70;
+  particles = [];
+  for(let i=0;i<n;i++){
+    particles.push({
+      x: Math.random()*rect.width,
+      y: Math.random()*rect.height,
+      len: 6 + Math.random()*10,
+      speedMul: 0.6 + Math.random()*0.8,
+      alpha: 0.25 + Math.random()*0.45
+    });
+  }
+}
+
+function updateWindVector(){
+  if(currentWind.dir==null || currentWind.speed==null){
+    travelAngle = null;
+    return;
+  }
+  const toward = normDeg(currentWind.dir + 180);
+  const v = bearingVec(toward);
+  travelAngle = Math.atan2(v.y, v.x);
+  speckSpeed = 0.5 + Math.min(currentWind.speed, 40) * 0.11;
+}
+
+function animate(){
+  const rect = canvas.getBoundingClientRect();
+  ctx.clearRect(0,0,rect.width,rect.height);
+
+  if(travelAngle!=null){
+    const dx = Math.cos(travelAngle), dy = Math.sin(travelAngle);
+    ctx.lineCap = 'round';
+    particles.forEach(p=>{
+      const spd = speckSpeed * p.speedMul;
+      p.x += dx*spd;
+      p.y += dy*spd;
+      if(p.x < -20) p.x = rect.width+20;
+      if(p.x > rect.width+20) p.x = -20;
+      if(p.y < -20) p.y = rect.height+20;
+      if(p.y > rect.height+20) p.y = -20;
+
+      const tailX = p.x - dx*p.len, tailY = p.y - dy*p.len;
+      const grad = ctx.createLinearGradient(tailX,tailY,p.x,p.y);
+      grad.addColorStop(0,'rgba(245,166,35,0)');
+      grad.addColorStop(1,`rgba(245,166,35,${p.alpha})`);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(tailX,tailY);
+      ctx.lineTo(p.x,p.y);
+      ctx.stroke();
+    });
+  }
+
+  updateWindsock();
+  requestAnimationFrame(animate);
+}
+
+function updateWindsock(){
+  if(!windsockAnchor || !windsockSegs.length) return;
+
+  const haveWind = travelAngle != null;
+  if(haveWind) lastBearingDeg = travelAngle * 180/Math.PI;
+  const speed = haveWind ? (currentWind.speed || 0) : 0;
+  const speedNorm = Math.min(speed/25, 1);
+
+  const dirG = document.getElementById('windsockDir');
+  if(dirG){
+    dirG.setAttribute('transform', `rotate(${lastBearingDeg})`);
+    dirG.style.opacity = haveWind ? '1' : '0.35';
+  }
+
+  const L = 30 + 46*speedNorm;         // extends further as wind picks up
+  const wBase = 13, wTip = 2.5;        // taper from pole end to free end
+  const amp = haveWind ? (2 + 5*speedNorm) : 1.2; // flutter amplitude
+  const freq = 2.2 + 4*speedNorm;      // flutter faster in stronger wind
+  const sag = (1-speedNorm) * 9;       // droops when calm, straightens when strong
+  const t0 = Date.now()/1000;
+
+  for(let i=0;i<5;i++){
+    const ta = i/5, tb = (i+1)/5;
+    const xA = ta*L, xB = tb*L;
+    const halfA = (wBase*(1-ta) + wTip*ta)/2, halfB = (wBase*(1-tb) + wTip*tb)/2;
+    const ycA = sag*ta*ta + amp*Math.sin(t0*freq - ta*6)*ta;
+    const ycB = sag*tb*tb + amp*Math.sin(t0*freq - tb*6)*tb;
+    windsockSegs[i].setAttribute('points',
+      `${xA},${ycA-halfA} ${xB},${ycB-halfB} ${xB},${ycB+halfB} ${xA},${ycA+halfA}`);
+  }
+}
+
+// ---------- readout cards ----------
+function renderRunwayCard(rwy){
+  const card = document.createElement('div');
+  card.className = 'rwy-card';
+  card.innerHTML = `
+    <h3>${rwy.id}</h3>
+    <div class="meta">MAG HDG ${String(rwy.heading).padStart(3,'0')}° / ${String(normDeg(rwy.heading+180)).padStart(3,'0')}° · ${rwy.length.toLocaleString()} × ${rwy.width} ft</div>
+    <div class="readouts">
+      <div class="readout">
+        <div class="k" id="hw-label-${rwy.lowEnd}">Headwind</div>
+        <div class="v green" id="hw-${rwy.lowEnd}">—<span class="unit">kt</span></div>
+      </div>
+      <div class="readout">
+        <div class="k">Crosswind</div>
+        <div class="v green" id="xw-${rwy.lowEnd}">—<span class="unit">kt</span></div>
+      </div>
+    </div>
+    <div class="exceed-banner" id="exceed-${rwy.lowEnd}">⚠ Crosswind exceeds set limit on this runway</div>
+  `;
+  return card;
+}
+
+function updateAll(){
+  updateWindVector();
+
+  const mapLbl = document.getElementById('mapWindLbl');
+  if(currentWind.dir!=null && currentWind.speed!=null){
+    mapLbl.textContent = `${String(Math.round(currentWind.dir)).padStart(3,'0')}° @ ${currentWind.speed}${currentWind.gust?'G'+currentWind.gust:''} kt`;
+  } else {
+    mapLbl.textContent = 'No wind data';
+  }
+
+  const limit = parseFloat(document.getElementById('ovLimit').value) || 25;
+
+  RUNWAYS.forEach(rwy => {
+    const hwEl = document.getElementById(`hw-${rwy.lowEnd}`);
+    const xwEl = document.getElementById(`xw-${rwy.lowEnd}`);
+    const hwLabel = document.getElementById(`hw-label-${rwy.lowEnd}`);
+    const banner = document.getElementById(`exceed-${rwy.lowEnd}`);
+
+    if(currentWind.dir==null || currentWind.speed==null){
+      hwEl.innerHTML = '—<span class="unit">kt</span>';
+      xwEl.innerHTML = '—<span class="unit">kt</span>';
+      banner.classList.remove('show');
+      return;
+    }
+
+    const comp = computeComponents(currentWind.dir, currentWind.speed, rwy.heading);
+    const gustComp = currentWind.gust ? computeComponents(currentWind.dir, currentWind.gust, rwy.heading) : null;
+    const crossMag = Math.abs(comp.cross);
+    const gustCrossMag = gustComp ? Math.abs(gustComp.cross) : crossMag;
+    const isHeadwind = comp.along >= 0;
+    const activeEnd = isHeadwind ? rwy.lowEnd : rwy.highEnd;
+
+    hwLabel.textContent = isHeadwind ? `Headwind (Rwy ${activeEnd})` : `Tailwind (Rwy ${activeEnd})`;
+    hwEl.innerHTML = `${Math.round(Math.abs(comp.along))}<span class="unit">kt</span>`;
+    hwEl.className = 'v ' + (isHeadwind ? 'green' : 'amber');
+
+    xwEl.innerHTML = `${Math.round(crossMag)}<span class="unit">kt</span>`;
+    xwEl.className = 'v ' + (crossMag >= limit ? 'red' : crossMag >= limit*0.8 ? 'amber' : 'green');
+
+    banner.classList.toggle('show', gustCrossMag >= limit || crossMag >= limit);
+  });
+}
+
+function setStatus(text, stale){
+  const s = document.getElementById('status');
+  s.innerHTML = `<span class="dot"></span>${text}`;
+  s.classList.toggle('stale', !!stale);
+}
+
+// aviationweather.gov's Data API does not send CORS headers ("Cross-origin
+// resource sharing is not permitted at this time"), so a direct browser
+// fetch to it will always fail. A Cloudflare Worker CORS proxy is required.
+//
+//   1. Deploy metar-proxy.js to Cloudflare Workers
+//      (dash.cloudflare.com → Workers & Pages → Create → Worker → paste
+//      the code from metar-proxy.js → Deploy)
+//   2. Copy the workers.dev URL it gives you and paste it below.
+const WORKER_URL = 'https://rwywind.simmons-rob.workers.dev';
+
+const NOAA_METAR_URL = 'https://aviationweather.gov/api/data/metar?ids=KSUU&format=json&hours=2';
+
+function applyMetar(m){
+  document.getElementById('mRaw').textContent = m.rawOb || '—';
+  document.getElementById('mWind').textContent = (m.wdir!=null ? String(m.wdir).padStart(3,'0')+'°' : 'VRB') + ' @ ' + (m.wspd ?? '—') + 'kt' + (m.wgst ? ' G'+m.wgst : '');
+  document.getElementById('mAlt').textContent = m.altim ? (m.altim/33.8639).toFixed(2)+' inHg' : '—';
+  document.getElementById('mVis').textContent = m.visib ? m.visib+' sm' : '—';
+  document.getElementById('mTemp').textContent = (m.temp!=null ? Math.round(m.temp)+'°C' : '—') + ' / ' + (m.dewp!=null ? Math.round(m.dewp)+'°C' : '—');
+
+  currentWind = {
+    dir: typeof m.wdir === 'number' ? m.wdir : null,
+    speed: m.wspd ?? null,
+    gust: m.wgst ?? null
+  };
+}
+
+async function fetchMetar(){
+  if(document.getElementById('ovEnable').checked) return;
+  setStatus('Fetching METAR…');
+
+  // 1) Worker proxy, if configured — reliable, no CORS issue.
+  if(WORKER_URL){
+    try{
+      const r = await fetch(`${WORKER_URL}?ids=KSUU&hours=2`);
+      if(!r.ok) throw new Error('worker bad response');
+      const data = await r.json();
+      if(!data || !data.length) throw new Error('no data');
+      applyMetar(data[0]);
+      setStatus('Live (via worker) · updated ' + new Date().toLocaleTimeString());
+      updateAll();
+      return;
+    }catch(err){ /* fall through */ }
+  }
+
+  // 2) Direct fetch — kept as a fallback in case CORS policy changes, but
+  //    expected to fail today since aviationweather.gov blocks CORS.
+  try{
+    const r = await fetch(NOAA_METAR_URL);
+    if(r.ok){
+      const data = await r.json();
+      if(data && data.length){
+        applyMetar(data[0]);
+        setStatus('Live (direct) · updated ' + new Date().toLocaleTimeString());
+        updateAll();
+        return;
+      }
+    }
+  }catch(err){ /* fall through */ }
+
+  // 3) Public CORS relay fallback — works with no setup, but is a third
+  //    party you don't control; deploy the worker above for a stable path.
+  try{
+    const r = await fetch('https://corsproxy.io/?url=' + encodeURIComponent(NOAA_METAR_URL));
+    if(!r.ok) throw new Error('corsproxy bad response');
+    const data = await r.json();
+    if(!data || !data.length) throw new Error('no data');
+    applyMetar(data[0]);
+    setStatus('Live (via corsproxy.io) · updated ' + new Date().toLocaleTimeString());
+    updateAll();
+    return;
+  }catch(err){
+    setStatus('METAR unavailable — enter wind manually below', true);
+    document.getElementById('mRaw').textContent = 'Could not reach aviationweather.gov (directly, via worker, or via fallback relay). Use the manual wind entry below, or deploy metar-proxy.js and set WORKER_URL.';
+  }
+}
+
+['ovDir','ovSpd','ovGust','ovLimit'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', ()=>{
+    if(document.getElementById('ovEnable').checked){
+      currentWind = {
+        dir: parseFloat(document.getElementById('ovDir').value),
+        speed: parseFloat(document.getElementById('ovSpd').value),
+        gust: parseFloat(document.getElementById('ovGust').value) || null
+      };
+      if(isNaN(currentWind.dir) || isNaN(currentWind.speed)){ currentWind={dir:null,speed:null,gust:null}; }
+    }
+    updateAll();
+  });
+});
+document.getElementById('ovEnable').addEventListener('change', (e)=>{
+  if(e.target.checked){
+    currentWind = {
+      dir: parseFloat(document.getElementById('ovDir').value),
+      speed: parseFloat(document.getElementById('ovSpd').value),
+      gust: parseFloat(document.getElementById('ovGust').value) || null
+    };
+    if(isNaN(currentWind.dir) || isNaN(currentWind.speed)){ currentWind={dir:null,speed:null,gust:null}; }
+    setStatus('Manual wind entry active');
+  } else {
+    fetchMetar();
+  }
+  updateAll();
+});
+document.getElementById('refreshBtn').addEventListener('click', fetchMetar);
+
+// build
+const grid = document.getElementById('rwyGrid');
+RUNWAYS.forEach(rwy => grid.appendChild(renderRunwayCard(rwy)));
+drawMap();
+resizeCanvas();
+initParticles();
+animate();
+
+fetchMetar();
+setInterval(fetchMetar, 5*60*1000);
+</script>
+</body>
+</html>
