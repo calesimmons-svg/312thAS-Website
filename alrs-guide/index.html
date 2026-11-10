@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>312AS ALRS Guide v1</title>
+<style>
+:root{
+  --bg:#f4f5f7;--card:#fff;--ink:#1b1f27;--muted:#5d6676;--line:#dde1e8;
+  --accent:#1f4e8c;--accent-ink:#fff;--chip:#e8eef8;--warn:#fff4dc;--warn-line:#e9c46a;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0f1218;--card:#171b23;--ink:#e7eaf0;--muted:#99a2b2;--line:#2a303c;
+  --accent:#6ea2e6;--accent-ink:#0f1218;--chip:#1e2633;--warn:#2b2513;--warn-line:#8a6d1f;
+}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--line)}
+.bar{max-width:1100px;margin:auto;padding:10px 16px;display:flex;gap:12px;align-items:center}
+.bar h1{font-size:18px;margin:0;white-space:nowrap}
+.badge{font-size:11px;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--chip);color:var(--accent)}
+#q{margin-left:auto;flex:1;max-width:280px;min-width:0;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit;font-size:14px}
+.wrap{max-width:1100px;margin:auto;padding:20px 16px 60px;display:grid;grid-template-columns:240px 1fr;gap:24px}
+nav{position:sticky;top:72px;align-self:start;max-height:calc(100vh - 90px);overflow:auto}
+nav b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px}
+nav a{display:block;padding:5px 8px;border-radius:6px;color:var(--ink);text-decoration:none;font-size:14px}
+nav a:hover{background:var(--chip)}
+section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin-bottom:18px}
+section h2{margin:0 0 10px;font-size:20px}
+p{margin:.5em 0}
+a{color:var(--accent);overflow-wrap:anywhere}
+ul{padding-left:20px}
+.doc{display:inline-flex;align-items:center;gap:8px;margin:6px 8px 6px 0;padding:9px 14px;border-radius:8px;background:var(--accent);color:var(--accent-ink);text-decoration:none;font-weight:600;font-size:14px}
+.doc::before{content:"📄"}
+.shots{display:grid;gap:12px;margin:12px 0}
+.shots img{width:100%;border:1px solid var(--line);border-radius:8px;cursor:zoom-in;background:#fff}
+pre{background:var(--chip);padding:12px 14px;border-radius:8px;white-space:pre-wrap;font:14px/1.5 ui-monospace,Menlo,Consolas,monospace;margin:8px 0}
+.copy{font:inherit;font-size:13px;padding:5px 10px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+code{background:var(--chip);padding:1px 5px;border-radius:4px;font-size:13px}
+.hide{display:none}
+#lb{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:50;padding:16px;cursor:zoom-out}
+#lb img{max-width:100%;max-height:100%;border-radius:6px}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:0 16px 30px}
+@media (max-width:820px){.wrap{grid-template-columns:1fr}nav{position:static;max-height:none}.bar h1{font-size:16px}}
+</style>
+</head>
+<body>
+<header><div class="bar">
+  <h1>312AS ALRS Guide</h1><span class="badge">v1</span>
+  <input id="q" type="search" placeholder="Search guide…">
+</div></header>
+
+<div class="wrap">
+<nav id="toc"><b>Contents</b></nav>
+<main id="main">
+
+<section id="overview"><h2>ALRS Web App</h2>
+<p>The Automated Lodging Reservation System (ALRS) by Howard Day and Associates is how you book UTA lodging.</p>
+<a class="doc" href="https://alrsweb.com" target="_blank" rel="noopener">Open alrsweb.com</a>
+<div class="shots" data-shots="alrs-1"></div>
+</section>
+
+<section id="welcome"><h2>Welcome to the ALRS Web</h2>
+<p>The ALRS Web can be accessed on your <b>phone</b> or on your <b>PC</b>.</p>
+<p>To access the site, go to <a href="https://alrsweb.com" target="_blank" rel="noopener">https://alrsweb.com</a>.</p>
+<p>For first time users, click on <b>REGISTER HERE</b> to register your email.</p>
+<div class="shots" data-shots="alrs-2"></div>
+</section>
+
+<section id="create"><h2>Create a New Account</h2>
+<p>You will need your mobile (or member) ID. A mobile ID should be sent to you via SMS text. After you enter your member ID, click <b>Next</b>.</p>
+<p>If this is the first time you are logging into the ALRS, your mobile ID will be your 10-digit phone number. Enter your 10-digit phone number without the dashes and click <b>Verify</b>.</p>
+<p><b>Note:</b> If you have previously logged into the ALRS, use your personal PIN.</p>
+<div class="shots" data-shots="alrs-3"></div>
+<p>Once your mobile ID and PIN are verified, register with your login <b>email address</b>. This email will be used by the system to send you reservation and cancellation information.</p>
+<p>After clicking <b>Submit</b>, the system will send a verification email to your registered address. Open the email titled "Confirm Email" and click <b>Click here to Confirm</b>.</p>
+<div class="shots" data-shots="alrs-4"></div>
+<p>Enter and confirm your new password, then click <b>REGISTER</b>.</p>
+<p>Password rules: 6–100 characters, with at least one digit, one uppercase letter, one lowercase letter, and one non-alphanumeric character.</p>
+<div class="shots" data-shots="alrs-5"></div>
+</section>
+
+<section id="login"><h2>Logging In</h2>
+<p>Go to <a href="https://alrsweb.com" target="_blank" rel="noopener">https://alrsweb.com</a>, enter your web login email and password, and click <b>LOG IN</b>.</p>
+<p>The system will send a one-time security code to your email and/or phone via SMS text. Enter the 6-digit security code, then click <b>CONTINUE</b>.</p>
+<div class="shots" data-shots="alrs-6"></div>
+</section>
+
+<section id="reserve"><h2>Reserve</h2>
+<p>Reservations must be made before the <b>CUT-OFF</b> date for each scheduled drill. The cut-off date and time is shown in the <b>Cut Off</b> column to the right of each published UTA's Arrive and Depart dates.</p>
+<p>Select your arrival and departure dates by tapping the <b>ARRIVE</b> and <b>AM Depart</b> fields, or select dates from the published UTA schedule. Click <b>NEXT</b>.</p>
+<div class="shots" data-shots="alrs-7"></div>
+<p>Click <b>RESERVE</b> to make your reservation for the drill.</p>
+<p>A confirmation will be sent with reservation details to your email. You can also see your reservation details on the web under the <b>Bookings</b> tab.</p>
+<div class="shots" data-shots="alrs-8"></div>
+</section>
+
+<section id="bookings"><h2>Bookings</h2>
+<p>Scroll through your bookings to display booking confirmation details. From the <b>Bookings</b> tab you can:</p>
+<ul>
+<li>Call the hotel</li>
+<li>Use the Google Maps feature to map driving directions</li>
+<li>Cancel reservations</li>
+<li>Check on reservation status</li>
+</ul>
+<div class="shots" data-shots="alrs-9"></div>
+</section>
+
+<section id="cancel"><h2>Cancellations</h2>
+<p>You can cancel an individual night or the entire reservation with all the nights.</p>
+<p>To cancel an individual night, click the <b>red trash can</b> to the right of the reservation date.</p>
+<p>To cancel all nights, click the trash can to the left of the range of reservation nights.</p>
+<p>Click <b>YES</b> to confirm the cancellation.</p>
+<div class="shots" data-shots="alrs-10"></div>
+</section>
+
+<p id="none" class="hide" style="color:var(--muted)">Nothing matches that search.</p>
+</main>
+</div>
+<footer>312th Airlift Squadron · ALRS Guide · v1</footer>
+<div id="lb"><img alt=""></div>
+
+<script>
+// Build TOC
+const toc=document.getElementById('toc');
+document.querySelectorAll('main section').forEach(s=>{
+  const a=document.createElement('a');a.href='#'+s.id;a.textContent=s.querySelector('h2').textContent;toc.appendChild(a);
+});
+// Screenshots
+document.querySelectorAll('[data-shots]').forEach(box=>{
+  box.dataset.shots.split(',').forEach(n=>{
+    const img=new Image();img.alt=n;img.loading='lazy';img.src='images/alrs-guide/'+n+'.jpg';
+    img.onerror=()=>img.remove();box.appendChild(img);
+  });
+});
+// Lightbox
+const lb=document.getElementById('lb');
+document.addEventListener('click',e=>{
+  if(e.target.matches('.shots img')){lb.querySelector('img').src=e.target.src;lb.style.display='flex'}
+  else if(e.target.closest('#lb')){lb.style.display='none'}
+  const c=e.target.closest('.copy');
+  if(c){navigator.clipboard.writeText(document.getElementById(c.dataset.copy).textContent).then(()=>{c.textContent='Copied';setTimeout(()=>c.textContent='Copy',1500)})}
+});
+// Search
+const q=document.getElementById('q');
+q.addEventListener('input',()=>{
+  const t=q.value.trim().toLowerCase();let shown=0;
+  document.querySelectorAll('main section').forEach(s=>{
+    const hit=!t||s.textContent.toLowerCase().includes(t);s.classList.toggle('hide',!hit);
+    toc.querySelector('a[href="#'+s.id+'"]').classList.toggle('hide',!hit);if(hit)shown++;
+  });
+  document.getElementById('none').classList.toggle('hide',shown>0);
+});
+</script>
+</body>
+</html>
