@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>312AS How to be a Reservist v1</title>
+<style>
+:root{
+  --bg:#f4f5f7;--card:#fff;--ink:#1b1f27;--muted:#5d6676;--line:#dde1e8;
+  --accent:#1f4e8c;--accent-ink:#fff;--chip:#e8eef8;--warn:#fff4dc;--warn-line:#e9c46a;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0f1218;--card:#171b23;--ink:#e7eaf0;--muted:#99a2b2;--line:#2a303c;
+  --accent:#6ea2e6;--accent-ink:#0f1218;--chip:#1e2633;--warn:#2b2513;--warn-line:#8a6d1f;
+}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--line)}
+.bar{max-width:1100px;margin:auto;padding:10px 16px;display:flex;gap:12px;align-items:center}
+.bar h1{font-size:18px;margin:0;white-space:nowrap}
+.badge{font-size:11px;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--chip);color:var(--accent)}
+#q{margin-left:auto;flex:1;max-width:280px;min-width:0;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit;font-size:14px}
+.wrap{max-width:1100px;margin:auto;padding:20px 16px 60px;display:grid;grid-template-columns:240px 1fr;gap:24px}
+nav{position:sticky;top:72px;align-self:start;max-height:calc(100vh - 90px);overflow:auto}
+nav b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px}
+nav a{display:block;padding:5px 8px;border-radius:6px;color:var(--ink);text-decoration:none;font-size:14px}
+nav a:hover{background:var(--chip)}
+section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin-bottom:18px}
+section h2{margin:0 0 10px;font-size:20px}
+p{margin:.5em 0}
+a{color:var(--accent);overflow-wrap:anywhere}
+ul{padding-left:20px}
+.doc{display:inline-flex;align-items:center;gap:8px;margin:6px 8px 6px 0;padding:9px 14px;border-radius:8px;background:var(--accent);color:var(--accent-ink);text-decoration:none;font-weight:600;font-size:14px}
+.doc::before{content:"📄"}
+.shots{display:grid;gap:12px;margin:12px 0}
+.shots img{width:100%;border:1px solid var(--line);border-radius:8px;cursor:zoom-in;background:#fff}
+pre{background:var(--chip);padding:12px 14px;border-radius:8px;white-space:pre-wrap;font:14px/1.5 ui-monospace,Menlo,Consolas,monospace;margin:8px 0}
+.copy{font:inherit;font-size:13px;padding:5px 10px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+code{background:var(--chip);padding:1px 5px;border-radius:4px;font-size:13px}
+.hide{display:none}
+#lb{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:50;padding:16px;cursor:zoom-out}
+#lb img{max-width:100%;max-height:100%;border-radius:6px}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:0 16px 30px}
+@media (max-width:820px){.wrap{grid-template-columns:1fr}nav{position:static;max-height:none}.bar h1{font-size:16px}}
+</style>
+</head>
+<body>
+<header><div class="bar">
+  <h1>312AS How to be a Reservist</h1><span class="badge">v1</span>
+  <input id="q" type="search" placeholder="Search…">
+</div></header>
+
+<div class="wrap">
+<nav id="toc"><b>Contents</b></nav>
+<main id="main">
+
+<section id="welcome"><h2>Welcome to the 312th</h2>
+<p>Here's some info to get you squared away. If you want to add or correct something, reach out to Cale Simmons.</p>
+</section>
+
+<section id="day1"><h2>1st Day Stuff</h2>
+<ul>
+<li>Squadron location: <a href="https://maps.app.goo.gl/mLzRuGKsJzCtdnmA9" target="_blank" rel="noopener">Google Maps</a></li>
+<li>When you show up, get an inprocessing checklist and start to inprocess. Scheduling can help.</li>
+<li>The biggest thing to worry about is the <b>monthly newcomers brief</b>. You can't do reserve stuff until you complete it (it's once a month).</li>
+<li>Ask scheduling to add you to the section group chats.</li>
+<li>Check our website (312as.com) for guides and links. Some that might help:
+<ul>
+<li><a href="https://sites.google.com/view/312-as-links/printer-assist?authuser=0" target="_blank" rel="noopener">312th Printer Setup / Network Drives</a></li>
+<li><a href="http://maps.af.mil/" target="_blank" rel="noopener">Travis AFB Bldgs Map</a></li>
+<li><a href="https://www.312as.com/mattermost-pbl-set-up" target="_blank" rel="noopener">Set up Mattermost / Puckboard</a></li>
+</ul></li>
+<li>Get a locker (email or call Bryce Cleary).</li>
+</ul>
+</section>
+
+<section id="pay"><h2>Reserve Pay</h2>
+<p>Starting with the most important topic: the ways to pay yourself and coding for FAs/781s. There are 3 primary ways.</p>
+<p><b>NOTE:</b> Never start any appointment with "I'm a reservist…" — nothing good will come from it. Sshhh. Back to pay…</p>
+
+<h3>1 – AT / RPA / MPA (one-day period)</h3>
+<ul>
+<li>Considered "active duty"; cannot use UTAs or TPs in conjunction</li>
+<li>If you have a David Grant appointment, being on a 1 can be helpful</li>
+<li>15 days of AT per year — USE them, please; giving them back is not ideal</li>
+<li>MPA is AMC-allocated funding for missions</li>
+<li>3 MPA vacancies for an augmented crew per mission</li>
+<li>RPA is an extra status if you use all AT and forecast to use all IDT statuses</li>
+</ul>
+<p><b>AT</b></p>
+<ul>
+<li>Requires <b>10 days advance</b> request</li>
+<li>Case-by-case. Likely approved for OSTs and missions with justification</li>
+<li>Not for your regular everyday reservist things</li>
+</ul>
+
+<h3>2 – UTA (Unit Training Assembly) – 4-hr period</h3>
+<ul>
+<li>Inactive duty, aka IDT</li>
+<li>May perform 2 per day</li>
+<li>48 per year / max 16 per quarter</li>
+<li>40A (UTA Reschedule form) submission required for pay</li>
+</ul>
+
+<h3>3 – GTPs / FTPs (TEEPs) – 4-hr period</h3>
+<ul>
+<li>Bonus statuses we get for being aircrew</li>
+<li>Inactive duty, aka IDT</li>
+<li><b>Flying TPs:</b> max 2 per day (72 max per FY)
+<ul>
+<li>Up to 72 FTPs per year / max 18 per quarter</li>
+<li>Sim flying requirements to log: 1 hr for a single, 3 hrs total for double FTPs</li>
+<li>Airplane flying requirements to log: .1 hr each FTP; .2 hrs total for double FTPs</li>
+<li>Can have 100% be FTPs</li>
+</ul></li>
+<li><b>GTP:</b> max 1 per day
+<ul>
+<li>36 GTPs per year / max 18 per quarter (can't go over 72 with FTPs)</li>
+<li>At least half of your TPs must be FTPs</li>
+<li>TP Binder entry required for pay</li>
+</ul></li>
+<li><b>Extraneous – RMPs ("RUMPS")</b>
+<ul><li>Usually reserved for CCs/DOs</li></ul></li>
+</ul>
+
+<h3>4 – IDTR (using GTPs/UTAs with a travel voucher)</h3>
+<ul>
+<li>Email an IDT travel request to scheduling 10 days in advance.</li>
+<li>Do <b>NOT</b> travel without notice that IDT travel is authorized.</li>
+</ul>
+<p><b>**Requires AFRC approval**</b></p>
+</section>
+
+<section id="goodyear"><h2>A Good Year</h2>
+<p>You have to make <b>50 points</b> to have a "good year." If you don't have a good year, that year won't count toward your retirement — and you don't want to find that out when you go to retire.</p>
+<p><b>Point score</b></p>
+<ul>
+<li>15 points for breathing (congratulations!)</li>
+<li>1 point per AT/RPA/MPA day</li>
+<li>1 point per UTA period</li>
+<li>1 point per TP period</li>
+</ul>
+<p><b>Busy year? No sweat.</b> To get that good year, use all your UTAs (48 + 15 for breathing = good year). You're not required to use a single TP.</p>
+</section>
+
+<section id="gaming"><h2>Gaming Your Statuses (Pro Tips and Technique Only)</h2>
+<p><b>Late-night sims</b> — I would use a 1/AT.</p>
+<ul>
+<li>4th-period sim from 1800–0200 (touches the next day): you get 3 days of AT vs 2.</li>
+<li>If life has led you to neglect TPs, go for TPs.</li>
+</ul>
+<p><b>Locals and any flying events</b> — we recommend FTPs (flying TPs/33s).</p>
+<ul>
+<li>This gives you flexibility to log more GTPs later.</li>
+<li>You can use all 72 TPs as FTPs, but only half as GTPs.</li>
+<li>If you have an extra duty in the squadron, GTPs are gold.</li>
+</ul>
+</section>
+
+<section id="expect"><h2>Participation Expectations</h2>
+<ul>
+<li>We don't expect you at drill weekends as long as you are current.</li>
+<li>If you're notified that you're overdue on anything, it's not an automatic "attend the next drill weekend." Clarify with your flight CC. Schedulers will send you bits of info all the time, and the 349th's priorities change month to month. Don't burn out — just ask more questions.</li>
+<li>I charge you with flying (or attempting to fly) 2 missions/OSTs a year. It's the only way to keep the whole unit current. Always open to feedback. If locals are the contribution your life can provide, that's OK. Stay off the 90-day no-fly list.</li>
+</ul>
+</section>
+
+<section id="sched"><h2>Scheduling</h2>
+<p>We're here to help, and we know being a reservist is confusing. Send all inquiries to <a href="mailto:312.as.pilots@us.af.mil">312.as.pilots@us.af.mil</a> · <a href="tel:7074245354">707-424-5354</a>.</p>
+<p>We try our best to respond to all emails in a timely fashion and reply once your inquiry is completed. One scheduler may be talking with you one day and be on a mission or leave the next. If it's not time sensitive, the org box is the best point of contact.</p>
+<p><b>If you are planning to fly a local:</b></p>
+<ul>
+<li>Double flying TPs (no advance request required).</li>
+<li>BUT if the local cancels:
+<ul>
+<li>Without prior coordination, you're limited to logging a G1.</li>
+<li>With advance coordination, possibly a U1G1. It may be worth making the request even if you don't end up needing it.</li>
+<li>Call your schedulers with further questions or creative solutions.</li>
+</ul></li>
+</ul>
+</section>
+
+<section id="track"><h2>Tracking Pay Status</h2>
+<a class="doc" href="https://utapsweb.afrc.af.mil/utapsweb/" target="_blank" rel="noopener">UTAPS</a>
+<p>There are tons of different trackers out there — just make sure yours matches what scheduling has. Check both every so often to make sure you're getting paid for what you worked.</p>
+<p>I've heard people like this one: <a href="https://apps.apple.com/us/app/mildrills/id1159981295" target="_blank" rel="noopener">MilDrills (App Store)</a></p>
+</section>
+
+<p id="none" class="hide" style="color:var(--muted)">Nothing matches that search.</p>
+</main>
+</div>
+<footer>312th Airlift Squadron · How to be a Reservist · v1</footer>
+<div id="lb"><img alt=""></div>
+
+<script>
+// Build TOC
+const toc=document.getElementById('toc');
+document.querySelectorAll('main section').forEach(s=>{
+  const a=document.createElement('a');a.href='#'+s.id;a.textContent=s.querySelector('h2').textContent;toc.appendChild(a);
+});
+// Screenshots
+document.querySelectorAll('[data-shots]').forEach(box=>{
+  box.dataset.shots.split(',').forEach(n=>{
+    const img=new Image();img.alt=n;img.loading='lazy';img.src='images/how-to-be-a-reservist/'+n+'.jpg';
+    img.onerror=()=>img.remove();box.appendChild(img);
+  });
+});
+// Lightbox
+const lb=document.getElementById('lb');
+document.addEventListener('click',e=>{
+  if(e.target.matches('.shots img')){lb.querySelector('img').src=e.target.src;lb.style.display='flex'}
+  else if(e.target.closest('#lb')){lb.style.display='none'}
+  const c=e.target.closest('.copy');
+  if(c){navigator.clipboard.writeText(document.getElementById(c.dataset.copy).textContent).then(()=>{c.textContent='Copied';setTimeout(()=>c.textContent='Copy',1500)})}
+});
+// Search
+const q=document.getElementById('q');
+q.addEventListener('input',()=>{
+  const t=q.value.trim().toLowerCase();let shown=0;
+  document.querySelectorAll('main section').forEach(s=>{
+    const hit=!t||s.textContent.toLowerCase().includes(t);s.classList.toggle('hide',!hit);
+    toc.querySelector('a[href="#'+s.id+'"]').classList.toggle('hide',!hit);if(hit)shown++;
+  });
+  document.getElementById('none').classList.toggle('hide',shown>0);
+});
+</script>
+</body>
+</html>

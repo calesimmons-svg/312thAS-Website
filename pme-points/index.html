@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>312AS PME Points v1</title>
+<style>
+:root{
+  --bg:#f4f5f7;--card:#fff;--ink:#1b1f27;--muted:#5d6676;--line:#dde1e8;
+  --accent:#1f4e8c;--accent-ink:#fff;--chip:#e8eef8;--warn:#fff4dc;--warn-line:#e9c46a;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0f1218;--card:#171b23;--ink:#e7eaf0;--muted:#99a2b2;--line:#2a303c;
+  --accent:#6ea2e6;--accent-ink:#0f1218;--chip:#1e2633;--warn:#2b2513;--warn-line:#8a6d1f;
+}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--line)}
+.bar{max-width:1100px;margin:auto;padding:10px 16px;display:flex;gap:12px;align-items:center}
+.bar h1{font-size:18px;margin:0;white-space:nowrap}
+.badge{font-size:11px;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--chip);color:var(--accent)}
+#q{margin-left:auto;flex:1;max-width:280px;min-width:0;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit;font-size:14px}
+.wrap{max-width:1100px;margin:auto;padding:20px 16px 60px;display:grid;grid-template-columns:240px 1fr;gap:24px}
+nav{position:sticky;top:72px;align-self:start;max-height:calc(100vh - 90px);overflow:auto}
+nav b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px}
+nav a{display:block;padding:5px 8px;border-radius:6px;color:var(--ink);text-decoration:none;font-size:14px}
+nav a:hover{background:var(--chip)}
+section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin-bottom:18px}
+section h2{margin:0 0 10px;font-size:20px}
+p{margin:.5em 0}
+a{color:var(--accent);overflow-wrap:anywhere}
+ul{padding-left:20px}
+.doc{display:inline-flex;align-items:center;gap:8px;margin:6px 8px 6px 0;padding:9px 14px;border-radius:8px;background:var(--accent);color:var(--accent-ink);text-decoration:none;font-weight:600;font-size:14px}
+.doc::before{content:"📄"}
+.shots{display:grid;gap:12px;margin:12px 0}
+.shots img{width:100%;border:1px solid var(--line);border-radius:8px;cursor:zoom-in;background:#fff}
+pre{background:var(--chip);padding:12px 14px;border-radius:8px;white-space:pre-wrap;font:14px/1.5 ui-monospace,Menlo,Consolas,monospace;margin:8px 0}
+.copy{font:inherit;font-size:13px;padding:5px 10px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+code{background:var(--chip);padding:1px 5px;border-radius:4px;font-size:13px}
+.hide{display:none}
+#lb{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:50;padding:16px;cursor:zoom-out}
+#lb img{max-width:100%;max-height:100%;border-radius:6px}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:0 16px 30px}
+@media (max-width:820px){.wrap{grid-template-columns:1fr}nav{position:static;max-height:none}.bar h1{font-size:16px}}
+</style>
+</head>
+<body>
+<header><div class="bar">
+  <h1>312AS PME Points</h1><span class="badge">v1</span>
+  <input id="q" type="search" placeholder="Search…">
+</div></header>
+
+<div class="wrap">
+<nav id="toc"><b>Contents</b></nav>
+<main id="main">
+
+<section id="credit"><h2>Points Credit for Correspondence PME as a Reservist</h2>
+<p><b>In-residence:</b> ARC members receive active duty points while attending in-residence courses on orders.</p>
+<p><b>Non-resident:</b> ARC members may receive DL (formerly ECI) points for completing certain non-resident distributed learning courses used to meet training requirements related to unit readiness or mobilization. To get DL points for a completed course:</p>
+<ul>
+<li>Must be RSSB approved</li>
+<li>Must have completed the AF equivalent first</li>
+<li>Total DL hours must be listed in the course syllabus</li>
+<li>Must have proof of satisfactory completion</li>
+</ul>
+<ul>
+<li><b>Qualifying courses:</b> AU courses, AF PME, CDCs</li>
+<li><b>May qualify if additional requirements are met:</b> FEMA, DAU, Cyber, non-Air Force PME</li>
+<li><b>Non-qualifying courses:</b> JKO (other than SEJPME), ADLS, CCAF</li>
+</ul>
+</section>
+
+<section id="correction"><h2>Points Not Showing Up? Request a Correction</h2>
+<p>Points normally update automatically within two months of course completion. If they don't, submit a correction request:</p>
+<ol>
+<li>Log into myFSS: <a href="https://myfss.us.af.mil/USAFCommunity/s/login/" target="_blank" rel="noopener">myfss.us.af.mil</a> (or via MyFSS on the AF Portal).</li>
+<li>Search for the article <b>"AFR/ANG General Point Credit Information"</b>.</li>
+<li>Scroll to the bottom and select <b>Create A Request</b>.</li>
+<li>Select <b>Category</b>, then <b>Retirement Point</b>.</li>
+<li>Attach the <b>Verification of Completion</b> from the AU portal. It must show course study hours, course title, course code, pass/fail status, and completion date.</li>
+</ol>
+<p><b>Getting your Verification of Completion:</b></p>
+<ul>
+<li>Completed AU courses through Arizona State University? Get it from <a href="https://au.asu.edu/" target="_blank" rel="noopener">au.asu.edu</a>.</li>
+<li>Air University students: <a href="https://auportal.maxwell.af.mil/auportal/sec/welcome.AirUniversity" target="_blank" rel="noopener">AU Portal</a> → <b>Distance Learning</b> → hover over <b>AUSIS</b> → <b>ALS, NCOA, SNCO, ACSC, SOS etc.</b> → <b>AUSIS</b> → <b>Study Hours</b>. You can then download your Verification of Completion.</li>
+</ul>
+</section>
+
+<section id="check"><h2>Check Your Points in vMPF</h2>
+<p>In vMPF go to <b>Personal Data → ANG/USAFR Point Credit Summary Inquiry (PCARS)</b>.</p>
+<ul>
+<li><b>Point Credit Summary:</b> points you earned show up under the <b>ADL</b> column.</li>
+<li><b>Advanced Distributed Learning:</b> individual classes show up here.</li>
+</ul>
+<div class="shots" data-shots="pme-1"></div>
+</section>
+
+<section id="myfss"><h2>myFSS Walkthrough</h2>
+<p>Here are the first couple screenshots of how to do it (updated).</p>
+<p>Search myFSS for <b>AFR/ANG General Point Credit Information</b>:</p>
+<div class="shots" data-shots="pme-2"></div>
+<p>Open the article:</p>
+<div class="shots" data-shots="pme-3"></div>
+<p>Scroll to the bottom and click <b>Create a Request</b>:</p>
+<div class="shots" data-shots="pme-4"></div>
+</section>
+
+<p id="none" class="hide" style="color:var(--muted)">Nothing matches that search.</p>
+</main>
+</div>
+<footer>312th Airlift Squadron · PME Points · v1</footer>
+<div id="lb"><img alt=""></div>
+
+<script>
+// Build TOC
+const toc=document.getElementById('toc');
+document.querySelectorAll('main section').forEach(s=>{
+  const a=document.createElement('a');a.href='#'+s.id;a.textContent=s.querySelector('h2').textContent;toc.appendChild(a);
+});
+// Screenshots
+document.querySelectorAll('[data-shots]').forEach(box=>{
+  box.dataset.shots.split(',').forEach(n=>{
+    const img=new Image();img.alt=n;img.loading='lazy';img.src='images/pme-points/'+n+'.jpg';
+    img.onerror=()=>img.remove();box.appendChild(img);
+  });
+});
+// Lightbox
+const lb=document.getElementById('lb');
+document.addEventListener('click',e=>{
+  if(e.target.matches('.shots img')){lb.querySelector('img').src=e.target.src;lb.style.display='flex'}
+  else if(e.target.closest('#lb')){lb.style.display='none'}
+  const c=e.target.closest('.copy');
+  if(c){navigator.clipboard.writeText(document.getElementById(c.dataset.copy).textContent).then(()=>{c.textContent='Copied';setTimeout(()=>c.textContent='Copy',1500)})}
+});
+// Search
+const q=document.getElementById('q');
+q.addEventListener('input',()=>{
+  const t=q.value.trim().toLowerCase();let shown=0;
+  document.querySelectorAll('main section').forEach(s=>{
+    const hit=!t||s.textContent.toLowerCase().includes(t);s.classList.toggle('hide',!hit);
+    toc.querySelector('a[href="#'+s.id+'"]').classList.toggle('hide',!hit);if(hit)shown++;
+  });
+  document.getElementById('none').classList.toggle('hide',shown>0);
+});
+</script>
+</body>
+</html>
