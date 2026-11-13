@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Air Force SELCAL Checker v2</title>
+<meta name="theme-color" content="#0b0f19">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SELCAL">
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    background: #0b0f19;
+    overflow-x: hidden;
+  }
+  #app-selcal {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  /* ===== page 3: selcal checker ===== */
+
+  #app-selcal {
+      --bg-color: #0b0f19;
+      --card-bg: #151d30;
+      --accent-color: #2563eb;
+      --accent-hover: #1d4ed8;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #24324d;
+      --gold: #eab308;
+      --gold-dim: #a16207;
+      --mono-font: 'SF Mono', 'JetBrains Mono', 'Courier New', monospace;
+    }
+  #app-selcal * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+  #app-selcal {
+      width: 100vw;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+    }
+  #app-selcal .fullscreen-wrapper {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      min-height: 100vh;
+      padding: 24px;
+    }
+  #app-selcal .container {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 36px;
+      width: 100%;
+      max-width: 640px;
+      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.7);
+    }
+  #app-selcal h1 {
+      font-size: 1.75rem;
+      text-align: center;
+      margin-bottom: 4px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #60a5fa;
+    }
+  #app-selcal .subtitle {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+  #app-selcal .section {
+      margin-bottom: 20px;
+    }
+  #app-selcal label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+  #app-selcal /* Type Filter Buttons */
+    .type-buttons {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr) 1.15fr;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+  #app-selcal .btn-type {
+      background-color: var(--bg-color);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 10px 4px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+  #app-selcal .btn-type:hover {
+      border-color: var(--accent-color);
+      color: var(--text-main);
+    }
+  #app-selcal .btn-type.active {
+      background-color: var(--accent-color);
+      border-color: var(--accent-color);
+      color: #ffffff;
+    }
+  #app-selcal .btn-random {
+      background-color: var(--bg-color);
+      border: 1px dashed var(--accent-color);
+      color: var(--accent-color);
+      padding: 10px 4px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+  #app-selcal .btn-random:hover {
+      background-color: var(--accent-color);
+      border-style: solid;
+      color: #ffffff;
+    }
+  #app-selcal .btn-random:active {
+      transform: scale(0.97);
+    }
+  #app-selcal select, #app-selcal input {
+      width: 100%;
+      padding: 12px 16px;
+      background-color: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-main);
+      font-size: 1rem;
+    }
+  #app-selcal select:focus, #app-selcal input:focus {
+      outline: 2px solid var(--accent-color);
+      border-color: transparent;
+    }
+  #app-selcal /* SELCAL Code Grid */
+    .selcal-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+  #app-selcal .selcal-grid input {
+      text-align: center;
+      font-size: 1.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 12px 0;
+      letter-spacing: 2px;
+    }
+  #app-selcal .info-display {
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      display: none;
+    }
+  #app-selcal .info-display strong {
+      color: var(--text-main);
+    }
+  #app-selcal .btn-test {
+      width: 100%;
+      padding: 16px;
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+  #app-selcal .btn-test:hover {
+      background-color: var(--accent-hover);
+    }
+  #app-selcal .btn-info {
+      width: 100%;
+      padding: 14px;
+      margin-top: 10px;
+      background-color: transparent;
+      color: var(--gold);
+      border: 1px solid rgba(234, 179, 8, 0.35);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+  #app-selcal .btn-info:hover {
+      background-color: rgba(234, 179, 8, 0.08);
+      border-color: var(--gold);
+    }
+  #app-selcal /* How SELCAL Works Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 100;
+    }
+  #app-selcal .modal-overlay.open {
+      display: flex;
+    }
+  #app-selcal .modal-box {
+      position: relative;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      max-width: 560px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 30px 28px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    }
+  #app-selcal .modal-box h2 {
+      color: var(--gold);
+      font-size: 1.15rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+  #app-selcal .modal-box h3 {
+      color: var(--gold);
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: 20px;
+      margin-bottom: 6px;
+    }
+  #app-selcal .modal-box p {
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      line-height: 1.65;
+    }
+  #app-selcal .modal-box .formula {
+      font-family: var(--mono-font);
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin: 10px 0;
+      color: var(--gold);
+      font-size: 1rem;
+      text-align: center;
+    }
+  #app-selcal .modal-close {
+      position: absolute;
+      top: 14px;
+      right: 16px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.6rem;
+      line-height: 1;
+      cursor: pointer;
+    }
+  #app-selcal .modal-close:hover {
+      color: var(--text-main);
+    }
+  #app-selcal /* Spectrum Analyser */
+    .analyser-card {
+      background: #0a0d14;
+      border: 1px solid rgba(234, 179, 8, 0.25);
+      border-radius: 14px;
+      padding: 20px 20px 22px;
+      margin-bottom: 20px;
+      box-shadow: inset 0 0 30px rgba(234, 179, 8, 0.03);
+    }
+  #app-selcal .analyser-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+  #app-selcal .analyser-title {
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.15em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+  #app-selcal .analyser-code {
+      font-family: var(--mono-font);
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: var(--gold);
+    }
+  #app-selcal .analyser-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-color);
+      padding: 4px 12px 4px 10px;
+      border-radius: 999px;
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+  #app-selcal .analyser-status .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #64748b;
+    }
+  #app-selcal .analyser-status.live {
+      color: #fca5a5;
+      border-color: rgba(248, 113, 113, 0.4);
+    }
+  #app-selcal .analyser-status.live .dot {
+      background: #ef4444;
+      box-shadow: 0 0 8px #ef4444;
+      animation: selcal-analyser-pulse 0.9s infinite;
+    }
+
+    @keyframes selcal-analyser-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.25; }
+    }
+  #app-selcal #spectrum-canvas {
+      width: 100%;
+      height: 220px;
+      display: block;
+      border-radius: 6px;
+    }
+  #app-selcal .freq-axis {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--mono-font);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+      margin: 8px 2px 18px;
+    }
+  #app-selcal .freq-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+  #app-selcal .freq-card {
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 12px 0;
+      text-align: center;
+      transition: border-color 0.2s;
+    }
+  #app-selcal .freq-card .fc-letter {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--gold);
+      font-family: var(--mono-font);
+    }
+  #app-selcal .freq-card .fc-hz {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      font-family: var(--mono-font);
+      letter-spacing: 0.03em;
+    }
+  #app-selcal .freq-card.empty .fc-letter {
+      color: var(--text-muted);
+    }
+  
+</style>
+</head>
+<body>
+
+<div id="app-selcal">
+<div class="fullscreen-wrapper">
+  <div class="container">
+    <h1>Air Force SELCAL Checker <span style="font-size:0.5em;color:var(--text-muted);vertical-align:middle;letter-spacing:0.05em;">v2</span></h1>
+    <div class="subtitle">SELCAL Fleet Directory &mdash; 53 aircraft</div>
+
+    <!-- Plane Type Filter Buttons -->
+    <div class="section">
+      <label>1. Select Aircraft Type</label>
+      <div class="type-buttons">
+        <button class="btn-type active" data-type="ALL">ALL</button>
+        <button class="btn-type" data-type="C-5">C-5</button>
+        <button class="btn-random" id="random-btn" type="button">🎲 Random</button>
+      </div>
+    </div>
+
+    <!-- Dynamic Tail Selection Dropdown -->
+    <div class="section">
+      <label for="aircraft-select">2. Select Tail / Code</label>
+      <select id="aircraft-select">
+        <option value=""></option>
+      </select>
+    </div>
+
+    <!-- Extra Details Display -->
+    <div id="info-display" class="info-display">
+      <div><strong>Type:</strong> <span id="info-type">-</span> &nbsp;|&nbsp; <strong>Fleet ID:</strong> <span id="info-fleet">-</span></div>
+    </div>
+
+    <!-- Manual Code Input -->
+    <div class="section">
+      <label>3. SELCAL Code</label>
+      <div class="selcal-grid">
+        <input type="text" id="char1" maxlength="1" pattern="[A-S]" placeholder="A">
+        <input type="text" id="char2" maxlength="1" pattern="[A-S]" placeholder="B">
+        <input type="text" id="char3" maxlength="1" pattern="[A-S]" placeholder="C">
+        <input type="text" id="char4" maxlength="1" pattern="[A-S]" placeholder="D">
+      </div>
+    </div>
+
+    <!-- Spectrum Analyser -->
+    <div class="analyser-card">
+      <div class="analyser-top">
+        <span class="analyser-title">Spectrum Analyser</span>
+        <span class="analyser-code" id="analyser-code">-- &mdash; --</span>
+      </div>
+      <div class="analyser-status" id="analyser-status">
+        <span class="dot"></span><span id="analyser-status-label">STANDBY</span>
+      </div>
+      <canvas id="spectrum-canvas"></canvas>
+      <div class="freq-axis">
+        <span>200 Hz</span><span>800 Hz</span><span>1400 Hz</span><span>2000 Hz</span>
+      </div>
+      <div class="freq-cards" id="freq-cards"></div>
+    </div>
+
+    <!-- Audio Test Trigger -->
+    <button class="btn-test" id="test-btn">TEST SELCAL TONE</button>
+    <button class="btn-info" id="how-it-works-btn">HOW SELCAL WORKS</button>
+  </div>
+</div>
+
+<!-- How SELCAL Works Modal -->
+<div class="modal-overlay" id="selcal-modal">
+  <div class="modal-box">
+    <button class="modal-close" id="modal-close-btn" aria-label="Close">&times;</button>
+    <h2>How SELCAL Works</h2>
+
+    <h3>The Code</h3>
+    <p>Every tail is assigned a unique 4-letter SELCAL code, built from 16 possible letters &mdash; A through S, skipping I, N, and O (they're too easy to confuse with 1, 4, and 0). That gives 65,780 possible 4-letter combinations, more than enough for every airframe in the fleet.</p>
+
+    <h3>The Tones</h3>
+    <p>Each letter maps to one specific audio tone. The 16 tones aren't spaced randomly &mdash; they climb geometrically from 312.6 Hz up to 1479.1 Hz, each one about 10.9% higher than the last:</p>
+    <div class="formula">f<sub>n</sub> = f<sub>A</sub> &times; r<sup>(n&minus;1)</sup> &nbsp;&nbsp; r &asymp; 1.109</div>
+    <p>That even spacing keeps every tone easy to tell apart from its neighbors, while keeping the whole set inside the same voiceband your HF/VHF radio already carries.</p>
+
+    <h3>The Transmission</h3>
+    <p>SELCAL never sends all 4 letters at once. It sends two dual-tone pulses back to back &mdash; each pulse is two frequencies playing together, which is just their waveforms added:</p>
+    <div class="formula">s(t) = sin(2&pi;f<sub>1</sub>t) + sin(2&pi;f<sub>2</sub>t)</div>
+    <p>Pulse 1 carries letters 1&ndash;2 for about 1.0 second, then a ~0.2 second gap, then pulse 2 carries letters 3&ndash;4 for another 1.0 second. That's exactly what happens when you hit "Test SELCAL Tone" above.</p>
+
+    <h3>The Decode</h3>
+    <p>Your aircraft's SELCAL decoder is always listening, filtering the incoming audio through narrow bandpass filters tuned to those 16 tones. It only chimes when it sees its own two exact tone-pairs, in the right order, held for the right duration &mdash; everyone else's calls pass through silently.</p>
+  </div>
+</div>
+</div>
+
+<script>
+(function(){
+
+  // Complete Aircraft Directory
+  const aircraftData = [
+    { type: 'C-5', code: 'DRAL', fleet: '31285B' },
+    { type: 'C-5', code: 'DRBJ', fleet: '40059B' },
+    { type: 'C-5', code: 'DSFP', fleet: '40060B' },
+    { type: 'C-5', code: 'DSGH', fleet: '40061B' },
+    { type: 'C-5', code: 'DSGK', fleet: '40062B' },
+    { type: 'C-5', code: 'DSGM', fleet: '50001B' },
+    { type: 'C-5', code: 'DSMR', fleet: '50002B' },
+    { type: 'C-5', code: 'FHMQ', fleet: '50003B' },
+    { type: 'C-5', code: 'FHPR', fleet: '50004B' },
+    { type: 'C-5', code: 'FLKQ', fleet: '50005B' },
+    { type: 'C-5', code: 'FPDL', fleet: '50006B' },
+    { type: 'C-5', code: 'FPEQ', fleet: '50007B' },
+    { type: 'C-5', code: 'FPJR', fleet: '50008B' },
+    { type: 'C-5', code: 'FQBE', fleet: '50009B' },
+    { type: 'C-5', code: 'FRPS', fleet: '50010B' },
+    { type: 'C-5', code: 'FRQS', fleet: '60011B' },
+    { type: 'C-5', code: 'FSAB', fleet: '60012B' },
+    { type: 'C-5', code: 'FSAC', fleet: '60013B' },
+    { type: 'C-5', code: 'FSAD', fleet: '60014B' },
+    { type: 'C-5', code: 'FSAE', fleet: '60015B' },
+    { type: 'C-5', code: 'FSAG', fleet: '60016B' },
+    { type: 'C-5', code: 'FSAP', fleet: '60017B' },
+    { type: 'C-5', code: 'FSBJ', fleet: '60018B' },
+    { type: 'C-5', code: 'FSBK', fleet: '60019B' },
+    { type: 'C-5', code: 'BCAQ', fleet: '60020B' },
+    { type: 'C-5', code: 'BEQR', fleet: '60021B' },
+    { type: 'C-5', code: 'BFDR', fleet: '60022B' },
+    { type: 'C-5', code: 'BFHS', fleet: '60023B' },
+    { type: 'C-5', code: 'BJDR', fleet: '60024B' },
+    { type: 'C-5', code: 'BLAR', fleet: '60025B' },
+    { type: 'C-5', code: 'BLAS', fleet: '60026B' },
+    { type: 'C-5', code: 'BMES', fleet: '70027B' },
+    { type: 'C-5', code: 'BMFP', fleet: '70028B' },
+    { type: 'C-5', code: 'BQAG', fleet: '70029B' },
+    { type: 'C-5', code: 'BQDG', fleet: '70030B' },
+    { type: 'C-5', code: 'BQFM', fleet: '70031B' },
+    { type: 'C-5', code: 'BRFP', fleet: '70032B' },
+    { type: 'C-5', code: 'BRQS', fleet: '70033B' },
+    { type: 'C-5', code: 'BSAC', fleet: '70034B' },
+    { type: 'C-5', code: 'BSAD', fleet: '70035B' },
+    { type: 'C-5', code: 'DFGS', fleet: '70036B' },
+    { type: 'C-5', code: 'DGEP', fleet: '70037B' },
+    { type: 'C-5', code: 'DMLS', fleet: '70038B' },
+    { type: 'C-5', code: 'DMPR', fleet: '70039B' },
+    { type: 'C-5', code: 'DPCS', fleet: '70040B' },
+    { type: 'C-5', code: 'DQBP', fleet: '70041B' },
+    { type: 'C-5', code: 'DQCE', fleet: '70042B' },
+    { type: 'C-5', code: 'DQGM', fleet: '70043B' },
+    { type: 'C-5', code: 'DRAH', fleet: '70044B' },
+    { type: 'C-5', code: 'DRAJ', fleet: '70045B' },
+    { type: 'C-5', code: 'BRQS', fleet: '80213B' },
+    { type: 'C-5', code: 'DFGS', fleet: '80216B' },
+    { type: 'C-5', code: 'FSBK', fleet: '90024B' }
+  ];
+
+  // SELCAL Frequencies (ICAO Annex 10)
+  const selcalFreqs = {
+    'A': 312.6, 'B': 346.7, 'C': 384.6, 'D': 426.6,
+    'E': 473.2, 'F': 524.8, 'G': 582.1, 'H': 645.7,
+    'J': 716.1, 'K': 794.3, 'L': 881.0, 'M': 977.2,
+    'P': 1083.9, 'Q': 1202.3, 'R': 1333.5, 'S': 1479.1
+  };
+
+  const inputs = [
+    document.getElementById('char1'),
+    document.getElementById('char2'),
+    document.getElementById('char3'),
+    document.getElementById('char4')
+  ];
+
+  const aircraftSelect = document.getElementById('aircraft-select');
+  const typeButtons = document.querySelectorAll('.btn-type');
+  const infoDisplay = document.getElementById('info-display');
+  const infoType = document.getElementById('info-type');
+  const infoFleet = document.getElementById('info-fleet');
+
+  let currentType = 'ALL';
+
+  // Format a fleet/tail number as XX-XXXX (dash after first two digits)
+  function formatFleet(fleet) {
+    if (!fleet || fleet.length < 3) return fleet;
+    return fleet.slice(0, 2) + '-' + fleet.slice(2);
+  }
+
+  // Populate Dropdown showing Fleet ID + SELCAL code, blank option first
+  function populateDropdown() {
+    aircraftSelect.innerHTML = '';
+
+    const blankOpt = document.createElement('option');
+    blankOpt.value = '';
+    blankOpt.textContent = '';
+    aircraftSelect.appendChild(blankOpt);
+
+    const filtered = currentType === 'ALL'
+      ? aircraftData
+      : aircraftData.filter(item => item.type === currentType);
+
+    filtered.forEach((item, idx) => {
+      const opt = document.createElement('option');
+      opt.value = item.code + '|' + idx;
+      opt.setAttribute('data-type', item.type);
+      opt.setAttribute('data-fleet', item.fleet);
+      opt.setAttribute('data-code', item.code);
+
+      opt.textContent = formatFleet(item.fleet) + '  \u2014  ' + item.code;
+
+      aircraftSelect.appendChild(opt);
+    });
+  }
+
+  // Handle Type Filter Button Clicks
+  typeButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      typeButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentType = btn.getAttribute('data-type');
+      populateDropdown();
+      infoDisplay.style.display = 'none';
+    });
+  });
+
+  // Handle Aircraft Dropdown Selection
+  aircraftSelect.addEventListener('change', (e) => {
+    const selectedOption = e.target.options[e.target.selectedIndex];
+    const code = selectedOption ? selectedOption.getAttribute('data-code') : null;
+
+    if (code && code.length === 4) {
+      inputs[0].value = code[0];
+      inputs[1].value = code[1];
+      inputs[2].value = code[2];
+      inputs[3].value = code[3];
+
+      infoType.textContent = selectedOption.getAttribute('data-type') || '-';
+      infoFleet.textContent = formatFleet(selectedOption.getAttribute('data-fleet')) || 'N/A';
+      infoDisplay.style.display = 'block';
+    } else {
+      infoDisplay.style.display = 'none';
+    }
+    updateAnalyserReadout();
+  });
+
+  // Input Auto-Advance & Formatting
+  inputs.forEach((input, index) => {
+    input.addEventListener('input', (e) => {
+      e.target.value = e.target.value.toUpperCase();
+      if (e.target.value && index < 3) {
+        inputs[index + 1].focus();
+      }
+      updateAnalyserReadout();
+    });
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && !input.value && index > 0) {
+        inputs[index - 1].focus();
+      }
+    });
+  });
+
+  /* ---------- Spectrum Analyser ---------- */
+
+  const canvas = document.getElementById('spectrum-canvas');
+  const canvasCtx = canvas.getContext('2d');
+  const analyserCodeEl = document.getElementById('analyser-code');
+  const analyserStatusEl = document.getElementById('analyser-status');
+  const analyserStatusLabel = document.getElementById('analyser-status-label');
+  const freqCardsEl = document.getElementById('freq-cards');
+
+  const MIN_HZ = 200;
+  const MAX_HZ = 2000;
+  const BAR_COUNT = 112;       // many thin bars, scanner-style
+  const BAR_FILL_RATIO = 0.32; // slim bars with gaps between them
+
+  let liveAnalyserNode = null;
+  let liveDataArray = null;
+  let liveMinBin = 0;
+  let liveMaxBin = 0;
+  let heldAmps = null; // peak-hold buffer so bars linger before falling
+
+  function resizeCanvas() {
+    const ratio = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = Math.max(1, rect.width * ratio);
+    canvas.height = Math.max(1, rect.height * ratio);
+    canvasCtx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    return rect;
+  }
+
+  function drawGridLines(w, h) {
+    canvasCtx.strokeStyle = 'rgba(234, 179, 8, 0.14)';
+    canvasCtx.lineWidth = 1;
+    const cols = 8, rows = 4;
+    for (let i = 1; i < cols; i++) {
+      const x = (w / cols) * i;
+      canvasCtx.beginPath();
+      canvasCtx.moveTo(x, 0);
+      canvasCtx.lineTo(x, h);
+      canvasCtx.stroke();
+    }
+    for (let j = 1; j < rows; j++) {
+      const y = (h / rows) * j;
+      canvasCtx.beginPath();
+      canvasCtx.moveTo(0, y);
+      canvasCtx.lineTo(w, y);
+      canvasCtx.stroke();
+    }
+    canvasCtx.strokeStyle = 'rgba(234, 179, 8, 0.3)';
+    canvasCtx.strokeRect(0.5, 0.5, w - 1, h - 1);
+  }
+
+  function updateAnalyserReadout() {
+    const chars = inputs.map(i => i.value.toUpperCase());
+    const filled = chars.filter(c => c).length;
+
+    if (filled === 4) {
+      analyserCodeEl.textContent = chars[0] + chars[1] + '  \u2014  ' + chars[2] + chars[3];
+    } else {
+      analyserCodeEl.textContent = '-- \u2014 --';
+    }
+
+    freqCardsEl.innerHTML = '';
+    chars.forEach(c => {
+      const card = document.createElement('div');
+      card.className = 'freq-card' + (c && selcalFreqs[c] ? '' : ' empty');
+
+      const letter = document.createElement('div');
+      letter.className = 'fc-letter';
+      letter.textContent = (c && selcalFreqs[c]) ? c : '\u2013';
+
+      const hz = document.createElement('div');
+      hz.className = 'fc-hz';
+      hz.textContent = (c && selcalFreqs[c]) ? selcalFreqs[c].toFixed(1) + ' Hz' : '\u2013\u2013\u2013';
+
+      card.appendChild(letter);
+      card.appendChild(hz);
+      freqCardsEl.appendChild(card);
+    });
+  }
+
+  function setTransmitting(isLive) {
+    if (isLive) {
+      analyserStatusEl.classList.add('live');
+      analyserStatusLabel.textContent = 'TRANSMITTING';
+    } else {
+      analyserStatusEl.classList.remove('live');
+      analyserStatusLabel.textContent = 'STANDBY';
+    }
+  }
+
+  // Persistent render loop: thin grainy bars, either a faint idle noise
+  // floor (standby) or real audio-driven amplitude with static-y jitter
+  // layered on top (transmitting) -- gives it that scanner/police-radio look.
+  function renderFrame() {
+    requestAnimationFrame(renderFrame);
+
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width < 1 || rect.height < 1) return;
+
+    canvasCtx.clearRect(0, 0, rect.width, rect.height);
+    drawGridLines(rect.width, rect.height);
+
+    if (liveAnalyserNode) {
+      liveAnalyserNode.getByteFrequencyData(liveDataArray);
+    }
+
+    const slot = rect.width / BAR_COUNT;
+    const barWidth = Math.max(1, slot * BAR_FILL_RATIO);
+
+    canvasCtx.shadowColor = 'rgba(234, 179, 8, 0.7)';
+    canvasCtx.shadowBlur = 5;
+
+    let amps = new Array(BAR_COUNT);
+
+    if (liveAnalyserNode) {
+      // First pass: raw amplitude per bar, and track this frame's peak
+      let maxV = 0.0001;
+      for (let i = 0; i < BAR_COUNT; i++) {
+        const frac = i / (BAR_COUNT - 1);
+        const binPos = liveMinBin + frac * (liveMaxBin - liveMinBin);
+        const b0 = Math.floor(binPos);
+        const b1 = Math.min(liveDataArray.length - 1, b0 + 1);
+        const t = binPos - b0;
+        const v = (liveDataArray[b0] * (1 - t) + liveDataArray[b1] * t) / 255;
+        amps[i] = v;
+        if (v > maxV) maxV = v;
+      }
+      // Second pass: normalize against the peak, apply a curve so only the
+      // true peak region stands tall (avoids a flat "chopped" plateau),
+      // then layer a light static/grain jitter on top
+      for (let i = 0; i < BAR_COUNT; i++) {
+        const normalized = Math.pow(amps[i] / maxV, 1.6);
+        const grain = (Math.random() * 0.08) - 0.04;
+        amps[i] = Math.max(0, Math.min(1, normalized + grain));
+      }
+      // Third pass: wider smoothing across neighbors so each peak reads as
+      // a broad, rounded shape (artificially fattened) instead of a single
+      // thin spike -- two passes with a 5-tap kernel spreads it further
+      const widenPass = (src) => {
+        const out = new Array(BAR_COUNT);
+        for (let i = 0; i < BAR_COUNT; i++) {
+          const p2 = src[Math.max(0, i - 2)];
+          const p1 = src[Math.max(0, i - 1)];
+          const c  = src[i];
+          const n1 = src[Math.min(BAR_COUNT - 1, i + 1)];
+          const n2 = src[Math.min(BAR_COUNT - 1, i + 2)];
+          out[i] = (p2 * 0.5 + p1 * 1 + c * 2 + n1 * 1 + n2 * 0.5) / 5;
+        }
+        return out;
+      };
+      amps = widenPass(widenPass(amps));
+
+      // Peak hold: rise instantly to new amplitude, but only decay slowly,
+      // so each pulse lingers for a beat before fading out
+      if (!heldAmps) heldAmps = new Array(BAR_COUNT).fill(0);
+      const DECAY_RATE = 0.90; // closer to 1 = slower fade
+      for (let i = 0; i < BAR_COUNT; i++) {
+        const decayed = heldAmps[i] * DECAY_RATE;
+        amps[i] = Math.max(amps[i], decayed);
+      }
+      heldAmps = amps;
+    } else {
+      heldAmps = null;
+      for (let i = 0; i < BAR_COUNT; i++) {
+        // faint flickering noise floor while on standby
+        const flicker = Math.sin(Date.now() / 350 + i * 1.7) * 0.02;
+        amps[i] = Math.max(0, Math.random() * 0.05 + flicker + 0.015);
+      }
+    }
+
+    const HEADROOM_RATIO = 0.82; // max bar height, leaves a gap at the top
+
+    for (let i = 0; i < BAR_COUNT; i++) {
+      const amp = amps[i];
+      const barHeight = Math.max(2, amp * rect.height * HEADROOM_RATIO);
+      const x = i * slot + (slot - barWidth) / 2;
+      const y = rect.height - barHeight;
+
+      canvasCtx.fillStyle = amp > 0.75 ? '#fde047' : '#eab308';
+      canvasCtx.fillRect(x, y, barWidth, barHeight);
+    }
+    canvasCtx.shadowBlur = 0;
+  }
+
+  function startVisualizer(analyserNode) {
+    liveDataArray = new Uint8Array(analyserNode.frequencyBinCount);
+    const sampleRate = analyserNode.context.sampleRate;
+    const binHz = sampleRate / analyserNode.fftSize;
+    liveMinBin = Math.max(0, Math.floor(MIN_HZ / binHz));
+    liveMaxBin = Math.min(liveDataArray.length - 1, Math.ceil(MAX_HZ / binHz));
+    liveAnalyserNode = analyserNode;
+  }
+
+  function stopVisualizer() {
+    liveAnalyserNode = null;
+    liveDataArray = null;
+  }
+
+  window.addEventListener('resize', resizeCanvas);
+
+  /* ---------- End Spectrum Analyser ---------- */
+
+  // Audio Pulse Generator
+  function playPulse(audioCtx, freq1, freq2, startTime, duration, analyserNode) {
+    const osc1 = audioCtx.createOscillator();
+    const osc2 = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+
+    osc1.frequency.value = freq1;
+    osc2.frequency.value = freq2;
+    osc1.type = 'sine';
+    osc2.type = 'sine';
+
+    gainNode.gain.setValueAtTime(0.25, startTime);
+
+    osc1.connect(gainNode);
+    osc2.connect(gainNode);
+
+    if (analyserNode) {
+      gainNode.connect(analyserNode);
+    } else {
+      gainNode.connect(audioCtx.destination);
+    }
+
+    osc1.start(startTime);
+    osc2.start(startTime);
+    osc1.stop(startTime + duration);
+    osc2.stop(startTime + duration);
+  }
+
+  // Play SELCAL Sound (shared by the Test button and the Random button)
+  function playCurrentSelcalCode() {
+    const code = inputs.map(i => i.value.toUpperCase()).join('');
+
+    if (code.length !== 4) {
+      alert('Please select or enter a full 4-letter SELCAL code.');
+      return;
+    }
+
+    for (let char of code) {
+      if (!selcalFreqs[char]) {
+        alert(`Invalid character: "${char}". Valid characters are A through S (excluding I, N, O).`);
+        return;
+      }
+    }
+
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    const audioCtx = new AudioContext();
+
+    const analyserNode = audioCtx.createAnalyser();
+    analyserNode.fftSize = 2048;
+    analyserNode.smoothingTimeConstant = 0.72;
+    analyserNode.connect(audioCtx.destination);
+
+    const f1 = selcalFreqs[code[0]];
+    const f2 = selcalFreqs[code[1]];
+    const f3 = selcalFreqs[code[2]];
+    const f4 = selcalFreqs[code[3]];
+
+    const now = audioCtx.currentTime;
+
+    // Dual Pulse Standard: Tone 1 (1.0s), Gap (0.2s), Tone 2 (1.0s)
+    playPulse(audioCtx, f1, f2, now, 1.0, analyserNode);
+    playPulse(audioCtx, f3, f4, now + 1.2, 1.0, analyserNode);
+
+    setTransmitting(true);
+    startVisualizer(analyserNode);
+
+    setTimeout(() => {
+      setTransmitting(false);
+      stopVisualizer();
+    }, 2350);
+  }
+
+  document.getElementById('test-btn').addEventListener('click', playCurrentSelcalCode);
+
+  // Random SELCAL Code: pick a random aircraft from the full fleet directory,
+  // load its code into the grid (and the info display / dropdown state to match),
+  // then immediately play it.
+  document.getElementById('random-btn').addEventListener('click', () => {
+    const pick = aircraftData[Math.floor(Math.random() * aircraftData.length)];
+
+    inputs[0].value = pick.code[0];
+    inputs[1].value = pick.code[1];
+    inputs[2].value = pick.code[2];
+    inputs[3].value = pick.code[3];
+
+    // Reflect the pick in the type filter + dropdown so the UI stays consistent
+    typeButtons.forEach(b => b.classList.remove('active'));
+    const matchingTypeBtn = Array.from(typeButtons).find(b => b.getAttribute('data-type') === pick.type);
+    if (matchingTypeBtn) {
+      matchingTypeBtn.classList.add('active');
+      currentType = pick.type;
+    } else {
+      currentType = 'ALL';
+      document.querySelector('.btn-type[data-type="ALL"]').classList.add('active');
+    }
+    populateDropdown();
+
+    const matchOpt = Array.from(aircraftSelect.options).find(o => o.getAttribute('data-code') === pick.code && o.getAttribute('data-fleet') === pick.fleet);
+    if (matchOpt) {
+      aircraftSelect.value = matchOpt.value;
+    }
+
+    infoType.textContent = pick.type;
+    infoFleet.textContent = formatFleet(pick.fleet);
+    infoDisplay.style.display = 'block';
+
+    updateAnalyserReadout();
+    playCurrentSelcalCode();
+  });
+
+  // How SELCAL Works modal
+  const howItWorksBtn = document.getElementById('how-it-works-btn');
+  const selcalModal = document.getElementById('selcal-modal');
+  const modalCloseBtn = document.getElementById('modal-close-btn');
+
+  howItWorksBtn.addEventListener('click', () => {
+    selcalModal.classList.add('open');
+  });
+
+  modalCloseBtn.addEventListener('click', () => {
+    selcalModal.classList.remove('open');
+  });
+
+  selcalModal.addEventListener('click', (e) => {
+    if (e.target === selcalModal) selcalModal.classList.remove('open');
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') selcalModal.classList.remove('open');
+  });
+
+  // Initial Load
+  populateDropdown();
+  updateAnalyserReadout();
+  resizeCanvas();
+  requestAnimationFrame(renderFrame);
+
+})();
+</script>
+</body>
+</html>
