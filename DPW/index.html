@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DPW Hero</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root{
+  --bg:#f3f4f6;--card:#fff;--ink:#111;--muted:#555;--line:#111;--accent:#1d4ed8;--auto:#dcfce7;--autoink:#14532d;--der:#fef3c7;--derink:#78350f;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--bg:#0b0f14;--card:#151b23;--ink:#e8edf2;--muted:#9aa7b4;--line:#c9d1d9;--accent:#60a5fa;--auto:#14391f;--autoink:#bbf7d0;--der:#3b2f0b;--derink:#fde68a}
+}
+:root[data-theme="dark"]{--bg:#0b0f14;--card:#151b23;--ink:#e8edf2;--muted:#9aa7b4;--line:#c9d1d9;--accent:#60a5fa;--auto:#14391f;--autoink:#bbf7d0;--der:#3b2f0b;--derink:#fde68a}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:14px}
+h1{margin:0 0 4px;font-size:22px}
+.sub{color:var(--muted);font-size:13px;margin-bottom:10px}
+.drop{border:2px dashed var(--accent);border-radius:10px;padding:16px;text-align:center;background:var(--card);cursor:pointer}
+.drop{position:relative}
+.drop.over{background:var(--auto)}
+.dropicon{display:block;font-size:26px;line-height:1;color:var(--accent)}
+.drop:not(.attn) .dropicon{display:none}
+.drop.attn{border-width:3px;padding:22px 16px}
+.drop.attn b{font-size:18px}
+.drop.attn .dropicon{animation:dpwBob 1.1s ease-in-out infinite}
+.drop.attn::after{content:'';position:absolute;inset:-3px;border:3px solid var(--accent);border-radius:12px;pointer-events:none;animation:dpwRing 1.8s ease-out infinite}
+.toprow{display:flex;gap:10px;align-items:stretch;flex-wrap:wrap}
+.toprow .drop{flex:1 1 260px}
+.toprow .tko{flex:0 0 auto;align-self:center}
+.drop:not(.attn){padding:10px 16px}
+.tko{display:none;flex-direction:column;align-items:flex-start;gap:4px;background:#070b10;border:1px solid #92400e;border-radius:10px;padding:9px 18px;color:#fbbf24;font-size:18px;line-height:1.25;font-weight:400}
+.tko .tkl1{display:flex;align-items:baseline;gap:10px}
+.tko .tkl2{display:flex;align-items:baseline;gap:8px}
+.tko small{font-size:18px;font-weight:700;color:#d97706}
+.tko b,.tko i{font-size:18px;font-weight:400;font-style:normal}
+.tko .tkl1 i,.tko .tkl2 i{color:#fcd34d}
+.rsn{display:block;font-size:10px;line-height:1.15;color:var(--muted)}
+.fingers{position:absolute;inset:0;overflow:hidden;border-radius:8px;pointer-events:none}
+.drop:not(.attn) .fingers{display:none}
+.drop>*:not(.fingers){position:relative;z-index:1}
+.fingers span{position:absolute;opacity:0;animation:dpwPop var(--d,2.4s) ease-out infinite;animation-delay:var(--w,0s);user-select:none}
+@keyframes dpwPop{0%{transform:translateY(10px) scale(.2);opacity:0}14%{transform:translateY(0) scale(1.2);opacity:1}30%{transform:translateY(-3px) scale(1);opacity:1}62%{transform:translateY(-8px) scale(1);opacity:.9}100%{transform:translateY(-18px) scale(.85);opacity:0}}
+@keyframes dpwBob{0%,100%{transform:translateY(3px)}50%{transform:translateY(-5px)}}
+@keyframes dpwRing{0%{transform:scale(1);opacity:.85}100%{transform:scale(1.045,1.18);opacity:0}}
+@media (prefers-reduced-motion: reduce){.drop.attn::after,.drop.attn .dropicon{animation:none}.fingers{display:none!important}}
+.drop b{color:var(--accent)}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;align-items:center}
+button{background:var(--accent);color:#fff;border:0;border-radius:8px;padding:9px 14px;font-size:14px;cursor:pointer}
+button.sec{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+label.opt{font-size:13px;display:inline-flex;gap:4px;align-items:center}
+select{padding:7px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:14px;max-width:100%}
+.status{font-size:13px;margin:6px 0;color:var(--muted)}
+.tabs{display:flex;gap:6px;margin:12px 0 4px;flex-wrap:wrap}
+.tab{background:var(--card);color:var(--ink);border:2px solid var(--line);border-radius:8px;padding:8px 14px;font-weight:700}
+.tab.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.tab small{display:block;font-weight:500;font-size:11px;opacity:.85}
+.wxline{font:13px ui-monospace,Menlo,monospace;background:var(--card);border-left:4px solid var(--accent);border-radius:6px;padding:8px 10px;margin:6px 0;display:none;word-break:break-word}
+.fc{background:var(--card);border-left:4px solid #f59e0b;border-radius:6px;padding:6px 8px;margin:6px 0}
+.taf{background:var(--card);border-left:4px solid #0ea5e9;border-radius:6px;padding:6px 10px;margin:6px 0;font:12px/1.5 ui-monospace,Menlo,monospace}
+.taf .th{word-break:break-word}
+.taf .tg{padding:1px 6px;border-radius:4px;margin:2px 0;word-break:break-word}
+.taf .tg.hl{background:var(--auto);color:var(--autoink)}
+.taf .tg.tmp{background:var(--der);color:var(--derink)}
+.taf .dh{font:11px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:var(--muted);margin-top:3px}
+#wxwrap[hidden]{display:none}
+.dat{background:var(--card);border-left:4px solid #8b5cf6;border-radius:6px;padding:6px 10px;margin:6px 0;font-size:12px;line-height:1.4}
+.dat div+div{margin-top:4px}
+.dat .dh{font-size:11px;color:var(--muted)}
+.info{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--accent);background:transparent;color:var(--accent);font:700 12px/1 Georgia,serif;font-style:italic;padding:0;margin-left:4px;cursor:pointer;vertical-align:middle;text-transform:none}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
+.modal[hidden]{display:none}
+.mbox{background:var(--card);color:var(--ink);border-radius:12px;max-width:520px;width:100%;max-height:85vh;overflow:auto;padding:18px 20px;box-shadow:0 10px 40px rgba(0,0,0,.4)}
+.mbox h2{margin:0 0 6px;font-size:18px}
+.mbox p{margin:6px 0;font-size:14px}
+.mbox ul{margin:6px 0 10px;padding-left:20px;font-size:14px;line-height:1.5}
+.mbox li{margin:4px 0}
+.mclose{float:right;background:transparent;color:var(--muted);border:0;font-size:22px;line-height:1;padding:0 2px;cursor:pointer}
+.mbox.wide{max-width:900px}
+.mbox img{max-width:100%;height:auto;border-radius:6px;border:1px solid color-mix(in srgb,var(--line) 30%,transparent);display:block}
+.mact{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.tab.dim{opacity:.5}
+.fch{font-size:11px;color:var(--muted);margin-bottom:4px}
+.fcrow{display:grid;grid-template-columns:repeat(7,minmax(104px,1fr));gap:4px;overflow-x:auto}
+.fcc{border:1px solid color-mix(in srgb,var(--line) 25%,transparent);border-radius:6px;padding:3px 6px;font-size:12px;white-space:nowrap}
+.fcc.now{background:var(--auto);color:var(--autoink)}
+.fct{display:flex;gap:4px;align-items:center}
+.fct b{font-size:14px}
+.fcw{color:var(--muted);font-size:11px;margin-top:1px}
+.fcp{color:#3b82f6;font-weight:600}
+.rwybar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--card);border-radius:10px;padding:10px;margin:8px 0}
+.rwybar b{font-size:14px}
+.ws{background:var(--card);border:3px solid var(--line);margin-top:10px}
+.row{display:grid;border-top:2px solid var(--line)}
+.cell{border-left:1px solid var(--line);padding:3px 6px 6px;min-height:62px}
+.cell:first-child{border-left:0}
+.cell label{font-size:11px;font-weight:600;display:block;text-transform:uppercase;letter-spacing:.02em}
+.cell input[type=text]{width:100%;border:0;background:transparent;color:var(--ink);font-size:20px;font-weight:600;padding:4px 0;outline:none;min-width:0}
+.cell input.auto{background:var(--auto);color:var(--autoink)}
+.cell input.derived{background:var(--der);color:var(--derink)}
+.title{text-align:center;font-weight:800;font-size:19px;padding:6px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+.title input{width:76px;border:1px solid var(--line);background:transparent;color:var(--ink);font-weight:700;font-size:16px;text-transform:uppercase;padding:2px 4px;text-align:center}
+.title input.auto{background:var(--auto);color:var(--autoink)}
+.note{text-align:center;font-size:14px;padding:3px}
+.sec-h{text-align:center;font-weight:800;font-size:17px;padding:3px;border-top:2px solid var(--line)}
+.r6{grid-template-columns:repeat(6,1fr)}
+.wx4{grid-template-columns:repeat(4,1fr)}
+.w{grid-column:span 2}
+.chk{display:inline-flex;align-items:center;gap:3px;font-size:11px;margin-right:6px}
+.cell label.chk{display:inline-flex;margin-right:14px}
+.chk input{width:16px;height:16px}
+.foot{display:flex;gap:14px;align-items:baseline;font-size:15px;padding:5px 8px;border-top:3px solid var(--line);min-height:34px}
+.foot b{font-size:15px}
+.calc{margin-top:10px;background:var(--card);border-radius:10px;padding:12px;font-size:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.calc b{display:block;font-size:20px}
+.rwybar .calc{margin:0;background:transparent;padding:0 0 0 4px;display:flex;flex-wrap:wrap;gap:3px 12px;font-size:9.5px;color:var(--muted)}
+.rwybar .calc>div{display:flex;flex-direction:column;line-height:1.2}
+.rwybar .calc b{font-size:13px;color:var(--ink)}
+.rwybar{gap:6px 8px;padding:6px 8px}
+.rwybar>b{font-size:13px}
+.rwybar select{font-size:12px;padding:4px 6px}
+.rwybar .tabs{margin:0;gap:4px;flex-wrap:nowrap}
+.rwybar .tab{padding:3px 8px;border-width:1.5px;border-radius:6px;font-size:12px;line-height:1.15}
+.rwybar .tab small{font-size:9.5px}
+.legend{font-size:12px;color:var(--muted);margin-top:8px}
+.legend span{padding:1px 6px;border-radius:4px;margin-right:6px}
+details{margin-top:10px;background:var(--card);border-radius:10px;padding:10px 12px;font-size:13px}
+pre{white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px;margin:6px 0 0}
+.log li{margin:2px 0}
+@media(max-width:760px){
+  .r6,.wx4{grid-template-columns:repeat(2,1fr)}
+  .cell{border-top:1px solid var(--line)}
+}
+@media print{
+  body{background:#fff;color:#000}.noprint{display:none!important}
+  .ws{margin:0;border-color:#000}
+  .cell input.auto,.cell input.derived,.title input.auto{background:transparent;color:#000}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="noprint">
+    <div class="toprow">
+      <span class="tko" id="tkoff" title="Takeoff time, date and Julian day from the CFP (ETD)">
+        <span class="tkl1"><small>Takeoff</small><b id="tkoTime"></b><i id="tkoDate"></i></span>
+        <span class="tkl2"><b id="tkoDayTxt"></b><i id="tkoJul"></i></span>
+      </span>
+    <div class="drop attn" id="drop">
+      <div class="fingers" id="fingers" aria-hidden="true"></div>
+      <span class="dropicon" aria-hidden="true">&#x2B06;&#xFE0E;</span>
+      <b id="dropText">Tap or drop crew papers here</b><br><span class="sub">PDF or TXT</span>
+      <input type="file" id="file" accept=".pdf,.txt,.csv,.json,.md,.log,text/*,application/pdf,application/json" hidden>
+    </div>
+    </div>
+    <div class="status" id="status"></div>
+    <div class="btns">
+      <span class="sub" style="margin:0"><b style="line-height:1.15;display:inline-block;text-align:left">DPW Weather<br>Source:</b></span><button class="tab on" id="srcCfp">CFP data</button><button class="tab" id="srcMetar">Current METAR</button><button class="tab" id="srcDatis">D-ATIS</button>
+      
+      
+      <button class="sec" id="clear">Clear DPW</button>
+      <button class="sec" id="wxToggle"><span class="rain" id="rain" aria-hidden="true"></span><span class="lbl">Hide / Show Weather</span></button>
+      <button class="sec" id="shotBtn">Send to FEs</button>
+    </div>
+    <div id="wxwrap">
+    <div class="wxline" id="wxline"></div>
+    <div class="wxline" id="metarline" style="border-left-color:#16a34a"></div>
+    <div class="taf" id="tafline" style="display:none"></div>
+    <div class="dat" id="datisline" style="display:none"></div>
+    <div class="fc" id="fcbar" style="display:none"></div>
+    </div>
+    <div class="rwybar">
+      <div class="tabs" id="tabs"></div>
+      <b>Runway</b>
+      <select id="rwySel"><option value="">Select runway…</option></select>
+      <div class="calc" id="calc"></div>
+      <span class="sub" id="rwyNote" style="margin:0" hidden></span><span class="sub" id="slopeNote" style="margin:0" hidden></span>
+    </div>
+  </div>
+
+  <div id="shot">
+  <div class="ws" id="ws">
+    <div class="title">ICAO <input type="text" id="icao" data-k="icao" maxlength="4"> C-5M DEPARTURE PLANNING WORKSHEET</div>
+    <div class="sec-h">WEATHER</div>
+    <div class="row wx4" style="border-top:1px solid var(--line)">
+      <div class="cell"><label>Temperature °C</label><input type="text" inputmode="decimal" data-k="temp"></div>
+      <div class="cell"><label>Pressure Altitude</label><input type="text" inputmode="numeric" data-k="pa"></div>
+      <div class="cell"><label>Wind Direction</label><input type="text" inputmode="numeric" data-k="wdir"></div>
+      <div class="cell"><label>Velocity / G</label>
+        <div style="display:flex;gap:6px;align-items:center"><input type="text" inputmode="numeric" data-k="wvel"><span>G</span><input type="text" inputmode="numeric" data-k="wgust"></div></div>
+    </div>
+    <div class="sec-h">RUNWAY AND AIRFIELD INFORMATION</div>
+    <div class="row r6" style="border-top:1px solid var(--line)">
+      <div class="cell"><label>Runway Heading <button type="button" class="info noprint" data-note="hdg" aria-label="Note">i</button></label><input type="text" inputmode="numeric" data-k="rwyHdg"></div>
+      <div class="cell"><label>Runway Length <button type="button" class="info noprint" data-note="len" aria-label="Note">i</button></label><input type="text" inputmode="numeric" data-k="rwyLen"></div>
+      <div class="cell w"><label>VR Runway Length (if different)</label><input type="text" inputmode="numeric" data-k="vrLen"></div>
+      <div class="cell w"><label>Slope <button type="button" class="info noprint" data-note="slope" aria-label="Note">i</button></label><input type="text" inputmode="decimal" data-k="slope">
+        <label class="chk"><input type="radio" name="ud" data-k="up">Up</label>
+        <label class="chk"><input type="radio" name="ud" data-k="dn">Dn</label></div>
+    </div>
+    <div class="row r6" style="border-top:1px solid var(--line)">
+      <div class="cell"><label>Field Elevation</label><input type="text" inputmode="numeric" data-k="fieldElev"></div>
+      <div class="cell"><label>Runway Elevation <button type="button" class="info noprint" data-note="elev" aria-label="Note">i</button></label><input type="text" inputmode="numeric" data-k="rwyElev"></div>
+      <div class="cell w"><label>RCR <button type="button" class="info noprint" id="rcrInfo" aria-label="How RCR is set">i</button></label><input type="text" inputmode="numeric" data-k="rcr"><span class="rsn" id="rcrWhy"></span></div>
+      <div class="cell"><label>RSC</label><input type="text" data-k="rsc"></div>
+      <div class="cell"><label>Screen Height <button type="button" class="info noprint" data-note="der" aria-label="Note">i</button></label><input type="text" inputmode="numeric" data-k="screen"></div>
+    </div>
+    <div class="row r6" style="border-top:1px solid var(--line)">
+      <div class="cell"><label>* Min Climb Gradient <button type="button" class="info noprint" data-note="mcg" aria-label="Note">i</button></label><input type="text" inputmode="decimal" data-k="mcg1"></div>
+      <div class="cell"><label>* Min Climb Gradient 2</label><input type="text" inputmode="decimal" data-k="mcg2"></div>
+      <div class="cell"><label>† ATC Climb Gradient</label><input type="text" inputmode="decimal" data-k="atc"></div>
+      <div class="cell"><label>Obstacle Height (MSL) <button type="button" class="info noprint" data-note="obs" aria-label="Note">i</button></label><input type="text" inputmode="numeric" data-k="obsHt"></div>
+      <div class="cell w"><label>Missed App Climb Gradient</label><input type="text" inputmode="decimal" data-k="mag"></div>
+    </div>
+    <div class="row r6" style="border-top:1px solid var(--line)">
+      <div class="cell"><label>* Altitude (MSL)</label><input type="text" inputmode="numeric" data-k="alt1"></div>
+      <div class="cell"><label>* Altitude (MSL)</label><input type="text" inputmode="numeric" data-k="alt2"></div>
+      <div class="cell"><label>† Altitude (MSL)</label><input type="text" inputmode="numeric" data-k="alt3"></div>
+      <div class="cell"><label>Obstacle Distance</label><input type="text" inputmode="numeric" data-k="obsDist"></div>
+      <div class="cell w"><label>Altitude (MSL)</label><input type="text" inputmode="numeric" data-k="magAlt"></div>
+    </div>
+    <div class="foot"><b>Notes:</b><span id="notesTxt"></span></div>
+  </div>
+
+  <div class="legend noprint"><span style="background:var(--auto);color:var(--autoink)">green</span>read from your file or runway data
+    <span style="background:var(--der);color:var(--derink)">amber</span>derived (field elevation from PA and altimeter), verify
+  </div>
+  </div>
+
+</div>
+
+<div class="modal noprint" id="shotModal" hidden>
+  <div class="mbox wide" role="dialog" aria-modal="true" aria-labelledby="shotTitle">
+    <button type="button" class="mclose" id="shotClose" aria-label="Close">&times;</button>
+    <h2 id="shotTitle">Send to FEs</h2>
+    <img id="shotImg" alt="Screenshot of the departure planning worksheet">
+    <div class="mact">
+      <button type="button" id="shotShare">Share</button>
+      <button type="button" class="sec" id="shotCopy">Copy image</button>
+      <button type="button" class="sec" id="shotSave">Save image</button>
+    </div>
+    <p id="shotMsg" style="font-size:12px;color:var(--muted)"></p>
+  </div>
+</div>
+<div class="modal noprint" id="noteModal" hidden>
+  <div class="mbox" role="dialog" aria-modal="true" aria-labelledby="noteTitle">
+    <button type="button" class="mclose" id="noteClose" aria-label="Close">&times;</button>
+    <h2 id="noteTitle"></h2>
+    <div id="noteBody"></div>
+  </div>
+</div>
+<div class="modal noprint" id="rcrModal" hidden>
+  <div class="mbox" role="dialog" aria-modal="true" aria-labelledby="rcrTitle">
+    <button type="button" class="mclose" id="rcrClose" aria-label="Close">&times;</button>
+    <h2 id="rcrTitle">How RCR is set</h2>
+    <p>RCR starts at 23 (dry). It changes to <b>12</b> when any of these is found, and the reason is shown in small type in the box:</p>
+    <ul>
+      <li><b>Rain in the METAR:</b> present weather such as RA, -RA, DZ, SHRA or TSRA.</li>
+      <li><b>Snow in the METAR:</b> SN or SG.</li>
+      <li><b>Dewpoint spread of 2&deg;C or less:</b> treated as very low.</li>
+      <li><b>METAR runway state:</b> damp, wet or snow.</li>
+      <li><b>CFP weather:</b> rain or snow in the CFP observation.</li>
+      <li><b>Forecast rain or snow:</b> in the Open-Meteo strip&rsquo;s &ldquo;now&rdquo; or &ldquo;+1h&rdquo; cell.</li>
+      <li><b>D-ATIS:</b> it mentions rain, wet, drizzle, showers, thunderstorms or snow.</li>
+    </ul>
+    <p><b>Icy conditions</b> (freezing rain, ice, slush, frost, ice pellets) leave the box empty so you enter the value yourself.</p>
+    <p>An RCR reported in the D-ATIS or METAR is used as reported. A value you type is never overwritten.</p>
+  </div>
+</div>
+<script>
+(function(){
+  var $=function(s){return document.querySelector(s)};
+  var fields={};
+  document.querySelectorAll('[data-k]').forEach(function(el){fields[el.dataset.k]=el});
+  var ROLES=['DEP','ARR'];
+  var ROLENAME={DEP:'Takeoff',ARR:'Dest'};
+  function blank(){return {sid:'',star:'',icao:'',taf:null,tafPapers:'',tafBusy:false,refTime:null,refLabel:'',datis:null,datisBusy:false,fc:null,fcAt:null,fcErr:'',lat:null,lon:null,wx:null,metar:null,metarAt:null,metarErr:'',cfp:null,src:'cfp',star:'',chosen:'',plan:'',papersRwys:[],rwys:[],form:null}}
+  var A={DEP:blank(),ARR:blank(),ALT:blank()};
+  var sel='DEP', notam={}, csvText=null;
+  // aviationweather.gov blocks direct browser requests (no CORS header). Paste your Cloudflare Worker URL here,
+  // e.g. 'https://metar-proxy.YOURNAME.workers.dev'. Leave empty to try the direct URL.
+  var METAR_PROXY='https://dpw.cale-simmons.workers.dev/';
+  var RWY_URL='https://davidmegginson.github.io/ourairports-data/runways.csv';
+
+  try{ pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; }catch(e){}
+
+  function status(msg,warn){var s=$('#status'); s.textContent=msg; s.style.color=warn?'#b45309':'';}
+  function normRwy(s){var m=String(s||'').toUpperCase().match(/^(\d{1,2})([LCR]?)$/); return m?(('0'+m[1]).slice(-2)+m[2]):String(s||'').toUpperCase();}
+
+  /* ---------- form state ---------- */
+  function setField(k,v,cls){
+    var el=fields[k]; if(!el||v===undefined||v===null||v==='') return;
+    if(el.type==='checkbox'||el.type==='radio'){ el.checked=!!v; return; }
+    el.value=v; el.classList.remove('auto','derived'); el.classList.add(cls||'auto');
+  }
+  function clearForm(){
+    Object.keys(fields).forEach(function(k){var el=fields[k];
+      if(el.type==='checkbox'||el.type==='radio') el.checked=false; else {el.value=''; el.classList.remove('auto','derived');}});
+  }
+  function collect(){
+    var o={}; Object.keys(fields).forEach(function(k){var el=fields[k];
+      o[k]=(el.type==='checkbox'||el.type==='radio')?el.checked:{v:el.value,c:el.classList.contains('auto')?'auto':(el.classList.contains('derived')?'derived':'')};});
+    return o;
+  }
+  function saveForm(){A[sel].form=collect();}
+  function loadForm(){
+    clearForm(); var f=A[sel].form; if(!f){ if(A[sel].icao) fields.icao.value=A[sel].icao; calc(); return; }
+    Object.keys(f).forEach(function(k){var el=fields[k]; if(!el) return; var x=f[k];
+      if(el.type==='checkbox'||el.type==='radio') el.checked=!!x;
+      else { el.value=x.v; el.classList.remove('auto','derived'); if(x.c) el.classList.add(x.c); }});
+    calc();
+  }
+  function withRole(role,fn){ saveForm(); var old=sel; sel=role; loadForm(); fn(); saveForm(); sel=old; loadForm(); }
+  document.querySelectorAll('input[type=text]').forEach(function(el){
+    el.addEventListener('input',function(){el.classList.remove('auto','derived'); if(el.id==='icao') A[sel].icao=el.value.toUpperCase(); if(el.dataset.k==='rcr'){ A[sel].rcrWhy=''; $('#rcrWhy').textContent=''; } renderTabs(); calc();});
+  });
+
+  /* ---------- tabs ---------- */
+  function renderTabs(){
+    var t=$('#tabs'); t.innerHTML='';
+    ROLES.forEach(function(r){
+      var b=document.createElement('button'); b.className='tab'+(r===sel?' on':'');
+      b.innerHTML=r+' <small>'+(A[r].icao||'—')+(A[r].plan?' · rwy '+A[r].plan:'')+'</small>';
+      b.onclick=function(){ if(r===sel) return; saveForm(); sel=r; loadForm(); renderTabs(); renderRwySel(); renderWx(); };
+      t.appendChild(b);
+    });
+  }
+  function zt(d){ d=d||new Date(); return ('0'+d.getUTCHours()).slice(-2)+('0'+d.getUTCMinutes()).slice(-2)+'Z'; }
+  function renderWx(){
+    var a=A[sel], el=$('#wxline'), ml=$('#metarline'), w=a.cfp;
+    if(w&&w.raw){el.style.display='block'; el.textContent='CFP Weather: '+w.raw;} else el.style.display='none';
+    if(a.metar){ml.style.display='block'; ml.textContent='METAR Weather: '+a.metar.raw+'   (last updated '+zt(a.metarAt)+(a.metarErr?', refresh failed':'')+')';}
+    else if(a.metarErr){ml.style.display='block'; ml.textContent='METAR Weather: unavailable ('+a.metarErr+')';}
+    else ml.style.display='none';
+    updateSrc(); renderTaf(); renderFc(); renderDatis();
+  }
+  function updateSrc(){
+    var sc=A[sel].src, d=A[sel].datis;
+    $('#srcCfp').classList.toggle('on',sc!=='metar'&&sc!=='datis');
+    $('#srcMetar').classList.toggle('on',sc==='metar');
+    $('#srcDatis').classList.toggle('on',sc==='datis');
+    $('#srcDatis').classList.toggle('dim',!!d&&d.state==='none');
+  }
+
+  /* ---------- runway select ---------- */
+  function rwyList(){
+    var a=A[sel], list=a.rwys&&a.rwys.length?a.rwys:a.papersRwys.map(function(i){return {ident:normRwy(i),len:null,elev:null,width:null,surf:'',disp:0}});
+    return list;
+  }
+  function renderRwySel(){
+    var s=$('#rwySel'), list=rwyList(), plan=normRwy(A[sel].plan);
+    s.innerHTML='<option value="">'+(list.length?'Select runway…':'No runways yet. Load runway data or type manually')+'</option>';
+    list.forEach(function(r){
+      var o=document.createElement('option'); o.value=r.ident;
+      o.textContent=r.ident+(r.len?'  ·  '+Number(r.len).toLocaleString()+' ft'+(r.width?' × '+r.width:''):'')+(r.disp?'  ·  displaced '+r.disp:'')+(r.ident===plan?'  ★ default':'');
+      s.appendChild(o);
+    });
+    var want=A[sel].chosen||plan; if(want) s.value=want;
+    $('#slopeNote').textContent=A[sel].slopeNote||''; $('#rcrWhy').textContent=A[sel].rcrWhy||'';
+    $('#rwyNote').textContent=(A[sel].rwys&&A[sel].rwys.length)?'Runway data: OurAirports. Verify against FLIP/Jepp.':(list.length?'Runway names from papers. Lengths need runway data.':'');
+  }
+  function applyRunway(ident,r,quiet){
+    ident=normRwy(ident); var m=ident.match(/^(\d{2})([LCR]?)$/); if(!m) return; A[sel].chosen=ident;
+    var hdg=parseInt(m[1],10)*10; if(hdg===0) hdg=360;
+    setField('rwyHdg',String(hdg).padStart(3,'0'),'auto');
+    fields.slope.value=''; fields.slope.classList.remove('auto','derived'); fields.up.checked=fields.dn.checked=false; A[sel].slopeNote='';
+    if(r&&r.len) setField('rwyLen',String(r.len),'auto'); else if(!quiet){ fields.rwyLen.value=''; fields.rwyLen.classList.remove('auto','derived'); }
+    if(r&&r.elev!==null&&r.elev!==undefined&&r.elev!=='') { if(!fields.fieldElev.value) setField('fieldElev',String(Math.round(r.elev)),'derived'); }
+    var sl=null, ends=null, nn=notam[A[sel].icao]||{}, SLOPE_MIN=0.2;
+    if(r&&r.len&&r.elev!=null&&r.opp!=null&&r.elev!==r.opp){ sl=(r.opp-r.elev)/r.len*100; ends=[r.elev,r.opp]; A[sel].slopeNote='Slope from runway-end elevations (OurAirports).'; }
+    else if(r&&r.len&&nn[ident]&&nn[recip(ident)]&&!isNaN(nn[ident].der)&&!isNaN(nn[recip(ident)].der)){ sl=(nn[ident].der-nn[recip(ident)].der)/r.len*100; ends=[nn[ident].der,nn[recip(ident)].der]; A[sel].slopeNote='Slope from DER elevations in the departure NOTAMs.'; }
+    var sloped=(sl!==null&&Math.abs(sl)>=SLOPE_MIN);
+    if(sl!==null){
+      if(sloped){ setField('slope',Math.abs(sl).toFixed(2),'derived'); if(sl>0) fields.up.checked=true; else fields.dn.checked=true; }
+      else setField('slope','N/A','derived');
+    } else A[sel].slopeNote='';
+    // runway elevation: sloped = highest end, no slope = lowest end
+    // sloped: higher of the runway's highest end and the field elevation; no slope: lower of the runway's lowest end and the field elevation
+    A[sel].elevInfo=ends?{base:(sloped?Math.max(ends[0],ends[1]):Math.min(ends[0],ends[1])),sloped:sloped}:null;
+    if(ends){ fields.rwyElev.value=''; fields.rwyElev.classList.remove('auto','derived'); syncRwyElev(); }
+    else if(r&&r.elev!=null&&r.elev!=='') setField('rwyElev',String(Math.round(r.elev)),'auto');
+    $('#slopeNote').textContent=A[sel].slopeNote||'';
+    var n=notam[A[sel].icao]&&notam[A[sel].icao][ident];
+    var sf=fields.screen;
+    if(!(sf.value&&!sf.classList.contains('auto')&&!sf.classList.contains('derived'))){
+      sf.value=''; sf.classList.remove('auto','derived');
+      if(n&&n.screen) setField('screen',n.screen,'auto'); else setField('screen','0','derived');
+    }
+    if(n){ if(n.mcg) setField('mcg1',n.mcg,'auto'); if(n.alt) setField('alt1',n.alt,'auto'); }
+    applyRsc(sel);
+    calc();
+  }
+  $('#rwySel').onchange=function(){
+    var id=this.value; if(!id) return;
+    var r=rwyList().filter(function(x){return x.ident===id})[0];
+    applyRunway(id,r,false); applyRcr(sel); applyRsc(sel);
+  };
+
+  /* ---------- file reading ---------- */
+  async function readPdf(buf){
+    var pdf=await pdfjsLib.getDocument({data:buf}).promise, out='';
+    for(var p=1;p<=pdf.numPages;p++){
+      var pg=await pdf.getPage(p), tc=await pg.getTextContent(), lastY=null, line='';
+      tc.items.forEach(function(it){
+        var y=it.transform[5];
+        if(lastY!==null && Math.abs(y-lastY)>3){ out+=line.trim()+'\n'; line=''; }
+        line+=it.str+' '; lastY=y;
+      });
+      out+=line.trim()+'\n\n';
+    }
+    return out;
+  }
+  async function handleFile(f){
+    if(!f) return;
+    if(/^image\//.test(f.type)){ status('That is an image. Upload the crew papers PDF so the text can be read.',true); return; }
+    status('Reading '+f.name+' …');
+    try{
+      var text='';
+      if(/\.pdf$/i.test(f.name)||f.type==='application/pdf') text=await readPdf(await f.arrayBuffer());
+      else {
+        text=await f.text();
+        if(/\.json$/i.test(f.name)){ try{ var j=JSON.parse(text); if(j&&j.dpwHero2){ loadSaved(j); status('Loaded saved worksheet.'); return; } }catch(e){} }
+      }
+      parsePapers(text,f.name);
+    }catch(err){ console.error(err); status('Could not read that file: '+err.message,true); }
+  }
+
+  /* ---------- parsing crew papers ---------- */
+  function parseWxBlock(b){
+    var o={}, m;
+    m=b.match(/\b([A-Z]{4})\s+(\d{2}\/\d{4}Z)/); if(m){o.icao=m[1]; o.time=m[2];}
+    m=b.match(/\b(\d{3}|VRB)(\d{2,3})(?:G(\d{2,3}))?KT\b/); if(m){o.wdir=m[1]; o.wvel=String(parseInt(m[2],10)); if(m[3]) o.wgust=String(parseInt(m[3],10));}
+    m=b.match(/\bT:\s*(-?\d+)\s*C/); if(m) o.temp=m[1];
+    m=b.match(/ALSTG:\s*(\d{2}\.\d{2})/); if(m) o.alt=parseFloat(m[1]);
+    m=b.match(/\bPA:\s*(-?\d+)\s*ft/i); if(m) o.pa=m[1];
+    m=b.match(/[A-Z]{4}\s+\d{2}\/\d{4}Z[^\n]*?(?=\s+T:\s*-?\d|\n|$)/); if(m) o.raw=m[0].trim();
+    return o;
+  }
+  function setCfpFields(w){
+    if(w.temp) setField('temp',w.temp,'auto');
+    if(w.pa) setField('pa',w.pa,'auto');
+    if(w.wdir) setField('wdir',w.wdir,'auto');
+    if(w.wvel) setField('wvel',w.wvel,'auto');
+    if(w.wgust) setField('wgust',w.wgust,'auto');
+    if(w.pa&&w.alt) setField('fieldElev',String(Math.round(parseFloat(w.pa)-(29.92-w.alt)*1000)),'derived');
+  }
+  function recip(id){
+    var m=normRwy(id).match(/^(\d{2})([LCR]?)$/); if(!m) return id;
+    var n=(parseInt(m[1],10)+18)%36; if(n===0) n=36;
+    return ('0'+n).slice(-2)+({L:'R',R:'L',C:'C'}[m[2]]||'');
+  }
+  function parsePapers(raw,name){
+    $('#drop').classList.remove('attn'); $('#dropText').textContent='Upload new crew papers here…';
+    var t=raw.replace(/\r/g,'').replace(/[ \t]+/g,' '), found=[], m;
+    A={DEP:blank(),ARR:blank(),ALT:blank()}; notam={};
+
+    // Airports
+    m=t.match(/DEP:\s*([A-Z]{4})\s+ARR:\s*([A-Z]{4})\s+ALT1:\s*([A-Z]{4}|None)/);
+    if(!m) m=t.match(/Itin #\s*Dep\s*Arr\s*Arr Alt 1[^\n]*\n\s*\d+\s+([A-Z]{4})\s+([A-Z]{4})\s+([A-Z]{4})/);
+    if(m){ A.DEP.icao=m[1]; A.ARR.icao=m[2]; }
+
+    // Weather briefing
+    var heads=[['DEP','Takeoff Weather'],['ARR','Dest Weather']], idx={};
+    ['Takeoff Weather','Dest Weather','Alternate Weather','Enroute Weather'].forEach(function(h){idx[h]=t.indexOf(h);});
+    heads.forEach(function(h){
+      var s=idx[h[1]]; if(s<0) return;
+      var e=t.length; Object.keys(idx).forEach(function(k){ if(idx[k]>s && idx[k]<e) e=idx[k]; });
+      var o=parseWxBlock(t.slice(s,e)); if(!o.icao&&!o.wdir) return;
+      A[h[0]].wx=o; if(!A[h[0]].icao&&o.icao) A[h[0]].icao=o.icao;
+    });
+
+    // CFP takeoff time (ETD) and arrival (ETD + EET)
+    var etd=null;
+    m=t.match(/ETD\s+(\d)(\d{3})\/(\d{4})Z/);
+    if(m) etd=Date.UTC(2020+parseInt(m[1],10),0,1)+(parseInt(m[2],10)-1)*86400000+parseInt(m[3].slice(0,2),10)*3600000+parseInt(m[3].slice(2),10)*60000;
+    else{
+      m=t.match(/\bTIME\s+(\d{2})(\d{2})Z(\d{2})([A-Z]{3})(\d{4})/);
+      var MO={JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11};
+      if(m&&MO[m[4]]!==undefined) etd=Date.UTC(+m[5],MO[m[4]],+m[3],+m[1],+m[2]);
+    }
+    if(etd!==null){
+      A.DEP.refTime=etd; A.DEP.refLabel='takeoff '+zt(new Date(etd))+' (CFP ETD)';
+      var em=t.match(/-([A-Z]{4})(\d{2})(\d{2})\s+[A-Z]{4}\b/);
+      if(em&&em[1]===A.ARR.icao){ var eta=etd+(parseInt(em[2],10)*60+parseInt(em[3],10))*60000; A.ARR.refTime=eta; A.ARR.refLabel='arrival '+zt(new Date(eta))+' (CFP ETD + EET)'; }
+    }
+    // TAFs printed in the crew papers (planning-time copy)
+    var ent=t.indexOf('Enroute Weather');
+    if(ent>-1){
+      var seg=t.slice(ent).replace(/Classification\s*-\s*Controlled Unclassified Military Information\s*-\s*FOUO\s*\d+\/\d+/gi,' ');
+      var hzi=seg.search(/Enroute\s+HAZARD|HAZARD\s+Charts/i); if(hzi>0) seg=seg.slice(0,hzi);
+      ROLES.forEach(function(r){
+        var ic=A[r].icao; if(!ic) return;
+        var tm=seg.match(new RegExp('TAF\\s+(?:AMD\\s+|COR\\s+)?'+ic+'\\s+\\d{6}Z[\\s\\S]*?(?:=|$)'));
+        if(tm) A[r].tafPapers=cleanTaf(tm[0].slice(0,1500));
+      });
+    }
+    // SID / STAR printed in the CFP
+    m=t.match(/\bSID\s*=\s*([^\n]*)/); if(m) A.DEP.sid=m[1].trim();
+    m=t.match(/\bSTAR\s*=\s*([^\n]*)/); if(m) A.ARR.star=m[1].trim();
+    // Planned runways
+    m=t.match(/Departure Groundpath\s*=\s*(\d{1,2}[LCR]?)/); if(m) A.DEP.plan=normRwy(m[1]);
+    m=t.match(/^\s*SID\s*=\s*(.+?)\s*$/m); if(m) A.DEP.sid=m[1].trim();
+    m=t.match(/^\s*STAR\s*=\s*(.+?)\s*$/m); if(m) A.ARR.star=m[1].trim();
+    m=t.match(/Arrival Groundpath\s*=\s*(\d{1,2}[LCR]?)/); if(m) A.ARR.plan=normRwy(m[1]);
+    m=t.match(/RWY\s+TDT\s+SDP([\s\S]*?)RAMP FUEL/);
+    if(m){ var re=/^\s*(\d{2}[LCR]?)\s?(\*?)\s+\d+/gm, x; while((x=re.exec(m[1]))){ var id=normRwy(x[1]); if(A.DEP.papersRwys.indexOf(id)<0) A.DEP.papersRwys.push(id); if(x[2]==='*') A.DEP.star=id; } }
+    if(!A.DEP.plan && A.DEP.star) A.DEP.plan=A.DEP.star;
+    if(A.ARR.plan) A.ARR.papersRwys=[A.ARR.plan, recip(A.ARR.plan)];
+    if(A.DEP.plan && A.DEP.papersRwys.indexOf(A.DEP.plan)<0) A.DEP.papersRwys.push(A.DEP.plan);
+
+    // NOTAM departure data (screen height / min climb), by airport and runway
+    var hdrs=[], hr=/\b([A-Z]{4})\s+[A-Z][A-Z' ]+?\s*\[Back to Top\]/g, hm;
+    while((hm=hr.exec(t))) hdrs.push({i:hm.index,icao:hm[1]});
+    var nr=/OMNIDIRECTIONAL DEPARTURE RWY\s*(\d{1,2}[LCR]?):?\s+STANDARD WITH DER\s+CROSSING HEIGHT OF\s*(\d+)\s*AGL\/(\d+)\s*MSL(?:\s+AND MIN CLIMB OF\s*[\d.]+%\s*\((\d+)\/NM\)\s*TO\s*(\d+))?/g, nm;
+    while((nm=nr.exec(t))){
+      var ap=null; hdrs.forEach(function(h){ if(h.i<nm.index) ap=h.icao; });
+      if(!ap) ap=A.DEP.icao; if(!ap) continue;
+      notam[ap]=notam[ap]||{};
+      notam[ap][normRwy(nm[1])]={screen:nm[2],der:parseInt(nm[3],10)-parseInt(nm[2],10),mcg:nm[4]||'',alt:nm[5]||''};
+    }
+
+    // Build per-airport forms
+    ROLES.forEach(function(r){
+      var a=A[r]; if(!a.icao) return;
+      sel=r; clearForm(); fields.icao.value=a.icao; fields.icao.classList.add('auto');
+      var w=a.wx; a.cfp=w; a.src='cfp'; if(w) setCfpFields(w);
+      setField('mag','200','derived'); setField('screen','0','derived');
+      if(a.plan) applyRunway(a.plan,null,true);
+      saveForm();
+      found.push(r+': '+a.icao+(w?' · wind '+w.wdir+'/'+w.wvel+(w.wgust?'G'+w.wgust:'')+' · '+w.temp+'°C · PA '+w.pa:' · no weather found')+(a.plan?' · planned rwy '+a.plan:''));
+    });
+    var nk=Object.keys(notam); if(nk.length){ found.push('Departure NOTAMs found for: '+nk.map(function(k){return k+' ('+Object.keys(notam[k]).join(', ')+')'}).join('; ')); }
+    sel='DEP'; loadForm(); renderTabs(); renderRwySel(); renderWx();
+    ROLES.forEach(function(r){ if(A[r].icao){ applyRcr(r); applyRsc(r); } });
+    renderTkoff();
+
+    var n=ROLES.filter(function(r){return A[r].icao}).length;
+    status((name?name+': ':'')+n+' airport'+(n===1?'':'s')+' found. '+(n?'Loading runways…':'Verify against the source.'),!n);
+    if(n){ loadRunways(); ROLES.forEach(function(r){ if(A[r].icao) loadMetar(r,true).then(function(){ loadDatis(r); loadTaf(r); return loadForecast(r); }); }); }
+  }
+
+  /* ---------- runway data (OurAirports) ---------- */
+  function csvLine(l){
+    var out=[],cur='',q=false;
+    for(var i=0;i<l.length;i++){var c=l[i];
+      if(q){ if(c==='"'){ if(l[i+1]==='"'){cur+='"';i++;} else q=false; } else cur+=c; }
+      else if(c==='"') q=true; else if(c===','){out.push(cur);cur='';} else cur+=c; }
+    out.push(cur); return out;
+  }
+  async function loadRunways(){
+    var need=ROLES.map(function(r){return A[r].icao}).filter(Boolean);
+    if(!need.length){ status('Read crew papers or enter an ICAO first.',true); return; }
+    status('Loading runway data for '+need.join(', ')+' …');
+    try{
+      if(!csvText){ var r=await fetch(RWY_URL); if(!r.ok) throw new Error('HTTP '+r.status); csvText=await r.text(); }
+      var lines=csvText.split('\n'), head=csvLine(lines[0]).map(function(h){return h.trim()}), ix={};
+      head.forEach(function(h,i){ix[h]=i;});
+      var got={}, coords={}; need.forEach(function(k){got[k]=[];});
+      for(var i=1;i<lines.length;i++){
+        var l=lines[i]; if(!l) continue;
+        var hit=null; for(var n=0;n<need.length;n++){ if(l.indexOf('"'+need[n]+'"')>-1){hit=need[n];break;} }
+        if(!hit) continue;
+        var c=csvLine(l); if(c[ix.airport_ident]!==hit) continue;
+        if(c[ix.closed]==='1') continue;
+        if(!coords[hit]){ var la=parseFloat(c[ix.le_latitude_deg]), lo=parseFloat(c[ix.le_longitude_deg]); if(!isNaN(la)&&!isNaN(lo)) coords[hit]={lat:la,lon:lo}; }
+        var len=parseInt(c[ix.length_ft],10)||null, w=parseInt(c[ix.width_ft],10)||null, surf=c[ix.surface]||'';
+        [['le','he'],['he','le']].forEach(function(p){
+          var id=c[ix[p[0]+'_ident']]; if(!id) return;
+          var el=c[ix[p[0]+'_elevation_ft']], oe=c[ix[p[1]+'_elevation_ft']];
+          got[hit].push({ident:normRwy(id),len:len,width:w,surf:surf,elev:el===''||el===undefined?null:parseFloat(el),opp:oe===''||oe===undefined?null:parseFloat(oe),disp:parseInt(c[ix[p[0]+'_displaced_threshold_ft']],10)||0});
+        });
+      }
+      var summary=[];
+      ROLES.forEach(function(r){
+        var a=A[r]; a.rwys=(got[a.icao]||[]).sort(function(x,y){return x.ident<y.ident?-1:1;});
+        if(coords[a.icao]){ a.lat=coords[a.icao].lat; a.lon=coords[a.icao].lon; }
+        summary.push(a.icao+': '+a.rwys.length+' runway ends');
+      });
+      // apply planned runways with real lengths
+      ROLES.forEach(function(r){
+        var a=A[r]; if(!a.icao||!a.plan||!a.rwys.length) return;
+        var rw=a.rwys.filter(function(x){return x.ident===normRwy(a.plan)})[0]; if(!rw) return;
+        withRole(r,function(){ applyRunway(a.plan,rw,true); });
+      });
+      renderRwySel(); renderTabs(); calc();
+      ROLES.forEach(function(r){ if(A[r].icao) loadForecast(r); });
+      status('');
+    }catch(err){
+      console.error(err);
+      status('Runway lookup failed ('+err.message+'). Outside requests are blocked in some previews. Open the downloaded file or host it, or type runway length by hand.',true);
+    }
+  }
+
+  /* ---------- live METAR ---------- */
+  function findRsc(raw,rwy){
+    var t=String(raw||'').toUpperCase(), m;
+    m=t.match(/\bRSC\s*[:\/]?\s*([A-Z0-9][A-Z0-9 \/.%-]{0,24}?)(?=\s+(?:RMK|RCR|SLP|\$)|\s*=|$)/);
+    if(m&&m[1].trim()) return m[1].trim();
+    var re=/\bR(\d{2}[LCR]?)\/(CLRD\/\/|[\d\/]{6})/g, g, all=[];
+    while((g=re.exec(t))) all.push({id:normRwy(g[1]),code:g[2]});
+    if(!all.length) return '';
+    var want=normRwy(rwy||'');
+    var pick=all.filter(function(x){return want&&(x.id===want||x.id===recip(want));})[0]||(all.length===1?all[0]:null);
+    if(!pick) return '';
+    var txt=pick.code.indexOf('CLRD')===0?'CLRD':(({'0':'DRY','1':'DAMP','2':'WET','3':'RIME/FROST','4':'DRY SNOW','5':'WET SNOW','6':'SLUSH','7':'ICE','8':'COMPACTED SNOW','9':'FROZEN RUTS'})[pick.code[0]]||'N/R');
+    return txt+((want&&pick.id!==want&&pick.id!==recip(want))||!want?' (R'+pick.id+')':'');
+  }
+  async function loadMetar(role,quiet){
+    var a=A[role];
+    if(!a.icao||!/^[A-Z0-9]{4}$/.test(a.icao)){ if(!quiet) status('Enter a 4-letter ICAO first.',true); return false; }
+    try{
+      var url=METAR_PROXY?METAR_PROXY+(METAR_PROXY.indexOf('?')>-1?'&':'?')+'ids='+a.icao:'https://aviationweather.gov/api/data/metar?ids='+a.icao+'&format=json';
+      var r=await fetch(url);
+      if(r.status===204) throw new Error('no METAR returned');
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      var d=await r.json(); if(!d||!d.length) throw new Error('no METAR returned');
+      var o=d[0]; o.raw=o.rawOb||o.raw_text||''; a.metar=o; a.metarErr=''; a.metarAt=new Date();
+    }catch(err){ console.error(err); a.metarErr=err.message; if(!a.metarAt) a.metar=null; }
+    if(role===sel) renderWx();
+    applyRcr(role);
+    return !!a.metar;
+  }
+  /* ---------- Share screenshot of the worksheet ---------- */
+  (function(){
+    var modal=$('#shotModal'), img=$('#shotImg'), msg=$('#shotMsg'), cur=null, url=null;
+    var fname=function(){ var a=A[sel]; return 'DPW_'+(a.icao||'worksheet')+(a.chosen||a.plan?'_'+(a.chosen||a.plan):'')+'.png'; };
+    var closeIt=function(){ modal.hidden=true; if(url){ URL.revokeObjectURL(url); url=null; } img.removeAttribute('src'); };
+    $('#shotClose').addEventListener('click',closeIt);
+    modal.addEventListener('click',function(e){ if(e.target===modal) closeIt(); });
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&!modal.hidden) closeIt(); });
+    $('#shotBtn').addEventListener('click',async function(){
+      if(typeof html2canvas!=='function'){ status('The screenshot tool did not load. It needs an internet connection.',true); return; }
+      status('Capturing the worksheet …');
+      var a=A[sel], rw=a.chosen||a.plan;
+      try{
+        var canvas=await html2canvas($('#ws'),{scale:2,backgroundColor:getComputedStyle(document.body).backgroundColor,useCORS:true,logging:false,
+          onclone:function(doc){
+            var win=doc.defaultView, root=doc.getElementById('ws');
+            root.querySelectorAll('input[type=text]').forEach(function(i){
+              var cs=win.getComputedStyle(i), d=doc.createElement('div');
+              d.textContent=i.value;
+              d.style.cssText='box-sizing:border-box;min-height:32px;padding:4px 0;font-size:'+cs.fontSize+';font-weight:'+cs.fontWeight+';text-align:'+cs.textAlign+';text-transform:'+cs.textTransform+';';
+              d.style.width=cs.width; d.style.color=cs.color; d.style.background=cs.backgroundColor;
+              if(parseFloat(cs.borderTopWidth)>0){ d.style.border=cs.borderTopWidth+' '+cs.borderTopStyle+' '+cs.borderTopColor; d.style.padding='2px 4px'; }
+              i.parentNode.replaceChild(d,i);
+            });
+            root.querySelectorAll('input[type=radio]').forEach(function(r){
+              var sp=doc.createElement('span'); sp.textContent=r.checked?'\u25C9':'\u25CB'; sp.style.fontSize='14px'; r.parentNode.replaceChild(sp,r);
+            });
+            root.querySelectorAll('.info').forEach(function(b){ b.remove(); });
+          }});
+        canvas.toBlob(function(b){
+          if(!b){ status('Could not create the image.',true); return; }
+          cur=new File([b],fname(),{type:'image/png'});
+          if(url) URL.revokeObjectURL(url);
+          url=URL.createObjectURL(b); img.src=url;
+          $('#shotShare').style.display=(navigator.canShare&&navigator.canShare({files:[cur]}))?'':'none';
+          $('#shotCopy').style.display=(window.ClipboardItem&&navigator.clipboard&&navigator.clipboard.write)?'':'none';
+          msg.textContent=''; modal.hidden=false; status('');
+        },'image/png');
+      }catch(err){ console.error(err); status('Screenshot failed ('+err.message+').',true); }
+    });
+    $('#shotShare').addEventListener('click',async function(){
+      try{ await navigator.share({files:[cur],title:'DPW '+(A[sel].icao||''),text:'C-5M Departure Planning Worksheet'}); }
+      catch(e){ if(e&&e.name!=='AbortError') msg.textContent='Sharing failed ('+e.message+'). Use Save image instead.'; }
+    });
+    $('#shotCopy').addEventListener('click',async function(){
+      try{ await navigator.clipboard.write([new ClipboardItem({'image/png':cur}) ]); msg.textContent='Image copied. Paste it into a message or email.'; }
+      catch(e){ msg.textContent='Copy failed ('+e.message+'). Use Save image instead.'; }
+    });
+    $('#shotSave').addEventListener('click',function(){
+      var a=document.createElement('a'); a.href=url; a.download=cur?cur.name:fname(); document.body.appendChild(a); a.click(); a.remove();
+      msg.textContent='Saved to your downloads.';
+    });
+  })();
+
+  /* ---------- pointing fingers in the upload box ---------- */
+  (function(){
+    var box=$('#fingers'), cols=9, rows=2, n=cols*rows, i;
+    for(i=0;i<n;i++){
+      var sp=document.createElement('span');
+      sp.textContent='\uD83D\uDC46';
+      sp.style.left=(3+((i%cols)+Math.random()*0.7)/cols*90).toFixed(1)+'%';
+      sp.style.top=(6+(Math.floor(i/cols)+Math.random()*0.6)/rows*62).toFixed(1)+'%';
+      sp.style.fontSize=(13+Math.round(Math.random()*9))+'px';
+      sp.style.setProperty('--d',(1.8+Math.random()*1.6).toFixed(2)+'s');
+      sp.style.setProperty('--w',(-Math.random()*3.4).toFixed(2)+'s');
+      box.appendChild(sp);
+    }
+  })();
+
+  /* ---------- rain inside the Hide / Show Weather button ---------- */
+  (function(){
+    var box=$('#rain'), n=18, i;
+    for(i=0;i<n;i++){
+      var d=document.createElement('i');
+      d.style.left=(2+((i+Math.random()*0.8)/n)*96).toFixed(1)+'%';
+      d.style.height=(6+Math.round(Math.random()*7))+'px';
+      d.style.setProperty('--d',(0.65+Math.random()*0.8).toFixed(2)+'s');
+      d.style.setProperty('--w',(-Math.random()*1.5).toFixed(2)+'s');
+      box.appendChild(d);
+    }
+  })();
+
+  /* ---------- takeoff time badge ---------- */
+  function renderTkoff(){
+    var t=A.DEP&&A.DEP.refTime, el=$('#tkoff');
+    if(!t){ el.style.display='none'; return; }
+    var dd=new Date(t), MON=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+    var jd=Math.floor((Date.UTC(dd.getUTCFullYear(),dd.getUTCMonth(),dd.getUTCDate())-Date.UTC(dd.getUTCFullYear(),0,0))/86400000);
+    $('#tkoDayTxt').textContent=('0'+dd.getUTCDate()).slice(-2)+' '+MON[dd.getUTCMonth()]+' '+dd.getUTCFullYear();
+    $('#tkoJul').textContent='/ JD '+('00'+jd).slice(-3);
+    // time of day only (Zulu): ignore the date, use the nearest takeoff time within 12 hours
+    var td=new Date(t), nw=new Date();
+    var d=(td.getUTCHours()*60+td.getUTCMinutes())-(nw.getUTCHours()*60+nw.getUTCMinutes());
+    d=((d+720)%1440+1440)%1440-720;
+    var a=Math.abs(d), h=Math.floor(a/60), m=('0'+(a%60)).slice(-2);
+    $('#tkoTime').textContent=zt(td);
+    $('#tkoDate').textContent=d===0?'(now)':(d>0?'(in '+h+'+'+m+')':'('+h+'+'+m+' ago)');
+    el.style.display='inline-flex';
+  }
+  setInterval(renderTkoff,30000);
+
+  /* ---------- Hide / Show weather ---------- */
+  (function(){
+    var w=$('#wxwrap');
+    try{ if(localStorage.getItem('dpwWxHidden')==='1') w.hidden=true; }catch(e){}
+    $('#wxToggle').addEventListener('click',function(){
+      w.hidden=!w.hidden;
+      try{ localStorage.setItem('dpwWxHidden',w.hidden?'1':'0'); }catch(e){}
+    });
+  })();
+
+  /* ---------- cell notes (the red guidance text on the form) ---------- */
+  (function(){
+    var NOTES={
+      hdg:{t:'Runway heading',b:['To the nearest 10 deg']},
+      len:{t:'Runway length',b:['When declared distances are published TORA is normally used for runway length. If ASDA and TORA differ, use ASDA for all calculations when ASDA is less than TORA. If ASDA is greater than TORA, ASDA may be used for VR calculations only.']},
+      elev:{t:'Runway elevation',b:['Sloped - highest elevation','No Slope - lowest elevation']},
+      der:{t:'DER crossing restriction (Screen height)',b:['TERPS: 0 feet','ICAO (PANS-OPS) / NATO (MIPS): 16 ft','NAS (Hardened Rwy \u2265 6,000 ft): 0 feet','NAS (Unhardened Rwy & Rwy < 6,000 ft): 0-35 feet']},
+      slope:{t:'Slope / runway elevation',b:['Sloped - highest elevation','No Slope - lowest elevation']},
+      mcg:{t:'Min climb gradient',b:['200 up to the MSA (for the dept rwy) if no other climb gradient']},
+      obs:{t:'Obstacle height (MSL)',b:['\u2264 200\u2019 AGL with < 500\u2019 lateral separation from the departure flight path; or','> 200\u2019 AGL published via NOTAM that do not have an associated climb gradient']}
+    };
+    var m=$('#noteModal'), last=null;
+    var close=function(){ m.hidden=true; if(last) last.focus(); };
+    document.querySelectorAll('.info[data-note]').forEach(function(btn){
+      btn.addEventListener('click',function(e){
+        e.preventDefault(); e.stopPropagation();
+        var n=NOTES[btn.dataset.note]; if(!n) return; last=btn;
+        $('#noteTitle').textContent=n.t;
+        var body=$('#noteBody'); body.innerHTML='';
+        n.b.forEach(function(line){ var p=document.createElement('p'); p.textContent=line; body.appendChild(p); });
+        m.hidden=false; $('#noteClose').focus();
+      });
+    });
+    $('#noteClose').addEventListener('click',close);
+    m.addEventListener('click',function(e){ if(e.target===m) close(); });
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&!m.hidden) close(); });
+  })();
+
+  /* ---------- RCR info popup ---------- */
+  (function(){
+    var m=$('#rcrModal');
+    var open=function(){ m.hidden=false; $('#rcrClose').focus(); }, close=function(){ m.hidden=true; $('#rcrInfo').focus(); };
+    $('#rcrInfo').addEventListener('click',open);
+    $('#rcrClose').addEventListener('click',close);
+    m.addEventListener('click',function(e){ if(e.target===m) close(); });
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&!m.hidden) close(); });
+  })();
+
+  /* ---------- TAF (live via Worker, or the copy in the crew papers) ---------- */
+  function cleanTaf(x){
+    x=String(x).replace(/Classification\s*-\s*Controlled Unclassified Military Information\s*-\s*FOUO\s*\d+\/\d+/gi,' ');
+    var i=x.search(/\s(?:Enroute\s+HAZARD|HAZARD\s+Charts|Classification\b|Controlled\s+Unclassified|FOUO|CUI\b|TACC\s)/i); if(i>0) x=x.slice(0,i);
+    var j=x.indexOf('TAF',4); if(j>0) x=x.slice(0,j).replace(/\s+[A-Z]{4}\s*$/,'');
+    var k=x.indexOf('='); if(k>0) x=x.slice(0,k+1);
+    x=x.replace(/\s+\d{1,3}\/\d{2,3}(?=\s|$)[\s\S]*$/,'');
+    x=x.replace(/\bT:\s*-?\d+\s*C\/-?\d+\s*F\b/g,'').replace(/ALSTG:\s*[\d.]+\s*ins/g,'').replace(/\bPA:\s*-?\d+\s*ft/gi,'').replace(/\bVT:\s*[\d:\-]+/g,'');
+    return x.replace(/\s+/g,' ').trim();
+  }
+  var TAF_MS=10*60*1000;
+  function tafDdhh(dd,hh,ref){
+    var r=new Date(ref), best=null;
+    for(var mo=-1;mo<=1;mo++){
+      var t=Date.UTC(r.getUTCFullYear(),r.getUTCMonth()+mo,dd,hh,0,0);
+      if(best===null||Math.abs(t-ref)<Math.abs(best-ref)) best=t;
+    }
+    return best;
+  }
+  function parseTaf(raw,ref){
+    var toks=String(raw).replace(/=+\s*$/,'').replace(/\s+/g,' ').trim().split(' '), vi=-1, i;
+    for(i=0;i<toks.length;i++){ if(/^\d{4}\/\d{4}$/.test(toks[i])){ vi=i; break; } }
+    if(vi<0) return null;
+    var vm=toks[vi].match(/^(\d{2})(\d{2})\/(\d{2})(\d{2})$/);
+    var vs=tafDdhh(+vm[1],+vm[2],ref), ve=vs+(((+vm[3])*24+(+vm[4]))-((+vm[1])*24+(+vm[2]))+((+vm[3])<(+vm[1])?720:0))*3600000;
+    var rest=toks.slice(vi+1), groups=[], cur={type:'BASE',start:vs,end:ve,tok:[]}, k, m;
+    for(k=0;k<rest.length;k++){
+      var tk=rest[k];
+      if((m=tk.match(/^FM(\d{2})(\d{2})(\d{2})$/))){
+        groups.push(cur); cur={type:'FM',start:tafDdhh(+m[1],+m[2],vs)+(+m[3])*60000,end:ve,tok:[tk]};
+      } else if(tk==='BECMG'||tk==='TEMPO'||/^PROB\d{2}$/.test(tk)){
+        var tks=[tk], j=k;
+        if(/^PROB\d{2}$/.test(tk)&&rest[k+1]==='TEMPO'){ tks.push('TEMPO'); j=k+1; }
+        var pm=(rest[j+1]||'').match(/^(\d{2})(\d{2})\/(\d{2})(\d{2})$/);
+        if(pm){
+          tks.push(rest[j+1]); groups.push(cur);
+          var s1=tafDdhh(+pm[1],+pm[2],vs), e1=tafDdhh(+pm[3],+pm[4],vs); if(e1<=s1) e1+=86400000;
+          cur={type:tk==='BECMG'?'BECMG':'TEMP',start:s1,end:e1,tok:tks}; k=j+1;
+        } else cur.tok.push(tk);
+      } else cur.tok.push(tk);
+    }
+    groups.push(cur);
+    var fms=groups.filter(function(g){return g.type==='FM';});
+    groups.forEach(function(g){
+      if(g.type==='BASE'&&fms.length) g.end=fms[0].start;
+      if(g.type==='FM'){ var nx=fms.filter(function(f){return f.start>g.start;})[0]; g.end=nx?nx.start:ve; }
+    });
+    return {hdr:toks.slice(0,vi+1).join(' '),vs:vs,ve:ve,groups:groups};
+  }
+  function tafActive(p,T){
+    var cls={}, prev=0;
+    if(T<p.vs||T>=p.ve) return null;
+    p.groups.forEach(function(g,i){
+      if(i===0) return;
+      if(g.type==='FM'){ if(g.start<=T) prev=i; }
+      else if(g.type==='BECMG'){ if(g.end<=T) prev=i; else if(g.start<=T) cls[i]='tmp'; }
+      else if(g.type==='TEMP'){ if(g.start<=T&&T<g.end) cls[i]='tmp'; }
+    });
+    cls[prev]='hl';
+    return cls;
+  }
+  async function loadTaf(role){
+    var a=A[role]; if(!a.icao||!METAR_PROXY||a.tafBusy) return;
+    if(a.taf&&a.taf.at&&(new Date()-a.taf.at)<TAF_MS) return;
+    a.tafBusy=true;
+    var res;
+    try{
+      var r=await fetch(METAR_PROXY+(METAR_PROXY.indexOf('?')>-1?'&':'?')+'taf='+a.icao);
+      if(r.status===204||r.status===404) res={state:'none',at:new Date()};
+      else{
+        if(!r.ok) throw new Error('HTTP '+r.status);
+        var d=await r.json(), o=d&&d[0], raw=o&&(o.rawTAF||o.raw_text||o.rawOb||'');
+        res=raw?{state:'ok',raw:raw,at:new Date()}:{state:'none',at:new Date()};
+      }
+    }catch(e){ res={state:'err',err:e.message}; }
+    if(!(res.state==='err'&&a.taf&&a.taf.state==='ok')) a.taf=res;
+    a.tafBusy=false;
+    if(role===sel) renderTaf();
+  }
+  function renderTaf(){
+    var a=A[sel], el=$('#tafline'), raw='', src='';
+    if(a.taf&&a.taf.state==='ok'){ raw=a.taf.raw; src='live, updated '+zt(a.taf.at); }
+    else if(a.tafPapers){ raw=a.tafPapers; src='copy in the crew papers (planning time)'; }
+    var add=function(cls,txt){ var x=document.createElement('div'); if(cls) x.className=cls; x.textContent=txt; el.appendChild(x); return x; };
+    el.innerHTML='';
+    if(!raw){
+      if(a.taf&&a.taf.state==='none'){ el.style.display='block'; add('','TAF: No TAF Available'); }
+      else if(a.taf&&a.taf.state==='err'){ el.style.display='block'; add('','TAF: unavailable ('+a.taf.err+')'+(/HTTP 400/.test(a.taf.err)?'. Update the Cloudflare Worker for live TAF.':'')); }
+      else el.style.display='none';
+      return;
+    }
+    el.style.display='block';
+    var T=a.refTime||Date.now(), label=a.refTime?a.refLabel:'now', p=parseTaf(raw,T);
+    if(!p){ add('th','TAF Weather: '+raw); return; }
+    add('th','TAF Weather: '+p.hdr);
+    var cls=tafActive(p,T)||{};
+    p.groups.forEach(function(g,i){ if(g.tok.length||g.type!=='BASE') add('tg'+(cls[i]?' '+cls[i]:''),g.tok.join(' ')); });
+    add('dh',(tafActive(p,T)?'Highlighted: in effect at '+label+' (green = prevailing, amber = changing or temporary)':'TAF validity does not cover '+label)+' · source: '+src);
+  }
+
+  /* ---------- RSC: N/A unless D-ATIS (or Current METAR) reports it ---------- */
+  function datisRsc(a,role){
+    if(!a.datis||a.datis.state!=='ok') return '';
+    var want=role==='ARR'?'arr':'dep', rank=function(i){ return i.type===want?0:((i.type==='combined'||!i.type)?1:2); };
+    var items=a.datis.items.slice().sort(function(x,y){ return rank(x)-rank(y); });
+    for(var i=0;i<items.length;i++){
+      var t=items[i].text.toUpperCase().replace(/\s+/g,' ');
+      var m=t.match(/\b(?:RSC|RUNWAY SURFACE CONDITIONS?)\b[\s:\/\-]*([A-Z][A-Z0-9 \/%]{1,30}?)(?=[.,;]| RCR\b| WIND\b| RWY\b| RUNWAY\b| BIRD\b| ADVISE\b|$)/);
+      if(m){ var v=m[1].trim(); if(v&&!/^(N\/A|NA\b|NOT |UNKNOWN|UNAVAIL)/.test(v)) return v; }
+    }
+    return '';
+  }
+  function applyRsc(role){
+    var a=A[role]; if(!a||!a.icao) return;
+    var run=function(){
+      var f=fields.rsc;
+      if(f.value&&!f.classList.contains('auto')&&!f.classList.contains('derived')) return; // typed by the user
+      f.value=''; f.classList.remove('auto','derived');
+      var v=datisRsc(a,role);
+      if(v) setField('rsc',v,'auto');
+      else if(a.src==='metar'&&a.metar&&(v=findRsc(a.metar.raw,a.chosen||a.plan))) setField('rsc',v,'auto');
+      else setField('rsc','N/A','derived');
+    };
+    if(role===sel){ run(); saveForm(); } else withRole(role,run);
+  }
+
+  /* ---------- RCR default ---------- */
+  function wetTokens(raw){
+    var t=String(raw||'').toUpperCase().split(/\s+/), hit=[];
+    for(var i=1;i<t.length;i++){ if(t[i]==='RMK') break; if(/^(\+|-|VC)?(MI|BC|DR|BL|SH|TS|FZ)?(DZ|RA|SN|SG|PL|GR|GS|UP)+$/.test(t[i])) hit.push(t[i]); }
+    return hit;
+  }
+  function tokKinds(tok){
+    var k=[];
+    if(/FZ/.test(tok)||/PL/.test(tok)) k.push('ice');
+    if(/SN|SG/.test(tok)) k.push('snow');
+    if(/RA|DZ|GR|GS|UP|TS/.test(tok)&&!/FZ/.test(tok)) k.push('rain');
+    return k;
+  }
+  function textKinds(t){
+    var k=[]; t=String(t).toUpperCase();
+    if(/FREEZING|\bICE\b|\bICY\b|SLUSH|FROST|RIME|FROZEN/.test(t)) k.push('ice');
+    if(/SNOW/.test(t)) k.push('snow');
+    if(/\b(RAIN|DRIZZLE|SHOWERS?|WET|DAMP|STANDING WATER|THUNDERSTORMS?)\b/.test(t)) k.push('rain');
+    return k;
+  }
+  function wcodeKinds(c){
+    if(c===56||c===57||c===66||c===67) return ['ice'];
+    if((c>=71&&c<=77)||c===85||c===86) return ['snow'];
+    if((c>=51&&c<=65)||(c>=80&&c<=82)||c>=95) return ['rain'];
+    return [];
+  }
+  function rcrVerdict(a,rwy){
+    var items=[], nums=[], texts=[];
+    var add=function(kinds,text){ kinds.forEach(function(k){ items.push({kind:k,text:text}); }); };
+    if(a.datis&&a.datis.state==='ok') a.datis.items.forEach(function(it){ texts.push(it.text); });
+    if(a.metar) texts.push(a.metar.raw);
+    texts.forEach(function(t){
+      var m=String(t).toUpperCase().match(/\bRCR[\s:\-]*(\d{1,2})(?:[\s\/]+(\d{1,2}))?(?:[\s\/]+(\d{1,2}))?/);
+      if(m) [m[1],m[2],m[3]].forEach(function(x){ if(x!==undefined) nums.push(parseInt(x,10)); });
+    });
+    if(nums.length) return {num:Math.min.apply(null,nums),items:[]};
+    if(a.datis&&a.datis.state==='ok') a.datis.items.forEach(function(it){ var kk=textKinds(it.text); kk.forEach(function(k){ items.push({kind:k,text:'D-ATIS '+(k==='snow'?'snow':(k==='ice'?'ice':'rain/wet'))}); }); });
+    if(a.metar){
+      wetTokens(a.metar.raw).forEach(function(tk){ add(tokKinds(tk),'METAR '+tk); });
+      var tp=a.metar.temp, dp=a.metar.dewp;
+      if(tp==null||dp==null){ var mm=String(a.metar.raw).match(/\s(M?\d{2})\/(M?\d{2})\s/); if(mm){ tp=parseInt(mm[1].replace('M','-'),10); dp=parseInt(mm[2].replace('M','-'),10); } }
+      if(tp!=null&&dp!=null&&(tp-dp)<=2) items.push({kind:'spread',text:'dewpoint spread '+(tp-dp)+'°C'});
+      var rs=findRsc(a.metar.raw,rwy); if(rs&&!/^(DRY|CLRD|N\/A|N\/R)/.test(rs)) add(textKinds(rs).length?textKinds(rs):['rain'],'METAR runway '+rs.replace(/\s*\(R\d+[LCR]?\)$/,'').toLowerCase());
+    }
+    if(a.cfp&&a.cfp.raw) wetTokens(a.cfp.raw).forEach(function(tk){ add(tokKinds(tk),'CFP '+tk); });
+    if(a.fc){ var fk={}; [0,1].forEach(function(i){ if(a.fc[i]) wcodeKinds(a.fc[i].code).forEach(function(k){ if(!fk[k]){ fk[k]=1; items.push({kind:k,text:'forecast '+(k==='snow'?'snow':(k==='ice'?'freezing precip':'rain'))}); } }); }); }
+    return {num:null,items:items};
+  }
+  function applyRcr(role){
+    var a=A[role]; if(!a||!a.icao) return;
+    var run=function(){
+      var f=fields.rcr;
+      if(f.value&&!f.classList.contains('auto')&&!f.classList.contains('derived')) return; // typed by the user
+      var v=rcrVerdict(a,a.chosen||a.plan);
+      f.value=''; f.classList.remove('auto','derived');
+      var uniq=function(arr){ var o={}; return arr.filter(function(x){ if(o[x]) return false; o[x]=1; return true; }); };
+      if(v.num!==null){ setField('rcr',String(v.num),'auto'); a.rcrWhy=''; }
+      else if(v.items.some(function(x){return x.kind==='ice';})){
+        a.rcrWhy='(icy/freezing: '+uniq(v.items.filter(function(x){return x.kind==='ice';}).map(function(x){return x.text;})).join('; ')+' — enter RCR)';
+      }
+      else if(v.items.length){ setField('rcr','12','derived'); a.rcrWhy='('+uniq(v.items.map(function(x){return x.text;})).join('; ')+')'; }
+      else { setField('rcr','23','derived'); a.rcrWhy=''; }
+    };
+    if(role===sel){ run(); saveForm(); $('#rcrWhy').textContent=a.rcrWhy||''; } else withRole(role,run);
+  }
+
+  /* ---------- D-ATIS ---------- */
+  var DATIS_URLS=['https://atis.info/api/','https://datis.clowd.io/api/'];
+  function usDatis(icao){ return /^[KP]/.test(icao)||/^T[JI]/.test(icao); }
+  function parseDatis(j){
+    var arr=Array.isArray(j)?j:(j&&typeof j.datis==='string'?[j]:[]);
+    arr=arr.filter(function(x){return x&&typeof x.datis==='string'&&x.datis.trim();});
+    if(!arr.length) return {state:'none',items:[]};
+    return {state:'ok',items:arr.map(function(x){return {type:x.type||'',code:x.code||'',text:x.datis.trim()};})};
+  }
+  async function loadDatis(role){
+    var a=A[role]; if(!a.icao||a.datisBusy) return;
+    var d=a.datis, ttl=!d?0:(d.state==='none'?30*60000:5*60000);
+    if(d&&(new Date()-d.at)<ttl) return;
+    a.datisBusy=true;
+    var res=null, lastErr='';
+    if(!usDatis(a.icao)) res={state:'none',items:[]};
+    else{
+      var routes=DATIS_URLS.map(function(u){return u+a.icao;});
+      if(METAR_PROXY) routes.push(METAR_PROXY+(METAR_PROXY.indexOf('?')>-1?'&':'?')+'datis='+a.icao);
+      for(var i=0;i<routes.length&&!res;i++){
+        try{
+          var r=await fetch(routes[i]), j=null;
+          try{ j=await r.json(); }catch(e){}
+          if(r.status===404||(j&&!Array.isArray(j)&&j.error&&!j.datis)) res={state:'none',items:[]};
+          else if(!r.ok) throw new Error('HTTP '+r.status);
+          else res=parseDatis(j);
+        }catch(e){ lastErr=e.message; }
+      }
+    }
+    if(!res){ res={state:'err',err:lastErr||'unreachable',items:(d&&d.items)||[]}; if(d&&d.state==='ok'){ res.state='ok'; res.stale=true; } }
+    res.at=(res.state==='ok'&&res.stale&&d)?d.at:new Date();
+    a.datis=res; a.datisBusy=false;
+    if(role===sel) renderDatis();
+    applyRcr(role); applyRsc(role);
+  }
+  function pickDatis(a,role){
+    if(!a.datis||a.datis.state!=='ok') return null;
+    var want=role==='ARR'?'arr':'dep', rank=function(i){ return i.type===want?0:((i.type==='combined'||!i.type)?1:2); };
+    return a.datis.items.slice().sort(function(x,y){ return rank(x)-rank(y); })[0]||null;
+  }
+  function parseDatisWx(text){
+    var t=String(text).toUpperCase().replace(/\s+/g,' '), o={}, m, neg;
+    if((m=t.match(/\b(\d{3}|VRB)(\d{2,3})(?:G(\d{2,3}))?KT\b/))){ o.wdir=m[1]; o.wvel=+m[2]; if(m[3]) o.wgust=+m[3]; }
+    else if((m=t.match(/\bWIN?DS?\b[ :]*(?:IS |FROM )?(\d{3}|VARIABLE|VRB)(?: DEGREES)?(?: AT |\/| )(\d{1,3})(?:[ ,]*(?:G|GUSTS?|GUSTING)(?: TO)? ?(\d{1,3}))?/))){ o.wdir=(m[1]==='VARIABLE'?'VRB':m[1]); o.wvel=+m[2]; if(m[3]) o.wgust=+m[3]; }
+    else if(/\bWIND(?:S)? CALM\b/.test(t)){ o.wdir='000'; o.wvel=0; }
+    if((m=t.match(/\bTEMP(?:ERATURE)?[ :]*(M|MINUS|-)? ?(\d{1,2})\b/))) o.temp=(m[1]?-1:1)*(+m[2]);
+    if((m=t.match(/\bDEW ?POINT[ :]*(M|MINUS|-)? ?(\d{1,2})\b/))) o.dewp=(m[1]?-1:1)*(+m[2]);
+    if(o.temp===undefined&&(m=t.match(/\s(M?\d{2})\/(M?\d{2})(?=\s|$)/))){ o.temp=parseInt(m[1].replace('M','-'),10); o.dewp=parseInt(m[2].replace('M','-'),10); }
+    if((m=t.match(/\bALTIMETER[ :]*(\d{2}\.\d{2}|\d{4})\b/))) o.alt=m[1].indexOf('.')>0?parseFloat(m[1]):parseInt(m[1],10)/100;
+    else if((m=t.match(/\bA(\d{4})\b/))) o.alt=parseInt(m[1],10)/100;
+    return o;
+  }
+  function applyDatisToForm(){
+    var a=A[sel], it=pickDatis(a,sel); if(!it) return false;
+    var w=parseDatisWx(it.text); if(w.wvel===undefined&&w.temp===undefined) return false;
+    a.src='datis';
+    ['temp','pa','wdir','wvel','wgust'].forEach(function(k){ fields[k].value=''; fields[k].classList.remove('auto','derived'); });
+    if(w.temp!==undefined) setField('temp',String(w.temp),'auto');
+    if(w.wdir!==undefined) setField('wdir',w.wdir,'auto');
+    if(w.wvel!==undefined) setField('wvel',String(w.wvel),'auto');
+    if(w.wgust) setField('wgust',String(w.wgust),'auto');
+    var fe=parseFloat(fields.fieldElev.value);
+    if(w.alt&&!isNaN(fe)) setField('pa',String(Math.round(fe+(29.92-w.alt)*1000)),'derived');
+    calc(); saveForm(); renderWx(); return true;
+  }
+  $('#srcDatis').onclick=async function(){
+    var a=A[sel];
+    if(!a.icao){ status('Load crew papers or enter an ICAO first.',true); return; }
+    status('Checking D-ATIS for '+a.icao+' …');
+    if(a.datis) a.datis.at=new Date(0);
+    await loadDatis(sel);
+    var d=A[sel].datis;
+    if(d&&d.state==='ok'){
+      if(applyDatisToForm()) status('Worksheet weather set from the D-ATIS'+(pickDatis(A[sel],sel).code?' (info '+pickDatis(A[sel],sel).code+')':'')+'. Verify against source.');
+      else status('D-ATIS found, but the weather could not be read from it.',true);
+    } else status('No DATIS Available'+(d&&d.state==='err'?' (lookup failed: '+d.err+')':'')+'.',true);
+    renderWx();
+  };
+  function renderDatis(){
+    var a=A[sel], el=$('#datisline'), d=a.datis;
+    if(!d){ el.style.display='none'; return; }
+    el.style.display='block'; el.innerHTML='';
+    var add=function(cls,txt){ var x=document.createElement('div'); if(cls) x.className=cls; x.textContent=txt; el.appendChild(x); return x; };
+    if(d.state==='none'){ add('','DATIS: No DATIS Available'); return; }
+    if(d.state==='err'){ add('','DATIS: lookup failed ('+d.err+')'); return; }
+    d.items.forEach(function(it){
+      add('','DATIS '+(it.code?it.code+' ':'')+(it.type&&it.type!=='combined'?'('+it.type.toUpperCase()+') ':'')+'— '+it.text);
+    });
+    add('dh','D-ATIS via atis.info · updated '+zt(d.at)+(d.stale?' (refresh failed)':''));
+  }
+
+  /* ---------- +6 hour forecast (Open-Meteo) ---------- */
+  var FC_MS=10*60*1000;
+  function wxIcon(code,day){
+    if(code===0) return day?'☀️':'🌙';
+    if(code===1) return day?'🌤️':'🌙';
+    if(code===2) return '⛅';
+    if(code===3) return '☁️';
+    if(code===45||code===48) return '🌫️';
+    if(code>=51&&code<=57) return '🌦️';
+    if(code>=61&&code<=67) return '🌧️';
+    if(code>=71&&code<=77) return '🌨️';
+    if(code>=80&&code<=82) return '🌦️';
+    if(code===85||code===86) return '🌨️';
+    if(code>=95) return '⛈️';
+    return '·';
+  }
+  function hz(t){ return ('0'+new Date(t).getUTCHours()).slice(-2)+'Z'; }
+  async function loadForecast(role){
+    var a=A[role], lat=a.metar&&a.metar.lat, lon=a.metar&&a.metar.lon;
+    if(lat==null||lon==null){ lat=a.lat; lon=a.lon; }
+    if(lat==null||lon==null) return false;
+    if(a.fc&&a.fcAt&&(new Date()-a.fcAt)<FC_MS) return true;
+    if(a.fcBusy) return false;
+    a.fcBusy=true;
+    try{
+      var u='https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&hourly=temperature_2m,precipitation_probability,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m,is_day&wind_speed_unit=kn&timezone=GMT&forecast_days=2';
+      var r=await fetch(u); if(!r.ok) throw new Error('HTTP '+r.status);
+      var d=await r.json(), h=d&&d.hourly; if(!h||!h.time) throw new Error('no forecast returned');
+      var start=Math.floor(Date.now()/3600000)*3600000, out=[];
+      for(var i=0;i<h.time.length&&out.length<7;i++){
+        var t=Date.parse(h.time[i]+'Z'); if(t<start) continue;
+        out.push({t:t,temp:h.temperature_2m[i],pop:h.precipitation_probability[i],code:h.weather_code[i],spd:h.wind_speed_10m[i],dir:h.wind_direction_10m[i],gst:h.wind_gusts_10m[i],day:h.is_day[i]});
+      }
+      if(!out.length) throw new Error('no forecast hours returned');
+      a.fc=out; a.fcAt=new Date(); a.fcErr='';
+    }catch(err){ console.error(err); a.fcErr=err.message; }
+    a.fcBusy=false;
+    if(role===sel) renderFc();
+    applyRcr(role);
+    return !!a.fc;
+  }
+  function renderFc(){
+    var a=A[sel], el=$('#fcbar');
+    if(!a.fc&&!a.fcErr){ el.style.display='none'; return; }
+    el.style.display='block';
+    if(!a.fc){ el.textContent='+6 hr forecast unavailable ('+a.fcErr+')'; return; }
+    var html='<div class="fch">+6 hr forecast (Open-Meteo model data, not an official forecast) · updated '+zt(a.fcAt)+(a.fcErr?', refresh failed':'')+'</div><div class="fcrow">';
+    a.fc.forEach(function(p,i){
+      var spd=Math.round(p.spd), g=Math.round(p.gst);
+      var wind=(p.dir==null?'---':String(Math.round(p.dir)).padStart(3,'0'))+'/'+spd+(g-spd>=10?'G'+g:'');
+      html+='<div class="fcc'+(i===0?' now':'')+'"><div class="fct">'+(i===0?'now':'+'+i+'h')+' ('+hz(p.t)+') <span>'+wxIcon(p.code,p.day)+'</span><b>'+Math.round(p.temp)+'°</b></div><div class="fcw">'+wind+' kt · <span class="fcp">'+(p.pop==null?'-':p.pop)+'%</span></div></div>';
+    });
+    el.innerHTML=html+'</div>';
+  }
+  function applyMetarToForm(){
+    var a=A[sel], o=a.metar; if(!o) return '';
+    a.src='metar';
+    ['temp','pa','wdir','wvel','wgust'].forEach(function(k){fields[k].value='';fields[k].classList.remove('auto','derived');});
+    if(o.temp!==undefined&&o.temp!==null) setField('temp',String(o.temp),'auto');
+    if(o.wdir!==undefined&&o.wdir!==null) setField('wdir',o.wdir==='VRB'?'VRB':String(o.wdir).padStart(3,'0'),'auto');
+    if(o.wspd!==undefined&&o.wspd!==null) setField('wvel',String(o.wspd),'auto');
+    if(o.wgst) setField('wgust',String(o.wgst),'auto');
+    if(o.elev!==undefined&&o.elev!==null&&!fields.fieldElev.value) setField('fieldElev',String(Math.round(o.elev*3.28084)),'derived');
+    var fe=parseFloat(fields.fieldElev.value);
+    if(o.altim&&!isNaN(fe)) setField('pa',String(Math.round(fe+(29.92-o.altim*0.02953)*1000)),'derived');
+    applyRsc(sel);
+    var rsc=fields.rsc.classList.contains('auto')?fields.rsc.value:'';
+    calc(); saveForm(); renderWx(); return rsc;
+  }
+  async function fetchMetar(){
+    var icao=(fields.icao.value||'').trim().toUpperCase();
+    if(!/^[A-Z0-9]{4}$/.test(icao)){ status('Enter a 4-letter ICAO first.',true); return false; }
+    A[sel].icao=icao; status('Fetching METAR for '+icao+' …');
+    var ok=await loadMetar(sel,false);
+    if(!ok){ status('METAR fetch failed ('+A[sel].metarErr+'). '+(METAR_PROXY?'Check the Cloudflare Worker URL.':'aviationweather.gov blocks direct browser requests, so METAR needs the Cloudflare Worker proxy (set METAR_PROXY at the top of the script).'),true); return false; }
+    var rsc=applyMetarToForm();
+    status('Current METAR loaded for '+icao+'. '+(rsc?'RSC: '+rsc+'.':'No RSC in the METAR or D-ATIS (RSC N/A).')+' Verify against source.');
+    return true;
+  }
+  window.DPW_fetchMetar=fetchMetar;
+  async function autoRefresh(){
+    for(var i=0;i<ROLES.length;i++){
+      var r=ROLES[i]; if(!A[r].icao) continue;
+      var ok=await loadMetar(r,true);
+      await loadForecast(r);
+      await loadDatis(r);
+      if(A[r].src==='datis') withRole(r,function(){ applyDatisToForm(); });
+      await loadTaf(r);
+      if(r===sel) renderTaf();
+      if(ok&&A[r].src==='metar') withRole(r,function(){ applyMetarToForm(); });
+    }
+  }
+  setInterval(autoRefresh,60000);
+  $('#srcMetar').onclick=fetchMetar;
+  $('#srcCfp').onclick=function(){
+    var a=A[sel]; if(!a.cfp){ status('No CFP weather for this airport. Read the crew papers first.',true); return; }
+    ['temp','pa','wdir','wvel','wgust'].forEach(function(k){fields[k].value='';fields[k].classList.remove('auto','derived');});
+    setCfpFields(a.cfp); a.wx=a.cfp; a.src='cfp'; applyRsc(sel); saveForm(); renderWx(); calc(); status('Using CFP weather for '+a.icao+'.');
+  };
+
+  /* ---------- wind components ---------- */
+  function num(k){var v=parseFloat(fields[k].value); return isNaN(v)?null:v;}
+  function cell(l,v){return '<div>'+l+'<b>'+v+'</b></div>'}
+  function renderNotes(){
+    var a=A[sel]||{}, rw=a.chosen||a.plan, parts=[], head='';
+    if(a.icao) head='Filed for '+a.icao;
+    if(sel==='DEP'&&a.sid) head+=(head?' ':'')+'SID - '+a.sid;
+    if(sel==='ARR'&&a.star) head+=(head?' ':'')+'STAR - '+a.star;
+    if(head) parts.push(head);
+    if(rw) parts.push('RWY '+rw);
+    $('#notesTxt').textContent=parts.join(' // ');
+  }
+  function syncRwyElev(){
+    var a=A[sel], ei=a&&a.elevInfo; if(!ei) return;
+    var f=fields.rwyElev;
+    if(f.value&&!f.classList.contains('auto')&&!f.classList.contains('derived')) return; // typed by the user
+    var fe=parseFloat(fields.fieldElev.value), v=ei.base;
+    if(!isNaN(fe)) v=ei.sloped?Math.max(v,fe):Math.min(v,fe);
+    var nv=String(Math.round(v));
+    if(f.value!==nv||!f.classList.contains('auto')) setField('rwyElev',nv,'auto');
+  }
+  function syncVr(){
+    var f=fields.vrLen, rl=fields.rwyLen.value;
+    if(f.value&&!f.classList.contains('derived')&&!f.classList.contains('auto')) return; // typed by the user
+    f.value=''; f.classList.remove('auto','derived');
+    if(rl) setField('vrLen',rl,'derived');
+  }
+  function calc(){
+    renderNotes(); syncVr(); syncRwyElev();
+    var c=$('#calc'), html='', hdg=num('rwyHdg'), wd=num('wdir'), ws=num('wvel'), wg=num('wgust');
+    if(hdg!==null&&ws!==null&&String(fields.wdir.value).toUpperCase()==='VRB') html+=cell('Wind','Variable '+ws+' kt');
+    if(hdg!==null&&wd!==null&&ws!==null){
+      var comp=function(s){var a=(wd-hdg)*Math.PI/180; return {h:s*Math.cos(a),x:s*Math.sin(a)};};
+      var ht=function(v){var r=Math.round(v); return (r>=0?'HW ':'TW ')+Math.abs(r)}, xw=function(v){var r=Math.round(v); return Math.abs(r)+(r>0?' R':(r<0?' L':''))};
+      var a=comp(ws); html+=cell('Headwind / Tailwind',ht(a.h)+' kt')+cell('Crosswind',xw(a.x)+' kt');
+      if(wg!==null){var g=comp(wg); html+=cell('Gust HW / TW',ht(g.h)+' kt')+cell('Gust crosswind',xw(g.x)+' kt');}
+    }
+    var rl=num('rwyLen'); if(rl!==null) html+=cell('Runway length',rl.toLocaleString()+' ft');
+    c.innerHTML=html; c.style.display=html?'':'none';
+  }
+  Object.keys(fields).forEach(function(k){ fields[k].addEventListener('input',calc); });
+
+  /* ---------- save / load / misc ---------- */
+  function loadSaved(j){
+    saveForm(); A=j.airports; notam=j.notam||{}; sel=j.sel||'DEP';
+    ROLES.forEach(function(r){ if(!A[r]) A[r]=blank(); });
+    loadForm(); renderTabs(); renderRwySel(); renderWx();
+  }
+  $('#clear').onclick=function(){
+    $('#drop').classList.add('attn'); $('#dropText').textContent='Tap or drop crew papers here';
+    A={DEP:blank(),ARR:blank(),ALT:blank()}; notam={}; sel='DEP'; clearForm();
+    status('');
+    renderTabs(); renderRwySel(); renderWx(); calc(); renderTkoff();
+  };
+
+  var drop=$('#drop'), inp=$('#file');
+  drop.addEventListener('click',function(){inp.click()});
+  inp.addEventListener('change',function(){handleFile(inp.files[0]); inp.value='';});
+  ['dragover','dragenter'].forEach(function(e){drop.addEventListener(e,function(ev){ev.preventDefault();drop.classList.add('over')})});
+  ['dragleave','drop'].forEach(function(e){drop.addEventListener(e,function(ev){ev.preventDefault();drop.classList.remove('over')})});
+  drop.addEventListener('drop',function(ev){handleFile(ev.dataTransfer.files[0])});
+
+  // URL automation: ?icao=KSUU
+  (function(){
+    var ic=new URLSearchParams(location.search).get('icao');
+    if(ic){ A.DEP.icao=ic.toUpperCase(); fields.icao.value=A.DEP.icao; renderTabs(); fetchMetar(); loadRunways(); }
+  })();
+  renderTabs(); renderRwySel(); calc();
+})();
+</script>
+</body>
+</html>
