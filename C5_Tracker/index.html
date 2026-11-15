@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>C-5 Spotting over Travis · v16</title>
+<title>C-5 Spotting over Travis · v17</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600&family=Yellowtail&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -363,7 +363,7 @@ td.m{color:var(--red);font-weight:600}
   <span id="r-mode"></span>
   <button id="refresh">REFRESH NOW</button>
 </section>
-<div class="ver">V16</div>
+<div class="ver">V17</div>
 
 <script>
 const HOME={lat:38.2627,lon:-121.9275,name:'Travis',icao:'KSUU'}; // Travis AFB
@@ -384,14 +384,14 @@ const CARDW=['north','north-east','east','south-east','south','south-west','west
 const cardw=b=>CARDW[Math.round(b/45)%8];
 
 /* ---------- fleet ---------- */
-const TRAVIS={ae051a:'68-0213',ae051d:'68-0216',ae055b:'84-0060',ae055d:'84-0062',ae0567:'85-0010',ae0568:'86-0011',ae056d:'86-0016',ae0570:'86-0019',ae0575:'86-0024',ae0577:'86-0026',ae0579:'87-0028',ae057a:'87-0029',ae057b:'87-0030',ae057d:'87-0032',ae0587:'87-0042',ae0589:'87-0044'};
-// [short name, full name, ICAO hex codes]. Tail numbers are only known for Travis; the others show their hex until the feed reports a registration.
+const TAILS={ae051a:'68-0213',ae051d:'68-0216',ae055b:'84-0060',ae055d:'84-0062',ae0567:'85-0010',ae0568:'86-0011',ae056d:'86-0016',ae0570:'86-0019',ae0575:'86-0024',ae0577:'86-0026',ae0579:'87-0028',ae057a:'87-0029',ae057b:'87-0030',ae057d:'87-0032',ae0587:'87-0042',ae0589:'87-0044',ae053e:'69-0024',ae0559:'83-1285',ae055c:'84-0061',ae055e:'85-0001',ae055f:'85-0002',ae0560:'85-0003',ae0561:'85-0004',ae0562:'85-0005',ae0564:'85-0007',ae0565:'85-0008',ae056a:'86-0013',ae056c:'86-0015',ae056e:'86-0017',ae0571:'86-0020',ae0576:'86-0025',ae0580:'87-0035',ae0581:'87-0036',ae0585:'87-0040',ae058a:'87-0045',ae0569:'86-0012',ae056b:'86-0014',ae0578:'87-0027',ae057c:'87-0031',ae057e:'87-0033',ae0582:'87-0037',ae0584:'87-0039',ae0586:'87-0041',ae0563:'85-0006',ae0566:'85-0009',ae056f:'86-0018',ae0572:'86-0021',ae0574:'86-0023',ae0583:'87-0038',ae0588:'87-0043'};
+// [short name, full name, ICAO hex codes]. Tail numbers for all 50 come from TAILS above.
 const BASES=[
  ['Travis','Travis AFB',['ae051a','ae051d','ae055b','ae055d','ae0567','ae0568','ae056d','ae0570','ae0575','ae0577','ae0579','ae057a','ae057b','ae057d','ae0587','ae0589']],
  ['Dover','Dover AFB',['ae053e','ae0559','ae055c','ae055e','ae055f','ae0560','ae0561','ae0562','ae0564','ae0565','ae056a','ae056c','ae056e','ae0571','ae0576','ae0580','ae0581','ae0585','ae058a']],
  ['Westover','Westover ARB',['ae0569','ae056b','ae0578','ae057c','ae057e','ae0582','ae0584','ae0586']],
  ['Kelly','Kelly Field / JBSA-Lackland',['ae0563','ae0566','ae056f','ae0572','ae0574','ae0583','ae0588']]];
-const FLEET=BASES.flatMap(([base,baseName,hx])=>hx.map(hex=>({hex,tail:TRAVIS[hex]||hex.toUpperCase(),base,baseName})));
+const FLEET=BASES.flatMap(([base,baseName,hx])=>hx.map(hex=>({hex,tail:TAILS[hex]||hex.toUpperCase(),base,baseName})));
 const BYHEX=Object.fromEntries(FLEET.map(f=>[f.hex,f]));
 const CN={US:'United States',GU:'Guam',JP:'Japan',KR:'South Korea',PH:'Philippines',AU:'Australia',NZ:'New Zealand',DE:'Germany',GB:'United Kingdom',ES:'Spain',IT:'Italy',TR:'Türkiye',QA:'Qatar',AE:'UAE',KW:'Kuwait',JO:'Jordan',DJ:'Djibouti',MH:'Marshall Islands',CA:'Canada',SA:'Saudi Arabia',IS:'Iceland',PT:'Portugal (Azores)',EG:'Egypt',BH:'Bahrain',NL:'Netherlands',FR:'France',PL:'Poland',MX:'Mexico',KE:'Kenya',IL:'Israel',GR:'Greece',IQ:'Iraq',AF:'Afghanistan',SG:'Singapore',TH:'Thailand',IN:'India',BS:'Bahamas',PR:'Puerto Rico',CU:'Cuba'};
 const flag=cc=>cc.length===2?String.fromCodePoint(...[...cc].map(c=>127397+c.charCodeAt(0))):'';
@@ -426,7 +426,7 @@ function buildState(cache){
   FLEET.forEach(f=>{
     const e=cache[f.hex];if(!e)return;
     const ac=e.ac||{},ground=ac.alt_baro==='ground';
-    if(!TRAVIS[f.hex]&&ac.r){const m=String(ac.r).trim().match(/^(\d{2})-?(\d{4})$/);if(m)f.tail=m[1]+'-'+m[2];}
+    if(!TAILS[f.hex]&&ac.r){const m=String(ac.r).trim().match(/^(\d{2})-?(\d{4})$/);if(m)f.tail=m[1]+'-'+m[2];}
     const hist=(e.history||[]).slice().sort((a,b)=>a.ts-b.ts);
     const lp=hist[hist.length-1]||{lat:ac.lat,lon:ac.lon,alt:ground?0:(ac.alt_baro||0),gs:ac.gs,g:ground?1:0,ts:e.cachedAt};
     if(lp.lat==null)return;
@@ -586,7 +586,7 @@ function board(){
   }).join('');
   rows.forEach(r=>{if(!r.l)return;const k=r.l.lat.toFixed(1)+','+r.l.lon.toFixed(1);if(PC[k])return;
     place(r.l.lat,r.l.lon).then(n=>{document.querySelectorAll('#lb td.loc').forEach(td=>{if(td.dataset.k===k){const sm=td.querySelector('small');td.firstChild.nodeValue=n;if(!sm)return;}});});});
-  const t=agg('today').filter(r=>r.base==='Travis'&&r.flights>0).sort((a,b)=>b.flights-a.flights||b.ctryN-a.ctryN)[0];
+  const trv=FLEET.filter(f=>f.base==='Travis');let sd=7;for(const c of dayKey())sd=Math.imul(sd^c.charCodeAt(0),2654435761)>>>0;sd^=sd>>>16;sd=Math.imul(sd,0x85ebca6b);sd^=sd>>>13;sd=Math.imul(sd,0xc2b2ae35);sd=(sd^(sd>>>16))>>>0;const pick=trv[sd%trv.length];const t=agg('today').find(r=>r.hex===pick.hex)||{tail:pick.tail,flights:0,ctryN:0,ctry:[]}; // random Travis tail, same one all day
   $('fav').innerHTML=`<div class="label">♥ TRAVIS PLANE OF THE DAY ♥</div>`+(t?`${STAR}<div class="tail">${t.tail}</div><div class="sc">today's true love ♥</div>
     <div class="chips"><span><b>${t.flights}×</b>times active</span><span><b>${t.ctryN}</b>countries</span><span><b>${ccList(t.ctry)}</b>${ccNames(t.ctry)}</span></div>`
     :`<div class="none">No love story yet — no Travis Fred has launched today ♥</div>`);
