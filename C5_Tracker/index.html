@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>C-5 Spotting over Travis · v19</title>
+<title>C-5 Spotting over Travis · v20</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600&family=Yellowtail&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -186,6 +186,8 @@ table.lb td.tl small{display:block;font-size:11px;letter-spacing:.14em;color:var
 td.m{color:var(--red);font-weight:600}
 .barc{width:120px}table.lb td.bs{font-size:13px;line-height:1.2;min-width:110px}table.lb td.loc{font-size:14px;line-height:1.25;min-width:190px}table.lb td.loc small{display:block;font-size:11px;letter-spacing:.12em;color:var(--teal)}.cc{font-size:15px;letter-spacing:.02em;text-align:right;white-space:normal;line-height:1.5}.barc i{display:block;height:10px;background:var(--orange)}
 .hint{font-size:12px;color:#6b7d80;margin-top:8px;font-family:var(--body)}
+.about{font-family:var(--body);font-size:12px;line-height:1.55;color:#6b7d80;max-width:780px;margin:18px auto 44px;text-align:center;padding:0 16px}
+.about b{color:var(--navy);font-weight:600}
 @media(max-width:900px){.top2{grid-template-columns:1fr}table.lb th:nth-child(6),table.lb td:nth-child(6){display:none}}
 
 /* globe */
@@ -303,7 +305,7 @@ td.m{color:var(--red);font-weight:600}
   <div>
     <div class="brand">
       <svg class="logo" viewBox="0 0 74 40"><path d="M0 14h18M0 20h13M0 26h18" stroke="#e0551f" stroke-width="3"/><path d="M56 14h18M61 20h13M56 26h18" stroke="#e0551f" stroke-width="3"/><circle cx="37" cy="20" r="15" fill="none" stroke="#12303f" stroke-width="3"/><path d="M22 20h30M37 5c-8 8-8 22 0 30M37 5c8 8 8 22 0 30" fill="none" stroke="#12303f" stroke-width="2.2"/></svg>
-      <h1>C-5 SPOTTING <span class="script">(all open source data)</span></h1>
+      <h1>C-5 SPOTTING</h1>
     </div>
     <div class="sub">
       <div class="row"><div class="clock" id="clock">—</div><div class="count" id="count">— AIRCRAFT WITHIN 50 MI</div></div>
@@ -363,7 +365,8 @@ td.m{color:var(--red);font-weight:600}
   <span id="r-mode"></span>
   <button id="refresh">REFRESH NOW</button>
 </section>
-<div class="ver">V19</div>
+<p class="about"><b>Where this data comes from.</b> Everything on this page is pulled from open-source, community-run ADS-B feeds (adsb.lol, adsb.fi and airplanes.live), the same public data anyone can see on a flight-tracking site. None of it comes from official USAF sources. A small Cloudflare Worker checks those feeds every 5 minutes for 50 C-5M tails, saves each position it hears, and tallies this year's flights and countries. Aircraft only show up when they're broadcasting and a hobbyist receiver hears them, so gaps and missed flights are normal.</p>
+<div class="ver">V20</div>
 
 <script>
 const HOME={lat:38.2627,lon:-121.9275,name:'Travis',icao:'KSUU'}; // Travis AFB
