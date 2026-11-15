@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>C-5 Spotting over Travis · v18</title>
+<title>C-5 Spotting over Travis · v19</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600&family=Yellowtail&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -350,11 +350,11 @@ td.m{color:var(--red);font-weight:600}
   <div class="tabs" id="tabs">
     <button data-m="flights" class="on">TIMES ACTIVE</button><button data-m="ctryN">COUNTRIES</button>
     <span class="sp"></span>
-    <button data-s="today" class="on">TODAY</button><button data-s="season">LAST 7 DAYS</button>
+    <button data-s="year" class="on" style="cursor:default">THIS YEAR</button>
   </div>
   
   <table class="lb"><thead><tr><th>#</th><th>TAIL</th><th>BASE</th><th>STATUS</th><th>LAST LOCATION</th><th></th><th>TIMES ACTIVE</th><th>COUNTRIES</th></tr></thead><tbody id="lb"></tbody></table>
-  <div class="hint">Stats come from the shared Worker database: one position every 5 minutes, kept for 7 days. Countries come from the airfields and ground positions it sees).</div>
+  <div class="hint">Stats are for this calendar year (Pacific time) and come from the shared Worker database, which checks open-source ADS-B feeds every 5 minutes. Countries come from the airfields and ground positions it sees.</div>
 </section>
 
 <section class="recv" id="recv">
@@ -363,7 +363,7 @@ td.m{color:var(--red);font-weight:600}
   <span id="r-mode"></span>
   <button id="refresh">REFRESH NOW</button>
 </section>
-<div class="ver">V18</div>
+<div class="ver">V19</div>
 
 <script>
 const HOME={lat:38.2627,lon:-121.9275,name:'Travis',icao:'KSUU'}; // Travis AFB
@@ -415,7 +415,7 @@ function dayKey(){return new Date().toLocaleDateString('en-CA',{timeZone:TZ});}
 // or test with ?worker=https://... on the page URL.
 const WORKER_URL=new URLSearchParams(location.search).get('worker')||'https://c5-spotting.cale-simmons.workers.dev';
 const FRESH=12*60e3; // the cron runs every 5 min; a fix newer than this counts as "now"
-let BASEF='all',S={days:{},last:{}},DEMO=null,AC=[],demo=false,lastOk=null,SEL=null,METRIC='flights',SCOPE='today';
+let BASEF='all',S={days:{},last:{}},DEMO=null,AC=[],demo=false,lastOk=null,SEL=null,METRIC='flights',SCOPE='year',YEAR=null;
 const view=()=>demo?DEMO:S;
 const ptAir=p=>!p.g&&(p.gs!=null?p.gs>=50:p.alt>1000);
 const CCC={};
@@ -452,7 +452,10 @@ function buildState(cache){
 }
 async function load(){
   let cache=null;
-  try{const r=await fetch(WORKER_URL.replace(/\/$/,'')+'/?fleet=1',{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);cache=await r.json();}catch(e){}
+  const W=WORKER_URL.replace(/\/$/,'');
+  const yp=fetch(W+'/?year=1',{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null);
+  try{const r=await fetch(W+'/?fleet=1',{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);cache=await r.json();}catch(e){}
+  YEAR=await yp;
   if(!cache||typeof cache!=='object'){
     demo=true;DEMO=DEMO||demoState();AC=demoAC();$('r-src').textContent='WORKER · UNREACHABLE';
     $('r-mode').innerHTML='<span class="demo">■ DEMO DATA — Worker not reachable from here</span>';
@@ -566,7 +569,15 @@ function hero(){
   else{$('nr-fred').textContent='…';place(l.lat,l.lon).then(n=>{const c2=closest();if(c2&&c2.l.lat.toFixed(1)+','+c2.l.lon.toFixed(1)===fk)$('nr-fred').textContent=n;});}
 }
 function agg(scope){
-  const st=view(),keys=scope==='today'?[dayKey()]:Object.keys(st.days);
+  const st=view(),yr=dayKey().slice(0,4);
+  // This year: use the Worker's year tally when it's there, otherwise whatever history is cached.
+  if(scope==='year'&&!demo&&YEAR&&YEAR.d&&String(YEAR.y)===yr){
+    const ks=Object.keys(YEAR.d).filter(k=>k.startsWith(yr));
+    return FLEET.map(f=>{const o={flights:0,ctry:new Set()};
+      ks.forEach(k=>{const d=YEAR.d[k][f.hex];if(!d)return;o.flights+=d.f||0;(d.p||[]).forEach(([la,lo,g])=>{const c=ccOf(la,lo,!!g);if(c)o.ctry.add(c);});});
+      return {...f,flights:o.flights,ctry:[...o.ctry],ctryN:o.ctry.size,l:st.last[f.hex]};});
+  }
+  const keys=scope==='today'?[dayKey()]:Object.keys(st.days).filter(k=>scope!=='year'||k.startsWith(yr));
   return FLEET.map(f=>{const o={flights:0,ctry:new Set()};
     keys.forEach(k=>{const d=(st.days[k]||{})[f.hex];if(!d)return;o.flights+=d.flights||0;(d.ctry||[]).forEach(c=>o.ctry.add(c));});
     return {...f,flights:o.flights,ctry:[...o.ctry],ctryN:o.ctry.size,l:st.last[f.hex]};});
@@ -586,9 +597,9 @@ function board(){
   }).join('');
   rows.forEach(r=>{if(!r.l)return;const k=r.l.lat.toFixed(1)+','+r.l.lon.toFixed(1);if(PC[k])return;
     place(r.l.lat,r.l.lon).then(n=>{document.querySelectorAll('#lb td.loc').forEach(td=>{if(td.dataset.k===k){const sm=td.querySelector('small');td.firstChild.nodeValue=n;if(!sm)return;}});});});
-  const trv=FLEET.filter(f=>f.base==='Travis');let sd=7;for(const c of dayKey())sd=Math.imul(sd^c.charCodeAt(0),2654435761)>>>0;sd^=sd>>>16;sd=Math.imul(sd,0x85ebca6b);sd^=sd>>>13;sd=Math.imul(sd,0xc2b2ae35);sd=(sd^(sd>>>16))>>>0;const pick=trv[sd%trv.length];const t=agg('today').find(r=>r.hex===pick.hex)||{tail:pick.tail,flights:0,ctryN:0,ctry:[]}; // random Travis tail, same one all day
+  const trv=FLEET.filter(f=>f.base==='Travis');let sd=7;for(const c of dayKey())sd=Math.imul(sd^c.charCodeAt(0),2654435761)>>>0;sd^=sd>>>16;sd=Math.imul(sd,0x85ebca6b);sd^=sd>>>13;sd=Math.imul(sd,0xc2b2ae35);sd=(sd^(sd>>>16))>>>0;const pick=trv[sd%trv.length];const t=agg('year').find(r=>r.hex===pick.hex)||{tail:pick.tail,flights:0,ctryN:0,ctry:[]}; // random Travis tail, same one all day
   $('fav').innerHTML=`<div class="label">♥ TRAVIS PLANE OF THE DAY ♥</div>`+(t?`${STAR}<div class="tail">${t.tail}</div><div class="sc">today's true love ♥</div>
-    <div class="chips"><span><b>${t.flights}×</b>times active</span><span><b>${t.ctryN}</b>countries</span><span><b>${ccList(t.ctry)}</b>${ccNames(t.ctry)}</span></div>`
+    <div class="chips"><span><b>${t.flights}×</b>times active this year</span><span><b>${t.ctryN}</b>countries this year</span><span><b>${ccList(t.ctry)}</b>${ccNames(t.ctry)}</span></div>`
     :`<div class="none">No love story yet — no Travis Fred has launched today ♥</div>`);
 }
 function render(){
