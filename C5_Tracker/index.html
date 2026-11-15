@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>C-5 Spotting over Travis · v15</title>
+<title>C-5 Spotting over Travis · v16</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600&family=Yellowtail&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -363,7 +363,7 @@ td.m{color:var(--red);font-weight:600}
   <span id="r-mode"></span>
   <button id="refresh">REFRESH NOW</button>
 </section>
-<div class="ver">V15</div>
+<div class="ver">V16</div>
 
 <script>
 const HOME={lat:38.2627,lon:-121.9275,name:'Travis',icao:'KSUU'}; // Travis AFB
@@ -413,7 +413,7 @@ function dayKey(){return new Date().toLocaleDateString('en-CA',{timeZone:TZ});}
 /* ---------- shared database (Cloudflare Worker) ---------- */
 // One Worker + one KV cache serves every site. Change this if you redeploy under a new name,
 // or test with ?worker=https://... on the page URL.
-const WORKER_URL=new URLSearchParams(location.search).get('worker')||'https://noisy-frog-4459.simmons-rob.workers.dev';
+const WORKER_URL=new URLSearchParams(location.search).get('worker')||'https://c5-spotting.cale-simmons.workers.dev';
 const FRESH=12*60e3; // the cron runs every 5 min; a fix newer than this counts as "now"
 let BASEF='all',S={days:{},last:{}},DEMO=null,AC=[],demo=false,lastOk=null,SEL=null,METRIC='flights',SCOPE='today';
 const view=()=>demo?DEMO:S;
