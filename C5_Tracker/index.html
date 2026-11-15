@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>C-5 Spotting over Travis · v20</title>
+<title>C-5 Spotting over Travis · v21</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600&family=Yellowtail&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -365,8 +365,8 @@ td.m{color:var(--red);font-weight:600}
   <span id="r-mode"></span>
   <button id="refresh">REFRESH NOW</button>
 </section>
-<p class="about"><b>Where this data comes from.</b> Everything on this page is pulled from open-source, community-run ADS-B feeds (adsb.lol, adsb.fi and airplanes.live), the same public data anyone can see on a flight-tracking site. None of it comes from official USAF sources. A small Cloudflare Worker checks those feeds every 5 minutes for 50 C-5M tails, saves each position it hears, and tallies this year's flights and countries. Aircraft only show up when they're broadcasting and a hobbyist receiver hears them, so gaps and missed flights are normal.</p>
-<div class="ver">V20</div>
+<p class="about"><b>Where this data comes from.</b> Everything on this page is pulled from open-source, community-run feeds: ADS-B from adsb.lol, adsb.fi and airplanes.live, plus satellite ADS-C position reports over the oceans from airframes.io (marked SAT). It's the same public data anyone can see on a flight-tracking site. None of it comes from official USAF sources. A small Cloudflare Worker checks those feeds every 5 minutes for 50 C-5M tails, saves each position it hears, and tallies this year's flights and countries. Oceanic data provided by Airframes.io and its community of feeders. Aircraft only show up when they're broadcasting and a hobbyist receiver hears them, so gaps and missed flights are normal.</p>
+<div class="ver">V21</div>
 
 <script>
 const HOME={lat:38.2627,lon:-121.9275,name:'Travis',icao:'KSUU'}; // Travis AFB
@@ -418,6 +418,8 @@ function dayKey(){return new Date().toLocaleDateString('en-CA',{timeZone:TZ});}
 // or test with ?worker=https://... on the page URL.
 const WORKER_URL=new URLSearchParams(location.search).get('worker')||'https://c5-spotting.cale-simmons.workers.dev';
 const FRESH=12*60e3; // the cron runs every 5 min; a fix newer than this counts as "now"
+const FRESH_SAT=45*60e3; // satellite (ADS-C) reports come every 10-30 min over the ocean
+const frOf=l=>l&&l.sat?FRESH_SAT:FRESH;
 let BASEF='all',S={days:{},last:{}},DEMO=null,AC=[],demo=false,lastOk=null,SEL=null,METRIC='flights',SCOPE='year',YEAR=null;
 const view=()=>demo?DEMO:S;
 const ptAir=p=>!p.g&&(p.gs!=null?p.gs>=50:p.alt>1000);
@@ -434,7 +436,7 @@ function buildState(cache){
     const lp=hist[hist.length-1]||{lat:ac.lat,lon:ac.lon,alt:ground?0:(ac.alt_baro||0),gs:ac.gs,g:ground?1:0,ts:e.cachedAt};
     if(lp.lat==null)return;
     const airNow=ptAir(lp),t=e.cachedAt||lp.ts;
-    st.last[f.hex]={t,lat:lp.lat,lon:lp.lon,alt:lp.alt||0,gs:lp.gs||0,air:airNow,cs:(ac.flight||'').trim()||f.tail};
+    st.last[f.hex]={t,lat:lp.lat,lon:lp.lon,alt:lp.alt||0,gs:lp.gs||0,air:airNow,sat:!!lp.s,cs:(ac.flight||'').trim()||f.tail};
     const day=ts=>{const k=pkey(ts);st.days[k]=st.days[k]||{};return st.days[k][f.hex]=st.days[k][f.hex]||{air:0,flights:0,ctry:[]};};
     const addC=(ts,cc)=>{if(!cc)return;const d=day(ts);if(!d.ctry.includes(cc))d.ctry.push(cc);};
     let open=null;
@@ -449,7 +451,7 @@ function buildState(cache){
       }
     });
     G.trails[f.hex]=hist.filter(ptAir).slice(-120).map(p=>[p.lat,p.lon]);
-    if(airNow&&Date.now()-t<FRESH)AC.push({hex:f.hex,tail:f.tail,cs:st.last[f.hex].cs,reg:f.tail,t:ac.t||'C5M',desc:'',op:'USAF',alt:lp.alt||0,gs:lp.gs||0,trk:ac.track??ac.true_heading??0,rate:ac.baro_rate||0,lat:lp.lat,lon:lp.lon,mil:true,d:dist(lp.lat,lp.lon),b:bearing(lp.lat,lp.lon),ground:false,air:true});
+    if(airNow&&Date.now()-t<(lp.s?FRESH_SAT:FRESH))AC.push({hex:f.hex,tail:f.tail,cs:st.last[f.hex].cs,reg:f.tail,t:ac.t||'C5M',desc:'',op:'USAF',alt:lp.alt||0,gs:lp.gs||0,trk:ac.track??ac.true_heading??0,rate:ac.baro_rate||0,lat:lp.lat,lon:lp.lon,mil:true,d:dist(lp.lat,lp.lon),b:bearing(lp.lat,lp.lon),ground:false,air:true});
   });
   AC.sort((a,b)=>a.d-b.d);S=st;
 }
@@ -464,7 +466,7 @@ async function load(){
     $('r-mode').innerHTML='<span class="demo">■ DEMO DATA — Worker not reachable from here</span>';
   }else{
     demo=false;buildState(cache);
-    const vals=Object.values(cache),newest=Math.max(0,...vals.map(e=>e.cachedAt||0));
+    const vals=Object.keys(cache).filter(k=>k[0]!=='_').map(k=>cache[k]),newest=Math.max(0,...vals.map(e=>e.cachedAt||0));
     $('r-src').textContent=`WORKER · ${vals.length}/${FLEET.length} TAILS CACHED`+(newest?` · NEWEST FIX ${Math.max(0,Math.round((Date.now()-newest)/60000))} MIN AGO`:'');
     $('r-mode').innerHTML=vals.length?'● LIVE · shared database':'<span class="demo">■ Cache is empty — wait for the first 5-minute cron run</span>';
   }
@@ -561,7 +563,7 @@ function hero(){
     $('nr-me').textContent=ME.name;$('nr-fred').textContent='—';$('nr-mi').textContent='—';$('nr-eta').textContent='—';
     return;
   }
-  const {f,l,d,b}=c,fresh=Date.now()-l.t<FRESH,air=fresh&&l.air,ti=tailInfo(f.hex);
+  const {f,l,d,b}=c,fresh=Date.now()-l.t<frOf(l),air=fresh&&l.air,ti=tailInfo(f.hex);
   $('h-cs').textContent=f.tail;
   $('h-pill').textContent=air?'AIRBORNE':fresh?'ON THE GROUND':'LAST SEEN '+tm(l.t);
   $('h-type').textContent='LOCKHEED C-5M SUPER GALAXY · USAF';
@@ -593,9 +595,9 @@ function board(){
   const mx=Math.max(1,rows[0]?rows[0][METRIC]:1);
   const now=Date.now();
   $('lb').innerHTML=rows.map((r,i)=>{
-    const l=r.l,live=l&&now-l.t<FRESH;
+    const l=r.l,live=l&&now-l.t<frOf(l);
     const stt=!l?'<span class="pillst no">NOT SEEN</span>':live?(l.air?'<span class="pillst air">AIRBORNE</span>':'<span class="pillst gnd">ON GROUND</span>'):`<span class="pillst no">LAST ${tm(l.t)}</span>`;
-    return `<tr data-h="${r.hex}" class="${SEL===r.hex?'sel':''}"><td class="rk">${i+1}</td><td class="tl"><a href="https://globe.adsbexchange.com/?icao=${r.hex}" target="_blank" rel="noopener">${r.tail}</a></td><td class="bs">${r.baseName}</td><td>${stt}</td><td class="loc" data-k="${r.l?r.l.lat.toFixed(1)+','+r.l.lon.toFixed(1):''}">${r.l?(PC[r.l.lat.toFixed(1)+','+r.l.lon.toFixed(1)]||'…'):'—'}${r.l?`<small>${live?'NOW':tm(r.l.t)}</small>`:''}</td><td class="barc"><i style="width:${Math.max(r[METRIC]>0?3:0,r[METRIC]/mx*100)}%"></i></td>
+    return `<tr data-h="${r.hex}" class="${SEL===r.hex?'sel':''}"><td class="rk">${i+1}</td><td class="tl"><a href="https://globe.adsbexchange.com/?icao=${r.hex}" target="_blank" rel="noopener">${r.tail}</a></td><td class="bs">${r.baseName}</td><td>${stt}</td><td class="loc" data-k="${r.l?r.l.lat.toFixed(1)+','+r.l.lon.toFixed(1):''}">${r.l?(PC[r.l.lat.toFixed(1)+','+r.l.lon.toFixed(1)]||'…'):'—'}${r.l?`<small>${live?'NOW':tm(r.l.t)}${r.l.sat?' · SAT':''}</small>`:''}</td><td class="barc"><i style="width:${Math.max(r[METRIC]>0?3:0,r[METRIC]/mx*100)}%"></i></td>
       <td class="${METRIC==='flights'?'m':''}">${r.flights?r.flights+'×':'—'}</td><td class="cc ${METRIC==='ctryN'?'m':''}">${ccList(r.ctry)}</td></tr>`;
   }).join('');
   rows.forEach(r=>{if(!r.l)return;const k=r.l.lat.toFixed(1)+','+r.l.lon.toFixed(1);if(PC[k])return;
