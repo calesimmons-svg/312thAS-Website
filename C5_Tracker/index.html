@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>C-5 Spotting over Travis · v21</title>
+<title>C-5 Spotting over Travis · v22</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600&family=Yellowtail&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -325,7 +325,7 @@ td.m{color:var(--red);font-weight:600}
           <div class="hn">
             <div class="rt"><div><div class="label">You</div><b id="nr-me">—</b></div><svg viewBox="0 0 24 24" fill="#e0551f"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg><div><div class="label">Fred</div><b id="nr-fred">—</b></div></div>
             <div class="nums"><div class="mi"><span id="nr-mi">—</span><small>MILES APART</small></div><div class="eta"><span id="nr-eta">—</span><small>AT MACH .77 · STRAIGHT LINE, NO WIND</small></div></div>
-            <div class="act"><button id="loc-btn">◎ USE MY CURRENT LOCATION</button><span id="loc-msg">Measuring from South Lake Tahoe until you tap it.</span></div>
+            <div class="act"><button id="loc-btn">◎ USE MY CURRENT LOCATION</button><span id="loc-msg">Measuring from Travis AFB until you tap it.</span></div>
           </div>
         </div>
         <div class="postcard" id="postcard"><svg viewBox="0 0 440 300" id="card-svg"></svg></div>
@@ -547,7 +547,7 @@ async function place(lat,lon){
     const n=[j.city||j.locality,j.principalSubdivision,j.countryName].filter((x,i,a)=>x&&a.indexOf(x)===i).slice(0,2).join(', ');
     return n?(PC[k]=n):'Over open water · '+raw;}catch(e){return raw;}
 }
-let ME={lat:38.9399,lon:-119.9772,name:'South Lake Tahoe'};
+let ME={lat:38.2627,lon:-121.9275,name:'Travis AFB'};
 try{const m=JSON.parse(localStorage.getItem('c5.me'));if(m&&m.lat!=null)ME=m;}catch(e){}
 function brg(a,b,c,d){const y=Math.sin(rad(d-b))*Math.cos(rad(c));const x=Math.cos(rad(a))*Math.sin(rad(c))-Math.sin(rad(a))*Math.cos(rad(c))*Math.cos(rad(d-b));return (Math.atan2(y,x)*180/Math.PI+360)%360;}
 function closest(){
