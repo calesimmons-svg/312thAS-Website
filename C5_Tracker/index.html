@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>C-5 Spotting over Travis · v22</title>
+<title>C-5 Spotting over Travis · v23</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600&family=Yellowtail&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -603,7 +603,7 @@ function board(){
   rows.forEach(r=>{if(!r.l)return;const k=r.l.lat.toFixed(1)+','+r.l.lon.toFixed(1);if(PC[k])return;
     place(r.l.lat,r.l.lon).then(n=>{document.querySelectorAll('#lb td.loc').forEach(td=>{if(td.dataset.k===k){const sm=td.querySelector('small');td.firstChild.nodeValue=n;if(!sm)return;}});});});
   const trv=FLEET.filter(f=>f.base==='Travis');let sd=7;for(const c of dayKey())sd=Math.imul(sd^c.charCodeAt(0),2654435761)>>>0;sd^=sd>>>16;sd=Math.imul(sd,0x85ebca6b);sd^=sd>>>13;sd=Math.imul(sd,0xc2b2ae35);sd=(sd^(sd>>>16))>>>0;const pick=trv[sd%trv.length];const t=agg('year').find(r=>r.hex===pick.hex)||{tail:pick.tail,flights:0,ctryN:0,ctry:[]}; // random Travis tail, same one all day
-  $('fav').innerHTML=`<div class="label">♥ TRAVIS PLANE OF THE DAY ♥</div>`+(t?`${STAR}<div class="tail">${t.tail}</div><div class="sc">today's true love ♥</div>
+  $('fav').innerHTML=`<div class="label">♥ PLANE OF THE DAY ♥</div>`+(t?`${STAR}<div class="tail">${t.tail}</div><div class="sc">today's true love ♥</div>
     <div class="chips"><span><b>${t.flights}×</b>times active this year</span><span><b>${t.ctryN}</b>countries this year</span><span><b>${ccList(t.ctry)}</b>${ccNames(t.ctry)}</span></div>`
     :`<div class="none">No love story yet — no Travis Fred has launched today ♥</div>`);
 }
