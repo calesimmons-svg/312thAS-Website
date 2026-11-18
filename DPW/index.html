@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>DPW Hero</title>
+<title>DPW Hero V62</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
@@ -114,8 +114,11 @@ select{padding:7px;border-radius:6px;border:1px solid var(--line);background:var
 .chk{display:inline-flex;align-items:center;gap:3px;font-size:11px;margin-right:6px}
 .cell label.chk{display:inline-flex;margin-right:14px}
 .chk input{width:16px;height:16px}
-.foot{display:flex;gap:14px;align-items:baseline;font-size:15px;padding:5px 8px;border-top:3px solid var(--line);min-height:34px}
+.foot{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;font-size:15px;padding:5px 8px;border-top:3px solid var(--line);min-height:34px}
 .foot b{font-size:15px}
+.cust{flex:1 1 220px;min-width:0;border-left:1px solid var(--line);padding-left:8px;align-self:stretch}
+.cust textarea{display:block;width:100%;height:3em;resize:none;overflow:hidden;border:0;background:transparent;color:var(--ink);font-size:14px;line-height:1.35;font-family:inherit;outline:none;padding:0}
+.cust textarea::placeholder{color:var(--muted);opacity:.7}
 .calc{margin-top:10px;background:var(--card);border-radius:10px;padding:12px;font-size:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
 .calc b{display:block;font-size:20px}
 .rwybar .calc{margin:0;background:transparent;padding:0 0 0 4px;display:flex;flex-wrap:wrap;gap:3px 12px;font-size:9.5px;color:var(--muted)}
@@ -123,6 +126,18 @@ select{padding:7px;border-radius:6px;border:1px solid var(--line);background:var
 .rwybar .calc b{font-size:13px;color:var(--ink)}
 .rwybar{gap:6px 8px;padding:6px 8px}
 .rwybar>b{font-size:13px}
+.rwypick{display:flex;flex-direction:column;gap:2px;min-width:0}
+.rwypick b{font-size:11px;line-height:1.1}
+.sv{display:flex;align-items:center;gap:8px;border:1px solid color-mix(in srgb,var(--line) 35%,transparent);border-radius:8px;padding:6px 8px;margin:5px 0}
+.sv .svt{flex:1;cursor:pointer;font-size:14px;line-height:1.3}
+.sv .svt b{font-size:16px}
+.sv .svt small{display:block;color:var(--muted);font-size:11px}
+.sv .svx{background:transparent;color:var(--muted);border:0;font-size:20px;padding:0 4px;line-height:1}
+.sv:hover{background:var(--auto)}
+.rwyact{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
+#clear{color:#ef4444;border-color:#ef4444;background:rgba(239,68,68,.12)}
+#shotBtn{color:#22c55e;border-color:#22c55e;background:rgba(34,197,94,.12)}
+.rwyact button{padding:5px 10px;font-size:12px}
 .rwybar select{font-size:12px;padding:4px 6px}
 .rwybar .tabs{margin:0;gap:4px;flex-wrap:nowrap}
 .rwybar .tab{padding:3px 8px;border-width:1.5px;border-radius:6px;font-size:12px;line-height:1.15}
@@ -160,12 +175,10 @@ pre{white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px;margin:6p
     </div>
     <div class="status" id="status"></div>
     <div class="btns">
-      <span class="sub" style="margin:0"><b style="line-height:1.15;display:inline-block;text-align:left">DPW Weather<br>Source:</b></span><button class="tab on" id="srcCfp">CFP data</button><button class="tab" id="srcMetar">Current METAR</button><button class="tab" id="srcDatis">D-ATIS</button>
+      <span class="sub" style="margin:0"><b style="line-height:1.15;display:inline-block;text-align:left">DPW Weather<br>Source:</b></span><button class="tab on" id="srcCfp">CFP</button><button class="tab" id="srcMetar">METAR</button><button class="tab" id="srcDatis">D-ATIS</button>
       
       
-      <button class="sec" id="clear">Clear DPW</button>
       <button class="sec" id="wxToggle"><span class="rain" id="rain" aria-hidden="true"></span><span class="lbl">Hide / Show Weather</span></button>
-      <button class="sec" id="shotBtn">Send to FEs</button>
     </div>
     <div id="wxwrap">
     <div class="wxline" id="wxline"></div>
@@ -176,16 +189,17 @@ pre{white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px;margin:6p
     </div>
     <div class="rwybar">
       <div class="tabs" id="tabs"></div>
-      <b>Runway</b>
-      <select id="rwySel"><option value="">Select runway…</option></select>
+      <div class="rwypick"><b>Runway</b>
+      <select id="rwySel"><option value="">Select runway…</option></select></div>
       <div class="calc" id="calc"></div>
       <span class="sub" id="rwyNote" style="margin:0" hidden></span><span class="sub" id="slopeNote" style="margin:0" hidden></span>
+      <span class="rwyact"><button class="sec" id="loadBtn" hidden>Load saved DPW</button><button class="sec" id="clear">Clear DPW</button><button class="sec" id="shotBtn">Save / Send to FE's</button></span>
     </div>
   </div>
 
   <div id="shot">
   <div class="ws" id="ws">
-    <div class="title">ICAO <input type="text" id="icao" data-k="icao" maxlength="4"> C-5M DEPARTURE PLANNING WORKSHEET</div>
+    <div class="title"><input type="text" id="icao" data-k="icao" maxlength="4"> C-5M DEPARTURE PLANNING WORKSHEET</div>
     <div class="sec-h">WEATHER</div>
     <div class="row wx4" style="border-top:1px solid var(--line)">
       <div class="cell"><label>Temperature °C</label><input type="text" inputmode="decimal" data-k="temp"></div>
@@ -224,7 +238,7 @@ pre{white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px;margin:6p
       <div class="cell"><label>Obstacle Distance</label><input type="text" inputmode="numeric" data-k="obsDist"></div>
       <div class="cell w"><label>Altitude (MSL)</label><input type="text" inputmode="numeric" data-k="magAlt"></div>
     </div>
-    <div class="foot"><b>Notes:</b><span id="notesTxt"></span></div>
+    <div class="foot"><b>Notes:</b><span id="notesTxt"></span><div class="cust"><textarea id="custNotes" rows="2" maxlength="300" placeholder="Custom notes (up to 300 characters)" aria-label="Custom notes"></textarea></div></div>
   </div>
 
   <div class="legend noprint"><span style="background:var(--auto);color:var(--autoink)">green</span>read from your file or runway data
@@ -243,8 +257,18 @@ pre{white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px;margin:6p
       <button type="button" id="shotShare">Share</button>
       <button type="button" class="sec" id="shotCopy">Copy image</button>
       <button type="button" class="sec" id="shotSave">Save image</button>
+      <button type="button" class="sec" id="shotDb">Save to database</button>
     </div>
     <p id="shotMsg" style="font-size:12px;color:var(--muted)"></p>
+  </div>
+</div>
+<div class="modal noprint" id="loadModal" hidden>
+  <div class="mbox" role="dialog" aria-modal="true" aria-labelledby="loadTitle">
+    <button type="button" class="mclose" id="loadClose" aria-label="Close">&times;</button>
+    <h2 id="loadTitle">Load saved DPW</h2>
+    <input type="text" id="loadSearch" placeholder="Search airport code (e.g. KSUU)" autocomplete="off" autocapitalize="characters" style="width:100%;padding:9px 10px;font-size:16px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);text-transform:uppercase;margin:6px 0 8px">
+    <div id="loadList"></div>
+    <p id="loadMsg" style="font-size:12px;color:var(--muted)"></p>
   </div>
 </div>
 <div class="modal noprint" id="noteModal" hidden>
@@ -285,6 +309,10 @@ pre{white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px;margin:6p
   // aviationweather.gov blocks direct browser requests (no CORS header). Paste your Cloudflare Worker URL here,
   // e.g. 'https://metar-proxy.YOURNAME.workers.dev'. Leave empty to try the direct URL.
   var METAR_PROXY='https://dpw.cale-simmons.workers.dev/';
+  // Cloudflare D1 save endpoint (the dpw-db Worker URL). Leave empty to keep saves on this device only.
+  var DB_URL='https://dpw-db.cale-simmons.workers.dev/';
+  // Optional: the same value as the DPW_KEY secret on the Worker (blank if you did not set one).
+  var DB_KEY='';
   var RWY_URL='https://davidmegginson.github.io/ourairports-data/runways.csv';
 
   try{ pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; }catch(e){}
@@ -322,7 +350,7 @@ pre{white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px;margin:6p
 
   /* ---------- tabs ---------- */
   function renderTabs(){
-    var t=$('#tabs'); t.innerHTML='';
+    var t=$('#tabs'); t.innerHTML=''; try{ updateLoadBtn(); }catch(e){}
     ROLES.forEach(function(r){
       var b=document.createElement('button'); b.className='tab'+(r===sel?' on':'');
       b.innerHTML=r+' <small>'+(A[r].icao||'—')+(A[r].plan?' · rwy '+A[r].plan:'')+'</small>';
@@ -634,6 +662,7 @@ pre{white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px;margin:6p
     modal.addEventListener('click',function(e){ if(e.target===modal) closeIt(); });
     document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&!modal.hidden) closeIt(); });
     $('#shotBtn').addEventListener('click',async function(){
+      var dbP=saveDpw();
       if(typeof html2canvas!=='function'){ status('The screenshot tool did not load. It needs an internet connection.',true); return; }
       status('Capturing the worksheet …');
       var a=A[sel], rw=a.chosen||a.plan;
@@ -653,6 +682,10 @@ pre{white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px;margin:6p
               var sp=doc.createElement('span'); sp.textContent=r.checked?'\u25C9':'\u25CB'; sp.style.fontSize='14px'; r.parentNode.replaceChild(sp,r);
             });
             root.querySelectorAll('.info').forEach(function(b){ b.remove(); });
+            var cn=root.querySelector('#custNotes');
+            if(cn){ var cw=cn.parentNode;
+              if(!cn.value.trim()) cw.remove();
+              else { var cd=doc.createElement('div'); cd.textContent=cn.value; cd.style.cssText='white-space:pre-wrap;word-break:break-word;font-size:14px;line-height:1.35;color:'+win.getComputedStyle(cn).color; cw.replaceChild(cd,cn); } }
           }});
         canvas.toBlob(function(b){
           if(!b){ status('Could not create the image.',true); return; }
@@ -662,6 +695,7 @@ pre{white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px;margin:6p
           $('#shotShare').style.display=(navigator.canShare&&navigator.canShare({files:[cur]}))?'':'none';
           $('#shotCopy').style.display=(window.ClipboardItem&&navigator.clipboard&&navigator.clipboard.write)?'':'none';
           msg.textContent=''; modal.hidden=false; status('');
+          dbP.then(function(r){ if(r.db==='ok') msg.textContent='Saved to database.'; else if(r.db!=='off'&&r.db!=='none') msg.textContent='Saved on this device. Database save failed ('+r.db+').'; });
         },'image/png');
       }catch(err){ console.error(err); status('Screenshot failed ('+err.message+').',true); }
     });
@@ -672,6 +706,13 @@ pre{white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px;margin:6p
     $('#shotCopy').addEventListener('click',async function(){
       try{ await navigator.clipboard.write([new ClipboardItem({'image/png':cur}) ]); msg.textContent='Image copied. Paste it into a message or email.'; }
       catch(e){ msg.textContent='Copy failed ('+e.message+'). Use Save image instead.'; }
+    });
+    $('#shotDb').addEventListener('click',async function(){
+      if(!DB_URL){ msg.textContent='Database not connected yet.'; return; }
+      if(!(fields.icao.value||'').trim()){ msg.textContent='Enter an airport first.'; return; }
+      msg.textContent='Saving to database …';
+      var r=await saveDpw();
+      msg.textContent=r.db==='ok'?'Saved to database.':'Database save failed ('+r.db+').';
     });
     $('#shotSave').addEventListener('click',function(){
       var a=document.createElement('a'); a.href=url; a.download=cur?cur.name:fname(); document.body.appendChild(a); a.click(); a.remove();
@@ -1137,6 +1178,24 @@ pre{white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px;margin:6p
     return true;
   }
   window.DPW_fetchMetar=fetchMetar;
+  // typing an ICAO by hand loads its runways (and weather) automatically
+  (function(){
+    var tm=null;
+    fields.icao.addEventListener('input',function(){
+      clearTimeout(tm);
+      var role=sel, ic=(fields.icao.value||'').trim().toUpperCase();
+      if(!/^[A-Z0-9]{4}$/.test(ic)) return;
+      tm=setTimeout(async function(){
+        if(sel!==role||A[role].loadedIcao===ic) return;
+        var a=A[role]; a.loadedIcao=ic; a.icao=ic;
+        a.rwys=[]; a.chosen=''; a.metar=null; a.metarAt=null; a.taf=null; a.datis=null; a.fc=null;
+        renderTabs(); renderRwySel();
+        await loadRunways();
+        if(!a.cfp) await fetchMetar(); else await loadMetar(role,true);
+        loadDatis(role); loadTaf(role); loadForecast(role);
+      },500);
+    });
+  })();
   async function autoRefresh(){
     for(var i=0;i<ROLES.length;i++){
       var r=ROLES[i]; if(!A[r].icao) continue;
@@ -1192,9 +1251,7 @@ pre{white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px;margin:6p
       var comp=function(s){var a=(wd-hdg)*Math.PI/180; return {h:s*Math.cos(a),x:s*Math.sin(a)};};
       var ht=function(v){var r=Math.round(v); return (r>=0?'HW ':'TW ')+Math.abs(r)}, xw=function(v){var r=Math.round(v); return Math.abs(r)+(r>0?' R':(r<0?' L':''))};
       var a=comp(ws); html+=cell('Headwind / Tailwind',ht(a.h)+' kt')+cell('Crosswind',xw(a.x)+' kt');
-      if(wg!==null){var g=comp(wg); html+=cell('Gust HW / TW',ht(g.h)+' kt')+cell('Gust crosswind',xw(g.x)+' kt');}
     }
-    var rl=num('rwyLen'); if(rl!==null) html+=cell('Runway length',rl.toLocaleString()+' ft');
     c.innerHTML=html; c.style.display=html?'':'none';
   }
   Object.keys(fields).forEach(function(k){ fields[k].addEventListener('input',calc); });
@@ -1207,7 +1264,7 @@ pre{white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px;margin:6p
   }
   $('#clear').onclick=function(){
     $('#drop').classList.add('attn'); $('#dropText').textContent='Tap or drop crew papers here';
-    A={DEP:blank(),ARR:blank(),ALT:blank()}; notam={}; sel='DEP'; clearForm();
+    A={DEP:blank(),ARR:blank(),ALT:blank()}; notam={}; sel='DEP'; clearForm(); $('#custNotes').value='';
     status('');
     renderTabs(); renderRwySel(); renderWx(); calc(); renderTkoff();
   };
@@ -1224,6 +1281,91 @@ pre{white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px;margin:6p
     var ic=new URLSearchParams(location.search).get('icao');
     if(ic){ A.DEP.icao=ic.toUpperCase(); fields.icao.value=A.DEP.icao; renderTabs(); fetchMetar(); loadRunways(); }
   })();
+  /* ---------- saved DPWs (Cloudflare D1, with a copy kept in this browser) ---------- */
+  var SAVE_KEY='dpwSaved';
+  function readSaved(){ try{ var j=JSON.parse(localStorage.getItem(SAVE_KEY)||'[]'); return Array.isArray(j)?j:[]; }catch(e){ return []; } }
+  function writeSaved(list){ try{ localStorage.setItem(SAVE_KEY,JSON.stringify(list.slice(0,200))); return true; }catch(e){ return false; } }
+  function dbUrl(qs){ return DB_URL+(DB_URL.indexOf('?')>-1?'&':'?')+qs; }
+  function dbHdr(post){ var h={}; if(post) h['Content-Type']='application/json'; if(DB_KEY) h['X-Key']=DB_KEY; return h; }
+  async function dbCall(url,opt){
+    var r=await fetch(url,opt), j=null; try{ j=await r.json(); }catch(e){}
+    if(!r.ok) throw new Error((j&&j.error)||('HTTP '+r.status));
+    return j||{};
+  }
+  async function dbList(q){ var j=await dbCall(dbUrl('q='+encodeURIComponent(q||'')),{headers:dbHdr(false)}); return j.items||[]; }
+  var dbCnt={};
+  async function saveDpw(){
+    var a=A[sel], ic=(fields.icao.value||'').trim().toUpperCase(); if(!ic) return {db:'none'};
+    var rw=a.chosen||a.plan||'', entry={icao:ic,rwy:rw,role:sel,ts:Date.now(),form:collect(),custom:$('#custNotes').value};
+    var list=readSaved().filter(function(e){ return !(e.icao===ic&&e.rwy===rw&&e.role===sel); });
+    list.unshift(entry);
+    if(!writeSaved(list)&&!DB_URL) status('Could not save in this browser (storage is blocked).',true);
+    var res='off';
+    if(DB_URL){
+      if(!/^[A-Z0-9]{4}$/.test(ic)) res='airport must be 4 characters';
+      else{ try{ await dbCall(DB_URL,{method:'POST',headers:dbHdr(true),body:JSON.stringify(entry)}); res='ok'; }catch(e){ res=e.message; } }
+    }
+    dbCnt={}; updateLoadBtn();
+    return {db:res};
+  }
+  function curIcao(){ var v=(fields.icao.value||'').trim().toUpperCase(); if(/^[A-Z0-9]{4}$/.test(v)) return v; var r=ROLES.filter(function(r){ return /^[A-Z0-9]{4}$/.test(A[r].icao||''); })[0]; return r?A[r].icao:''; }
+  function loadBtnText(n){ $('#loadBtn').textContent='Load saved DPW'+(n?' ('+n+')':''); }
+  function updateLoadBtn(){
+    var ok=ROLES.some(function(r){ return A[r].cfp||/^[A-Z0-9]{4}$/.test(A[r].icao||''); }), b=$('#loadBtn'); b.hidden=!ok;
+    if(!ok) return;
+    var ic=curIcao(), n=ic?readSaved().filter(function(e){ return e.icao===ic; }).length:0;
+    if(DB_URL&&ic){
+      if(!dbCnt) dbCnt={};
+      var c=dbCnt[ic]; if(c) n=c.n;
+      // ask the database at most once a minute per airport (this runs on every keystroke)
+      if(!c||Date.now()-c.at>60000){
+        c=dbCnt[ic]={n:n,at:Date.now()};
+        dbList(ic).then(function(items){ c.n=items.filter(function(e){ return e.icao===ic; }).length; if(curIcao()===ic) loadBtnText(c.n); }).catch(function(){});
+      }
+    }
+    loadBtnText(n);
+  }
+  function svWhen(ts){ var d=new Date(ts), M=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC']; return ('0'+d.getUTCDate()).slice(-2)+' '+M[d.getUTCMonth()]+' '+d.getUTCFullYear()+' '+zt(d); }
+  var loadSeq=0;
+  async function fetchSaved(q){
+    var local=readSaved().filter(function(e){ return !q||e.icao.indexOf(q)>-1; });
+    if(!DB_URL) return {items:local,src:'device'};
+    try{ return {items:await dbList(q),src:'db'}; }catch(err){ return {items:local,src:'device',err:err.message}; }
+  }
+  async function renderSaved(){
+    var q=($('#loadSearch').value||'').trim().toUpperCase(), box=$('#loadList'), my=++loadSeq;
+    if(DB_URL) $('#loadMsg').textContent='Loading from the database …';
+    var r=await fetchSaved(q); if(my!==loadSeq) return;
+    var list=r.items; box.innerHTML='';
+    var where=r.src==='db'?'Saved in the database.':('Saved on this device.'+(r.err?' Database unreachable ('+r.err+').':''));
+    $('#loadMsg').textContent=!list.length?(q?'No saved DPW for "'+q+'" yet. Clear the search to see everything saved.':'Nothing saved yet. Press Save / Send to FE\'s on a finished worksheet to save it here.')+(r.err?' Database unreachable ('+r.err+').':''):where+' Tap one to load it into the '+(sel==='DEP'?'DEP':'ARR')+' tab.';
+    list.forEach(function(e){
+      var row=document.createElement('div'); row.className='sv';
+      var t=document.createElement('div'); t.className='svt';
+      t.innerHTML='<b>'+e.icao+'</b>'+(e.rwy?' &middot; RWY '+e.rwy:'')+' &middot; '+(e.role==='ARR'?'ARR':'DEP')+'<small>Saved '+svWhen(e.ts)+'</small>';
+      t.onclick=function(){ applySaved(e); };
+      var x=document.createElement('button'); x.type='button'; x.className='svx'; x.title='Delete'; x.textContent='×';
+      x.onclick=async function(){
+        if(e.id&&DB_URL){ try{ await dbCall(dbUrl('id='+e.id),{method:'DELETE',headers:dbHdr(false)}); }catch(err){ $('#loadMsg').textContent='Delete failed ('+err.message+').'; return; } }
+        writeSaved(readSaved().filter(function(z){ return !(z.icao===e.icao&&z.rwy===e.rwy&&z.role===e.role); }));
+        dbCnt={}; renderSaved(); updateLoadBtn();
+      };
+      row.appendChild(t); row.appendChild(x); box.appendChild(row);
+    });
+  }
+  function applySaved(e){
+    saveForm(); var a=A[sel];
+    a.icao=e.icao; a.chosen=e.rwy||''; a.plan=''; a.form=e.form; a.rwys=[]; a.loadedIcao=e.icao;
+    $('#custNotes').value=e.custom||'';
+    loadForm(); renderTabs(); renderRwySel(); renderWx();
+    $('#loadModal').hidden=true;
+    status('Loaded saved DPW for '+e.icao+(e.rwy?' RWY '+e.rwy:'')+'.');
+    loadRunways().then(function(){ renderRwySel(); calc(); });
+  }
+  $('#loadBtn').addEventListener('click',function(){ $('#loadSearch').value=curIcao(); renderSaved(); $('#loadModal').hidden=false; setTimeout(function(){ $('#loadSearch').focus(); },30); });
+  $('#loadSearch').addEventListener('input',renderSaved);
+  $('#loadClose').addEventListener('click',function(){ $('#loadModal').hidden=true; });
+  $('#loadModal').addEventListener('click',function(e){ if(e.target===this) this.hidden=true; });
   renderTabs(); renderRwySel(); calc();
 })();
 </script>
