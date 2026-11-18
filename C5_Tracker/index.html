@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>C-5 Spotting over Travis · v26</title>
+<title>C-5 Spotting over Travis · v27</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600&family=Yellowtail&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -170,9 +170,9 @@ h2 .script{font-size:24px;margin-left:10px;letter-spacing:0}
 .fav .none{color:var(--gold);padding:18px 0}
 table.lb{width:100%;border-collapse:collapse;border:3px solid var(--navy);background:var(--card)}
 table.lb th{background:var(--navy);color:#fff;font-family:var(--num);letter-spacing:.14em;font-size:11px;padding:8px 10px;text-align:right;font-weight:500}
-table.lb th:nth-child(-n+7){text-align:left}
+table.lb th:nth-child(-n+6){text-align:left}
 table.lb td{padding:8px 10px;border-top:1px solid #d8ccb0;font-family:var(--num);font-size:16px;text-align:right}
-table.lb td:nth-child(-n+7){text-align:left}
+table.lb td:nth-child(-n+6){text-align:left}
 table.lb tr{cursor:default}
 table.lb tr:hover td{background:#f6e9c9}
 table.lb tr.sel td{background:#f1dfae}
@@ -188,7 +188,7 @@ td.m{color:var(--red);font-weight:600}
 .hint{font-size:12px;color:#6b7d80;margin-top:8px;font-family:var(--body)}
 .about{font-family:var(--body);font-size:12px;line-height:1.55;color:#6b7d80;max-width:780px;margin:18px auto 44px;text-align:center;padding:0 16px}
 .about b{color:var(--navy);font-weight:600}
-@media(max-width:900px){.top2{grid-template-columns:1fr}table.lb th:nth-child(7),table.lb td:nth-child(7){display:none}}
+@media(max-width:900px){.top2{grid-template-columns:1fr}}
 
 /* globe */
 .globe{margin-top:34px;display:grid;grid-template-columns:1fr 300px;background:var(--navy);border:3px solid var(--navy);color:#fff}
@@ -355,7 +355,7 @@ td.m{color:var(--red);font-weight:600}
     <button data-s="year" class="on" style="cursor:default">THIS YEAR</button>
   </div>
   
-  <table class="lb"><thead><tr><th>#</th><th>TAIL</th><th>BASE</th><th>STATUS</th><th>LAST LOCATION</th><th>LAST CALLSIGN</th><th></th><th>TIMES ACTIVE</th><th>COUNTRIES</th></tr></thead><tbody id="lb"></tbody></table>
+  <table class="lb"><thead><tr><th>#</th><th>TAIL</th><th>BASE</th><th>STATUS</th><th>LAST LOCATION</th><th>LAST CALLSIGN</th><th>TIMES ACTIVE</th><th>COUNTRIES</th></tr></thead><tbody id="lb"></tbody></table>
   <div class="hint">Stats are for this calendar year (Pacific time) and come from the shared Worker database, which checks open-source ADS-B feeds every 5 minutes. Countries come from the airfields and ground positions it sees.</div>
 </section>
 
@@ -366,7 +366,7 @@ td.m{color:var(--red);font-weight:600}
   <button id="refresh">REFRESH NOW</button>
 </section>
 <p class="about"><b>Where this data comes from.</b> Everything on this page is pulled from open-source, community-run feeds: ADS-B from adsb.lol, adsb.fi and airplanes.live, plus satellite ADS-C position reports over the oceans from airframes.io (marked SAT). It's the same public data anyone can see on a flight-tracking site. None of it comes from official USAF sources. A small Cloudflare Worker checks those feeds every 5 minutes for 50 C-5M tails, saves each position it hears, and tallies this year's flights and countries. Oceanic data provided by Airframes.io and its community of feeders. Aircraft only show up when they're broadcasting and a hobbyist receiver hears them, so gaps and missed flights are normal.</p>
-<div class="ver">V26</div>
+<div class="ver">V27</div>
 
 <script>
 const HOME={lat:38.2627,lon:-121.9275,name:'Travis',icao:'KSUU'}; // Travis AFB
@@ -791,8 +791,7 @@ function board(){
   $('lb').innerHTML=rows.map((r,i)=>{
     const l=r.l,live=l&&now-l.t<frOf(l);
     const stt=!l?'<span class="pillst no">NOT SEEN</span>':live?(l.air?'<span class="pillst air">AIRBORNE</span>':'<span class="pillst gnd">ON GROUND</span>'):`<span class="pillst no">LAST ${tm(l.t)}</span>`;
-    return `<tr data-h="${r.hex}" class="${SEL===r.hex?'sel':''}"><td class="rk">${i+1}</td><td class="tl"><a href="https://globe.adsbexchange.com/?icao=${r.hex}" target="_blank" rel="noopener">${r.tail}</a></td><td class="bs">${r.baseName}</td><td>${stt}</td><td class="loc" data-k="${r.l?r.l.lat.toFixed(1)+','+r.l.lon.toFixed(1):''}">${r.l?(PC[r.l.lat.toFixed(1)+','+r.l.lon.toFixed(1)]||'…'):'—'}${r.l?`<small>${live?'NOW':tm(r.l.t)}${r.l.sat?' · SAT':''}</small>`:''}</td><td class="cs">${r.l&&r.l.lcs?r.l.lcs:'—'}</td><td class="barc"><i style="width:${Math.max(r[METRIC]>0?3:0,r[METRIC]/mx*100)}%"></i></td>
-      <td class="${METRIC==='flights'?'m':''}">${r.flights?r.flights+'×':'—'}</td><td class="cc ${METRIC==='ctryN'?'m':''}">${ccList(r.ctry,r.oc)}</td></tr>`;
+    return `<tr data-h="${r.hex}" class="${SEL===r.hex?'sel':''}"><td class="rk">${i+1}</td><td class="tl"><a href="https://globe.adsbexchange.com/?icao=${r.hex}" target="_blank" rel="noopener">${r.tail}</a></td><td class="bs">${r.baseName}</td><td>${stt}</td><td class="loc" data-k="${r.l?r.l.lat.toFixed(1)+','+r.l.lon.toFixed(1):''}">${r.l?(PC[r.l.lat.toFixed(1)+','+r.l.lon.toFixed(1)]||'…'):'—'}${r.l?`<small>${live?'NOW':tm(r.l.t)}${r.l.sat?' · SAT':''}</small>`:''}</td><td class="cs">${r.l&&r.l.lcs?r.l.lcs:'—'}</td><td class="${METRIC==='flights'?'m':''}">${r.flights?r.flights+'×':'—'}</td><td class="cc ${METRIC==='ctryN'?'m':''}">${ccList(r.ctry,r.oc)}</td></tr>`;
   }).join('');
   rows.forEach(r=>{if(!r.l)return;const k=r.l.lat.toFixed(1)+','+r.l.lon.toFixed(1);if(PC[k])return;
     place(r.l.lat,r.l.lon).then(n=>{document.querySelectorAll('#lb td.loc').forEach(td=>{if(td.dataset.k===k){const sm=td.querySelector('small');td.firstChild.nodeValue=n;if(!sm)return;}});});});
