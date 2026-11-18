@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>DPW Hero V74</title>
+<title>DPW Hero V75</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#0b1d3a">
 <meta name="mobile-web-app-capable" content="yes">
@@ -164,10 +164,6 @@ button.upd{background:var(--accent);color:#fff;border-color:var(--accent)}
 details{margin-top:10px;background:var(--card);border-radius:10px;padding:10px 12px;font-size:13px}
 pre{white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px;margin:6px 0 0}
 .log li{margin:2px 0}
-@media(max-width:760px){
-  .r6,.wx4{grid-template-columns:repeat(2,1fr)}
-  .cell{border-top:1px solid var(--line)}
-}
 @media print{
   body{background:#fff;color:#000}.noprint{display:none!important}
   .ws{margin:0;border-color:#000}
@@ -389,6 +385,16 @@ pre{white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px;margin:6p
     Object.keys(fields).forEach(function(k){var el=fields[k];
       if(el.type==='checkbox'||el.type==='radio') el.checked=false; else {el.value=''; el.classList.remove('auto','derived');}});
   }
+  /* worksheet keeps its desktop layout on a phone: it is shrunk to fit (pinch to zoom), never reflowed */
+  var WS_W=720;
+  function fitWs(){
+    var ws=$('#ws'), wr=document.querySelector('.wrap'); if(!ws||!wr) return;
+    var avail=wr.clientWidth-28;
+    ws.style.zoom=''; ws.style.width='';
+    if(avail>0 && avail<WS_W){ ws.style.width=WS_W+'px'; ws.style.zoom=(avail/WS_W).toFixed(4); }
+  }
+  function unfitWs(){ var ws=$('#ws'); if(ws) ws.style.zoom=''; }
+  window.addEventListener('resize',fitWs); window.addEventListener('orientationchange',fitWs); fitWs();
   function collect(){
     var o={}; Object.keys(fields).forEach(function(k){var el=fields[k];
       o[k]=(el.type==='checkbox'||el.type==='radio')?el.checked:{v:el.value,c:el.classList.contains('auto')?'auto':(el.classList.contains('derived')?'derived':'')};});
@@ -726,7 +732,7 @@ pre{white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px;margin:6p
       status('Capturing the worksheet …');
       var a=A[sel], rw=a.chosen||a.plan;
       try{
-        var canvas=await html2canvas($('#ws'),{scale:2,backgroundColor:getComputedStyle(document.body).backgroundColor,useCORS:true,logging:false,
+        unfitWs(); var canvas; try{ canvas=await html2canvas($('#ws'),{windowWidth:Math.max(document.documentElement.clientWidth,780),scale:2,backgroundColor:getComputedStyle(document.body).backgroundColor,useCORS:true,logging:false,
           onclone:function(doc){
             var win=doc.defaultView, root=doc.getElementById('ws');
             root.querySelectorAll('input.sidname').forEach(function(i){
@@ -753,7 +759,7 @@ pre{white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px;margin:6p
             if(cn){ var cw=cn.parentNode;
               if(!cn.value.trim()) cw.remove();
               else { var cd=doc.createElement('div'); cd.textContent=cn.value; cd.style.cssText='white-space:pre-wrap;word-break:break-word;font-size:14px;line-height:1.35;color:'+win.getComputedStyle(cn).color; cw.replaceChild(cd,cn); } }
-          }});
+          }}); }finally{ fitWs(); }
         canvas.toBlob(function(b){
           if(!b){ status('Could not create the image.',true); return; }
           cur=new File([b],fname(),{type:'image/png'});
