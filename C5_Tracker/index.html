@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>C-5 Spotting over Travis · v25</title>
+<title>C-5 Spotting over Travis · v26</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600&family=Yellowtail&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -355,7 +355,7 @@ td.m{color:var(--red);font-weight:600}
     <button data-s="year" class="on" style="cursor:default">THIS YEAR</button>
   </div>
   
-  <table class="lb"><thead><tr><th>#</th><th>TAIL</th><th>BASE</th><th>STATUS</th><th>LAST LOCATION</th><th>CALLSIGN</th><th></th><th>TIMES ACTIVE</th><th>COUNTRIES</th></tr></thead><tbody id="lb"></tbody></table>
+  <table class="lb"><thead><tr><th>#</th><th>TAIL</th><th>BASE</th><th>STATUS</th><th>LAST LOCATION</th><th>LAST CALLSIGN</th><th></th><th>TIMES ACTIVE</th><th>COUNTRIES</th></tr></thead><tbody id="lb"></tbody></table>
   <div class="hint">Stats are for this calendar year (Pacific time) and come from the shared Worker database, which checks open-source ADS-B feeds every 5 minutes. Countries come from the airfields and ground positions it sees.</div>
 </section>
 
@@ -366,7 +366,7 @@ td.m{color:var(--red);font-weight:600}
   <button id="refresh">REFRESH NOW</button>
 </section>
 <p class="about"><b>Where this data comes from.</b> Everything on this page is pulled from open-source, community-run feeds: ADS-B from adsb.lol, adsb.fi and airplanes.live, plus satellite ADS-C position reports over the oceans from airframes.io (marked SAT). It's the same public data anyone can see on a flight-tracking site. None of it comes from official USAF sources. A small Cloudflare Worker checks those feeds every 5 minutes for 50 C-5M tails, saves each position it hears, and tallies this year's flights and countries. Oceanic data provided by Airframes.io and its community of feeders. Aircraft only show up when they're broadcasting and a hobbyist receiver hears them, so gaps and missed flights are normal.</p>
-<div class="ver">V25</div>
+<div class="ver">V26</div>
 
 <script>
 const HOME={lat:38.2627,lon:-121.9275,name:'Travis',icao:'KSUU'}; // Travis AFB
