@@ -1,4 +1,4 @@
-// C-5 Tracker Worker  ·  v4 (50 tails + this-year tally + airframes.io satellite ADS-C over the oceans)
+// C-5 Tracker Worker  ·  v5 (50 tails + this-year tally + airframes.io satellite ADS-C over the oceans)
 // Cron (every 5 min) polls public ADS-B feeds for the 16 tails and stores one
 // shared "database" in KV (key: fleet-cache). Every site reads it via ?fleet=1.
 //
@@ -219,6 +219,7 @@ async function refreshFleet(env) {
       if (last && sp.ts <= last.ts) continue;
       const pt = { lat: sp.lat, lon: sp.lon, alt: sp.alt, gs: null, g: 0, ts: sp.ts, s: 1 };
       e.history.push(pt);
+      if (sp.cs) e.cs = String(sp.cs).trim();
       if (tally(ys, hex, pt)) dirty = true;
       if (!found[hex] && (!e.cachedAt || sp.ts >= e.cachedAt)) {
         e.ac = { hex, flight: sp.cs || '', lat: sp.lat, lon: sp.lon, alt_baro: sp.alt, src: 'airframes-adsc' };
@@ -242,7 +243,8 @@ async function refreshFleet(env) {
       if (tally(ys, hex, pt)) dirty = true;
     }
     history = history.filter(p => now - p.ts <= MAX_AGE_MS).slice(-MAX_POINTS);
-    fleet[hex] = { ac, cachedAt: now, history };
+    const cs = String(ac.flight || '').trim(); // remember the last non-empty callsign
+    fleet[hex] = { ac, cachedAt: now, history, cs: cs || prev.cs || '' };
     updated++;
   }
   fleet._af = af; // airframes.io state rides along in the same write
