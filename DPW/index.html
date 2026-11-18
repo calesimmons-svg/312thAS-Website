@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>DPW Hero V67</title>
+<title>DPW Hero V74</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#0b1d3a">
 <meta name="mobile-web-app-capable" content="yes">
@@ -121,6 +121,10 @@ select{padding:7px;border-radius:6px;border:1px solid var(--line);background:var
 .chk{display:inline-flex;align-items:center;gap:3px;font-size:11px;margin-right:6px}
 .cell label.chk{display:inline-flex;margin-right:14px}
 .chk input{width:16px;height:16px}
+.cell.bx{display:flex;flex-direction:column}
+.cell.bx .mcgsel,.cell.bx .sidname{margin-top:auto !important;flex:none}
+.cell input[type=text].sidname{display:block;width:100%;max-width:100%;margin-top:1px;height:17px;padding:0 2px;font-size:10px;font-weight:600;color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:3px;box-sizing:border-box}
+.mcgsel{display:block;width:100%;max-width:100%;margin-top:1px;height:17px;padding:0 2px;font-size:10px;font-weight:600;color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:3px;text-overflow:ellipsis}
 .foot{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;font-size:15px;padding:5px 8px;border-top:3px solid var(--line);min-height:34px}
 .foot b{font-size:15px}
 .cust{flex:1 1 220px;min-width:0;border-left:1px solid var(--line);padding-left:8px;align-self:stretch}
@@ -193,7 +197,7 @@ pre{white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px;margin:6p
       
       <button class="sec" id="wxToggle"><span class="rain" id="rain" aria-hidden="true"></span><span class="lbl">Hide / Show Weather</span></button>
     </div>
-    <div id="wxwrap">
+    <div id="wxwrap" hidden>
     <div class="wxline" id="wxline"></div>
     <div class="wxline" id="metarline" style="border-left-color:#16a34a"></div>
     <div class="taf" id="tafline" style="display:none"></div>
@@ -238,11 +242,35 @@ pre{white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px;margin:6p
       <div class="cell"><label>Screen Height <button type="button" class="info noprint" data-note="der" aria-label="Note">i</button></label><input type="text" inputmode="numeric" data-k="screen"></div>
     </div>
     <div class="row r6" style="border-top:1px solid var(--line)">
-      <div class="cell"><label>* Min Climb Gradient <button type="button" class="info noprint" data-note="mcg" aria-label="Note">i</button></label><input type="text" inputmode="decimal" data-k="mcg1"></div>
-      <div class="cell"><label>* Min Climb Gradient 2</label><input type="text" inputmode="decimal" data-k="mcg2"></div>
-      <div class="cell"><label>† ATC Climb Gradient</label><input type="text" inputmode="decimal" data-k="atc"></div>
+      <div class="cell bx"><label>* Min Climb Gradient <button type="button" class="info noprint" data-note="mcg" aria-label="Note">i</button></label><input type="text" inputmode="decimal" data-k="mcg1">
+        <select class="mcgsel" data-k="mcgType" aria-label="Departure procedure type for the min climb gradient">
+          <option value="">Type &#9662;</option>
+          <option>Diverse Departure</option>
+          <option>ICAO Omnidirectional Departure</option>
+          <option>Obstacle Departure Procedure (ODP)</option>
+          <option>VCOA (Visual Climb Over Airport)</option>
+          <option>DVA (Diverse Vector Area)</option>
+          <option>Specific ATC Departure Instructions</option>
+          <option>Standard Instrument Departure (SID)</option>
+          <option>MAJCOM-Certified Procedure</option>
+        </select></div>
+      <div class="cell bx"><label>* Min Climb Gradient 2</label><input type="text" inputmode="decimal" data-k="mcg2">
+        <select class="mcgsel" data-k="mcgType2" aria-label="Departure procedure type for the min climb gradient">
+          <option value="">Type &#9662;</option>
+          <option>Diverse Departure</option>
+          <option>ICAO Omnidirectional Departure</option>
+          <option>Obstacle Departure Procedure (ODP)</option>
+          <option>VCOA (Visual Climb Over Airport)</option>
+          <option>DVA (Diverse Vector Area)</option>
+          <option>Specific ATC Departure Instructions</option>
+          <option>Standard Instrument Departure (SID)</option>
+          <option>MAJCOM-Certified Procedure</option>
+        </select></div>
+      <div class="cell bx"><label>† ATC Climb Gradient</label><input type="text" inputmode="decimal" data-k="atc">
+        <input type="text" class="sidname" data-k="atcSid" placeholder="SID name" maxlength="30" autocapitalize="characters" aria-label="SID name for the ATC climb gradient"></div>
       <div class="cell"><label>Obstacle Height (MSL) <button type="button" class="info noprint" data-note="obs" aria-label="Note">i</button></label><input type="text" inputmode="numeric" data-k="obsHt"></div>
-      <div class="cell w"><label>Missed App Climb Gradient</label><input type="text" inputmode="decimal" data-k="mag"></div>
+      <div class="cell w bx"><label>Missed App Climb Gradient</label><input type="text" inputmode="decimal" data-k="mag">
+        <input type="text" class="sidname" data-k="magApp" placeholder="Approach for MSA" maxlength="40" aria-label="Approach used for the missed approach climb gradient (MSA)"></div>
     </div>
     <div class="row r6" style="border-top:1px solid var(--line)">
       <div class="cell"><label>* Altitude (MSL)</label><input type="text" inputmode="numeric" data-k="alt1"></div>
@@ -701,6 +729,10 @@ pre{white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px;margin:6p
         var canvas=await html2canvas($('#ws'),{scale:2,backgroundColor:getComputedStyle(document.body).backgroundColor,useCORS:true,logging:false,
           onclone:function(doc){
             var win=doc.defaultView, root=doc.getElementById('ws');
+            root.querySelectorAll('input.sidname').forEach(function(i){
+              if(!i.value.trim()){ i.remove(); return; }
+              var d=doc.createElement('div'); d.textContent=i.value; d.style.cssText='font-size:10px;font-weight:600;line-height:1.2;margin-top:2px'; i.parentNode.replaceChild(d,i);
+            });
             root.querySelectorAll('input[type=text]').forEach(function(i){
               var cs=win.getComputedStyle(i), d=doc.createElement('div');
               d.textContent=i.value;
@@ -708,6 +740,10 @@ pre{white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px;margin:6p
               d.style.width=cs.width; d.style.color=cs.color; d.style.background=cs.backgroundColor;
               if(parseFloat(cs.borderTopWidth)>0){ d.style.border=cs.borderTopWidth+' '+cs.borderTopStyle+' '+cs.borderTopColor; d.style.padding='2px 4px'; }
               i.parentNode.replaceChild(d,i);
+            });
+            root.querySelectorAll('select.mcgsel').forEach(function(sl){
+              if(!sl.value){ sl.remove(); return; }
+              var d=doc.createElement('div'); d.textContent=sl.value; d.style.cssText='font-size:10px;font-weight:600;line-height:1.2;margin-top:2px'; sl.parentNode.replaceChild(d,sl);
             });
             root.querySelectorAll('input[type=radio]').forEach(function(r){
               var sp=doc.createElement('span'); sp.textContent=r.checked?'\u25C9':'\u25CB'; sp.style.fontSize='14px'; r.parentNode.replaceChild(sp,r);
@@ -815,11 +851,8 @@ pre{white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px;margin:6p
   /* ---------- Hide / Show weather ---------- */
   (function(){
     var w=$('#wxwrap');
-    try{ if(localStorage.getItem('dpwWxHidden')==='1') w.hidden=true; }catch(e){}
-    $('#wxToggle').addEventListener('click',function(){
-      w.hidden=!w.hidden;
-      try{ localStorage.setItem('dpwWxHidden',w.hidden?'1':'0'); }catch(e){}
-    });
+    w.hidden=true; // the weather starts hidden every time; Hide / Show Weather opens it for this visit
+    $('#wxToggle').addEventListener('click',function(){ w.hidden=!w.hidden; });
   })();
 
   /* ---------- cell notes (the red guidance text on the form) ---------- */
