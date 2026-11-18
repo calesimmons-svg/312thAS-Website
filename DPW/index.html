@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>DPW Hero V63</title>
+<title>DPW Hero V64</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
@@ -133,6 +133,9 @@ select{padding:7px;border-radius:6px;border:1px solid var(--line);background:var
 .sv .svt b{font-size:16px}
 .sv .svt small{display:block;color:var(--muted);font-size:11px}
 .sv:hover{background:var(--auto)}
+.svh{font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--muted);margin:12px 0 2px}
+.sv .svn{margin-top:4px;font-size:13px;white-space:pre-wrap;word-break:break-word}
+.sv .svn.none{color:var(--muted);font-style:italic;font-size:12px}
 .rwyact{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
 #clear{color:#ef4444;border-color:#ef4444;background:rgba(239,68,68,.12)}
 #shotBtn{color:#22c55e;border-color:#22c55e;background:rgba(34,197,94,.12)}
@@ -1338,12 +1341,21 @@ pre{white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px;margin:6p
     var list=r.items; box.innerHTML='';
     var where=r.src==='db'?'Saved in the database.':('Saved on this device.'+(r.err?' Database unreachable ('+r.err+').':''));
     $('#loadMsg').textContent=!list.length?(q?'No saved DPW for "'+q+'" yet. Clear the search to see everything saved.':'Nothing saved yet. Press Save / Send to FE\'s on a finished worksheet to save it here.')+(r.err?' Database unreachable ('+r.err+').':''):where+' Tap one to load it into the '+(sel==='DEP'?'DEP':'ARR')+' tab.';
-    list.forEach(function(e){
-      var row=document.createElement('div'); row.className='sv';
-      var t=document.createElement('div'); t.className='svt';
-      t.innerHTML='<b>'+e.icao+'</b>'+(e.rwy?' &middot; RWY '+e.rwy:'')+' &middot; '+(e.role==='ARR'?'ARR':'DEP')+'<small>Saved '+svWhen(e.ts)+'</small>';
-      t.onclick=function(){ applySaved(e); };
-      row.appendChild(t); box.appendChild(row);
+    // group by airport + runway, newest group first, newest save first inside each group
+    list=list.slice().sort(function(a,b){ return (b.ts||0)-(a.ts||0); });
+    var groups=[], gi={};
+    list.forEach(function(e){ var k=e.icao+'|'+(e.rwy||''); if(!(k in gi)){ gi[k]=groups.length; groups.push({icao:e.icao,rwy:e.rwy||'',items:[]}); } groups[gi[k]].items.push(e); });
+    groups.forEach(function(g){
+      var h=document.createElement('div'); h.className='svh'; h.textContent=g.icao+(g.rwy?' · RWY '+g.rwy:' · no runway'); box.appendChild(h);
+      g.items.forEach(function(e){
+        var row=document.createElement('div'); row.className='sv';
+        var t=document.createElement('div'); t.className='svt';
+        var b=document.createElement('b'); b.textContent=(e.role==='ARR'?'ARR':'DEP'); t.appendChild(b);
+        var sm=document.createElement('small'); sm.textContent='Saved '+svWhen(e.ts); t.appendChild(sm);
+        var nt=(e.custom||'').trim(), n=document.createElement('div'); n.className='svn'+(nt?'':' none'); n.textContent=nt||'No notes'; t.appendChild(n);
+        t.onclick=function(){ applySaved(e); };
+        row.appendChild(t); box.appendChild(row);
+      });
     });
   }
   function applySaved(e){
