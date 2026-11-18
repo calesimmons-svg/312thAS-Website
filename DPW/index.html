@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>DPW Hero V62</title>
+<title>DPW Hero V63</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
@@ -132,7 +132,6 @@ select{padding:7px;border-radius:6px;border:1px solid var(--line);background:var
 .sv .svt{flex:1;cursor:pointer;font-size:14px;line-height:1.3}
 .sv .svt b{font-size:16px}
 .sv .svt small{display:block;color:var(--muted);font-size:11px}
-.sv .svx{background:transparent;color:var(--muted);border:0;font-size:20px;padding:0 4px;line-height:1}
 .sv:hover{background:var(--auto)}
 .rwyact{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
 #clear{color:#ef4444;border-color:#ef4444;background:rgba(239,68,68,.12)}
@@ -1344,13 +1343,7 @@ pre{white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px;margin:6p
       var t=document.createElement('div'); t.className='svt';
       t.innerHTML='<b>'+e.icao+'</b>'+(e.rwy?' &middot; RWY '+e.rwy:'')+' &middot; '+(e.role==='ARR'?'ARR':'DEP')+'<small>Saved '+svWhen(e.ts)+'</small>';
       t.onclick=function(){ applySaved(e); };
-      var x=document.createElement('button'); x.type='button'; x.className='svx'; x.title='Delete'; x.textContent='×';
-      x.onclick=async function(){
-        if(e.id&&DB_URL){ try{ await dbCall(dbUrl('id='+e.id),{method:'DELETE',headers:dbHdr(false)}); }catch(err){ $('#loadMsg').textContent='Delete failed ('+err.message+').'; return; } }
-        writeSaved(readSaved().filter(function(z){ return !(z.icao===e.icao&&z.rwy===e.rwy&&z.role===e.role); }));
-        dbCnt={}; renderSaved(); updateLoadBtn();
-      };
-      row.appendChild(t); row.appendChild(x); box.appendChild(row);
+      row.appendChild(t); box.appendChild(row);
     });
   }
   function applySaved(e){
