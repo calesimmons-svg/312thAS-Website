@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>DPW Hero V66</title>
+<title>DPW Hero V67</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#0b1d3a">
 <meta name="mobile-web-app-capable" content="yes">
@@ -271,6 +271,8 @@ pre{white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px;margin:6p
       <button type="button" class="sec" id="shotCopy">Copy image</button>
       <button type="button" class="sec" id="shotSave">Save image</button>
       <button type="button" class="sec" id="shotDb">Save to database</button>
+      <button type="button" id="shotOver" hidden>Overwrite saved DPW</button>
+      <button type="button" class="sec" id="shotNew" hidden>Save as new</button>
     </div>
     <p id="shotMsg" style="font-size:12px;color:var(--muted)"></p>
   </div>
@@ -691,7 +693,7 @@ pre{white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px;margin:6p
     modal.addEventListener('click',function(e){ if(e.target===modal) closeIt(); });
     document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&!modal.hidden) closeIt(); });
     $('#shotBtn').addEventListener('click',async function(){
-      var dbP=saveDpw();
+      var dbP=loaded?Promise.resolve({db:'none'}):saveDpw();
       if(typeof html2canvas!=='function'){ status('The screenshot tool did not load. It needs an internet connection.',true); return; }
       status('Capturing the worksheet …');
       var a=A[sel], rw=a.chosen||a.plan;
@@ -724,6 +726,8 @@ pre{white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px;margin:6p
           $('#shotShare').style.display=(navigator.canShare&&navigator.canShare({files:[cur]}))?'':'none';
           $('#shotCopy').style.display=(window.ClipboardItem&&navigator.clipboard&&navigator.clipboard.write)?'':'none';
           msg.textContent=''; modal.hidden=false; status('');
+          var L=loaded; $('#shotDb').hidden=!!L; $('#shotOver').hidden=!L; $('#shotNew').hidden=!L;
+          if(L){ $('#shotOver').textContent='Overwrite saved '+L.icao+(L.rwy?' RWY '+L.rwy:'')+' '+L.role; msg.textContent='You loaded a saved DPW. Overwrite it, or Save as new to keep both.'; }
           dbP.then(function(r){ if(r.db==='ok') msg.textContent='Saved to database.'; else if(r.db!=='off'&&r.db!=='none') msg.textContent='Saved on this device. Database save failed ('+r.db+').'; });
         },'image/png');
       }catch(err){ console.error(err); status('Screenshot failed ('+err.message+').',true); }
@@ -743,6 +747,18 @@ pre{white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px;margin:6p
       var r=await saveDpw();
       msg.textContent=r.db==='ok'?'Saved to database.':'Database save failed ('+r.db+').';
     });
+    function dbSaveBtn(mode){
+      return async function(){
+        if(!DB_URL){ msg.textContent='Database not connected yet.'; return; }
+        if(!(fields.icao.value||'').trim()){ msg.textContent='Enter an airport first.'; return; }
+        msg.textContent='Saving to database \u2026';
+        var r=await saveDpw({mode:mode});
+        if(r.db==='ok'){ msg.textContent=mode==='new'?'Saved as a new DPW.':'Saved over the existing DPW.'; if(loaded) $('#shotOver').textContent='Overwrite saved '+loaded.icao+(loaded.rwy?' RWY '+loaded.rwy:'')+' '+loaded.role; }
+        else msg.textContent=/^offline/.test(r.db)?'Saved on this device. It will upload at the next sync.':'Database save failed ('+r.db+').';
+      };
+    }
+    $('#shotOver').addEventListener('click',dbSaveBtn('over'));
+    $('#shotNew').addEventListener('click',dbSaveBtn('new'));
     $('#shotSave').addEventListener('click',function(){
       var a=document.createElement('a'); a.href=url; a.download=cur?cur.name:fname(); document.body.appendChild(a); a.click(); a.remove();
       msg.textContent='Saved to your downloads.';
@@ -1293,7 +1309,7 @@ pre{white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px;margin:6p
   }
   $('#clear').onclick=function(){
     $('#drop').classList.add('attn'); $('#dropText').textContent='Tap or drop crew papers here';
-    A={DEP:blank(),ARR:blank(),ALT:blank()}; notam={}; sel='DEP'; clearForm(); $('#custNotes').value='';
+    A={DEP:blank(),ARR:blank(),ALT:blank()}; notam={}; sel='DEP'; clearForm(); $('#custNotes').value=''; loaded=null;
     status('');
     renderTabs(); renderRwySel(); renderWx(); calc(); renderTkoff();
   };
@@ -1323,16 +1339,26 @@ pre{white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px;margin:6p
   }
   async function dbList(q){ var j=await dbCall(dbUrl('q='+encodeURIComponent(q||'')),{headers:dbHdr(false)}); return j.items||[]; }
   var dbCnt={};
-  async function saveDpw(){
+  var loaded=null; // the saved DPW that was loaded into the form: {id,icao,rwy,role}
+  async function saveDpw(opt){
+    opt=opt||{};
     var a=A[sel], ic=(fields.icao.value||'').trim().toUpperCase(); if(!ic) return {db:'none'};
     var rw=a.chosen||a.plan||'', entry={icao:ic,rwy:rw,role:sel,ts:Date.now(),form:collect(),custom:$('#custNotes').value};
-    var list=readSaved().filter(function(e){ return !(e.icao===ic&&e.rwy===rw&&e.role===sel); });
+    var over=opt.mode==='over'&&loaded&&loaded.id, asNew=opt.mode==='new';
+    if(over) entry.id=loaded.id; if(asNew) entry.mode='new';
+    var list=readSaved().filter(function(e){ return over?e.id!==loaded.id:asNew?true:!(e.icao===ic&&e.rwy===rw&&e.role===sel); });
     list.unshift(entry);
     if(!writeSaved(list)&&!DB_URL) status('Could not save in this browser (storage is blocked).',true);
     var res='off';
     if(DB_URL){
       if(!/^[A-Z0-9]{4}$/.test(ic)) res='airport must be 4 characters';
-      else{ try{ await dbCall(DB_URL,{method:'POST',headers:dbHdr(true),body:JSON.stringify(entry)}); res='ok'; }catch(e){ res=e.message; if(!navigator.onLine||e instanceof TypeError){ entry.pend=true; writeSaved(list); res='offline: saved on this device, will upload at the next sync'; } } }
+      else{
+        try{
+          var j=await dbCall(DB_URL,{method:'POST',headers:dbHdr(true),body:JSON.stringify(entry)}); res='ok';
+          if(j.id) entry.id=j.id; delete entry.mode; writeSaved(list);
+          if(opt.mode) loaded={id:entry.id||null,icao:ic,rwy:rw,role:sel};
+        }catch(e){ res=e.message; if(!navigator.onLine||e instanceof TypeError){ entry.pend=true; writeSaved(list); res='offline: saved on this device, will upload at the next sync'; } }
+      }
     }
     dbCnt={}; updateLoadBtn();
     return {db:res};
@@ -1388,6 +1414,7 @@ pre{white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px;margin:6p
   function applySaved(e){
     saveForm(); var a=A[sel];
     a.icao=e.icao; a.chosen=e.rwy||''; a.plan=''; a.form=e.form; a.rwys=[]; a.loadedIcao=e.icao;
+    loaded={id:e.id||null,icao:e.icao,rwy:e.rwy||'',role:e.role||'DEP'};
     $('#custNotes').value=e.custom||'';
     loadForm(); renderTabs(); renderRwySel(); renderWx();
     $('#loadModal').hidden=true;
@@ -1427,14 +1454,14 @@ pre{white-space:pre-wrap;max-height:260px;overflow:auto;font-size:12px;margin:6p
   async function syncDb(){
     if(!DB_URL) return {ok:false,msg:'not set up'};
     try{
-      var local=readSaved(), pushed=0, left=0;
+      var local=readSaved(), pushed=0;
       for(var i=0;i<local.length;i++){
         var e=local[i]; if(!e.pend) continue;
-        try{ await dbCall(DB_URL,{method:'POST',headers:dbHdr(true),body:JSON.stringify(e)}); delete e.pend; pushed++; }catch(err){ if(err instanceof TypeError) throw err; delete e.pend; }
+        try{ var pj=await dbCall(DB_URL,{method:'POST',headers:dbHdr(true),body:JSON.stringify(e)}); if(pj.id) e.id=pj.id; delete e.pend; delete e.mode; pushed++; }catch(err){ if(err instanceof TypeError) throw err; delete e.pend; delete e.mode; }
       }
-      var items=await dbList(''), m={};
-      local.forEach(function(e){ m[e.icao+'|'+e.rwy+'|'+e.role]=e; });
-      items.forEach(function(it){ var k=it.icao+'|'+(it.rwy||'')+'|'+it.role, o=m[k]; if(!o||(o.ts||0)<=(it.ts||0)){ m[k]={icao:it.icao,rwy:it.rwy||'',role:it.role,ts:it.ts,form:it.form,custom:it.custom||''}; } });
+      var items=await dbList(''), m={}, dk={};
+      items.forEach(function(it){ dk[it.icao+'|'+(it.rwy||'')+'|'+it.role]=1; m['i'+it.id]={id:it.id,icao:it.icao,rwy:it.rwy||'',role:it.role,ts:it.ts,form:it.form,custom:it.custom||''}; });
+      local.forEach(function(e){ if(!e.id&&!dk[e.icao+'|'+e.rwy+'|'+e.role]) m['n'+e.icao+'|'+e.rwy+'|'+e.role]=e; });
       var all=Object.keys(m).map(function(k){ return m[k]; }).sort(function(a,b){ return (b.ts||0)-(a.ts||0); });
       writeSaved(all); dbCnt={}; updateLoadBtn();
       return {ok:true,msg:'connected, '+items.length+' saved'+(pushed?' ('+pushed+' uploaded)':'')};
