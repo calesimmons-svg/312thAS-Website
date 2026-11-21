@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>C-5 Spotting over Travis · v29</title>
+<title>C-5 Spotting over Travis · v30</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600&family=Yellowtail&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -141,6 +141,7 @@ h2 .script{font-size:24px;margin-left:10px;letter-spacing:0}
 .recv{margin-top:26px;display:flex;justify-content:space-between;gap:20px;border:3px solid var(--navy);padding:12px 18px;background:var(--card);font-family:var(--num);letter-spacing:.14em;font-size:13px;align-items:center;flex-wrap:wrap}
 .recv b{color:var(--teal)}.recv .demo{color:var(--red)}
 .recv button{font:inherit;letter-spacing:.18em;border:2px solid var(--navy);background:var(--gold);padding:5px 12px;cursor:pointer}
+.updated{text-align:center;font:600 11px var(--num);letter-spacing:.2em;color:var(--teal);text-transform:uppercase;padding:6px 0 44px}
 .ver{position:fixed;right:10px;bottom:8px;font-family:var(--num);font-size:11px;letter-spacing:.2em;background:var(--navy);color:var(--gold);padding:3px 8px;opacity:.9}
 
 /* leaderboard */
@@ -395,7 +396,8 @@ table.lb th:nth-child(7),table.lb td:nth-child(7){text-align:center;width:130px}
   <button id="refresh">REFRESH NOW</button>
 </section>
 <p class="about"><b>Where this data comes from.</b> Everything on this page is pulled from open-source, community-run feeds: ADS-B from adsb.lol, adsb.fi and airplanes.live, plus satellite ADS-C position reports over the oceans from airframes.io (marked SAT). It's the same public data anyone can see on a flight-tracking site. None of it comes from official USAF sources. A small Cloudflare Worker checks those feeds every 5 minutes for 50 C-5M tails, saves each position it hears, and tallies this year's flights and countries. Oceanic data provided by Airframes.io and its community of feeders. Aircraft only show up when they're broadcasting and a hobbyist receiver hears them, so gaps and missed flights are normal.</p>
-<div class="ver">V29</div>
+<div class="updated">Last updated Nov 21, 2026 · V30</div>
+<div class="ver">V30</div>
 
 <script>
 const HOME={lat:38.2627,lon:-121.9275,name:'Travis',icao:'KSUU'}; // Travis AFB
@@ -934,7 +936,9 @@ function gUpdate(){
 function clock(){
   const d=new Date();
   const t=d.toLocaleTimeString('en-US',{timeZone:TZ,hour:'numeric',minute:'2-digit'});
-  const dt=d.toLocaleDateString('en-US',{timeZone:TZ,weekday:'short',month:'short',day:'numeric'}).toUpperCase().replace(',','');
+  const dt0=d.toLocaleDateString('en-US',{timeZone:TZ,weekday:'short',month:'short',day:'numeric'}).toUpperCase().replace(',','');
+  const [jy,jm,jd]=dayKey().split('-').map(Number),jul=Math.round((Date.UTC(jy,jm-1,jd)-Date.UTC(jy,0,0))/864e5);
+  const dt=`${dt0} · JULIAN ${String(jul).padStart(3,'0')}`;
   $('clock').innerHTML=`${t.replace(/ (AM|PM)/,'<small style="font-size:34px;color:inherit;margin:0"> $1</small>')}<small>${dt}</small>`;
 }
 $('refresh').onclick=()=>{load();};
