@@ -1,0 +1,2570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>312AS — 312th Airlift Squadron · v84</title>
+<style>
+  :root{
+    --bg:#e4dbc2; --panel:#f2ebd8; --panel-2:#e9e0c6; --ink:#252a19; --muted:#6a684f;
+    --line:#b8ac88; --od:#4a5230; --od-deep:#2b321e; --signal:#c2621d; --on-od:#efe7cf;
+    --hero-text:#efe7cf; --hero-muted:#b7b38f; --shadow:0 1px 0 rgba(0,0,0,.04),0 10px 24px -16px rgba(43,50,30,.45);
+    --head:"Bahnschrift","Barlow Condensed","Roboto Condensed","Arial Narrow","Helvetica Neue",ui-sans-serif,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#12160d; --panel:#1b2114; --panel-2:#232a19; --ink:#e9e0c5; --muted:#a09c7e;
+      --line:#38422a; --od:#9aab68; --od-deep:#0d100a; --signal:#e3a33b; --on-od:#12160d;
+      --hero-text:#ece3c8; --hero-muted:#a8a584; --shadow:0 12px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;color:var(--ink);background:var(--bg);
+    font:16px/1.55 ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:env(safe-area-inset-bottom,0);
+  }
+  a{color:inherit}
+  :focus-visible{outline:2px solid var(--signal);outline-offset:2px}
+
+  /* hero: olive field with grid and contour lines */
+  .hero{
+    position:relative;color:var(--hero-text);
+    padding:calc(56px + env(safe-area-inset-top,0px)) 24px 52px;
+    overflow:hidden;
+    background-color:var(--od-deep);
+    background-image:
+      repeating-linear-gradient(0deg,rgba(217,207,168,.06) 0 1px,transparent 1px 56px),
+      repeating-linear-gradient(90deg,rgba(217,207,168,.06) 0 1px,transparent 1px 56px);
+    background-repeat:repeat,repeat;
+    background-position:0 0,0 0;
+  }
+  .ifr{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  .ifr-page{position:fixed;inset:0;width:100%;height:100%;z-index:-1;--chart:#59613a;--chart-box:var(--bg)}
+  @media (prefers-color-scheme:dark){.ifr-page{--chart:#c3bd92}}
+  .ifr.ifr-page{opacity:.2}
+  .hero .ifr{opacity:.55}
+  .hero-fade{
+    position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(90deg,color-mix(in srgb,var(--od-deep) 92%,transparent) 0%,color-mix(in srgb,var(--od-deep) 55%,transparent) 38%,transparent 70%);
+  }
+  .hero::after{ /* sand and olive stripe along the bottom edge */
+    content:"";z-index:3;position:absolute;left:0;right:0;bottom:0;height:8px;
+    background:repeating-linear-gradient(-45deg,#c9b98a 0 14px,#4a5230 14px 28px);
+  }
+  .hero-in{position:relative;z-index:2;max-width:1320px;margin:0 auto;padding:30px 0 6px}
+  .hero-in::before,.hero-in::after{ /* corner brackets */
+    content:"";position:absolute;width:26px;height:26px;border:2px solid var(--signal);opacity:.9;
+  }
+  .hero-in::before{top:0;left:0;border-right:0;border-bottom:0}
+  .hero-in::after{right:0;bottom:0;border-left:0;border-top:0}
+  .hero h1{
+    margin:0;padding:0 14px;font-family:var(--head);font-stretch:condensed;font-weight:800;
+    font-size:clamp(54px,12vw,120px);line-height:.92;letter-spacing:.02em;text-transform:uppercase;
+  }
+  .hero h1 small{
+    display:block;margin-top:16px;font-family:var(--head);font-stretch:condensed;font-weight:500;
+    font-size:clamp(16px,2.4vw,22px);letter-spacing:.14em;text-transform:uppercase;color:var(--hero-muted);line-height:1.3;
+  }
+
+  /* sections: side-by-side columns, each a card with a vertical list of links */
+  main{max-width:1320px;margin:0 auto;padding:36px 24px 72px}
+  .stack{
+    display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;
+    gap:20px;counter-reset:sec;
+  }
+  .card{
+    position:relative;counter-increment:sec;background:var(--panel);
+    flex:0 0 calc((100% - 40px) / 3);min-width:0;
+    border:1.5px solid var(--line);border-top:4px solid var(--od);box-shadow:var(--shadow);
+  }
+  .card::after{ /* notched corner */
+    content:"";position:absolute;top:-4px;right:-1.5px;width:0;height:0;z-index:1;
+    border-top:22px solid var(--bg);border-left:22px solid transparent;
+  }
+  .card-h{
+    display:flex;align-items:center;gap:12px;padding:12px 30px 12px 16px;
+    background:var(--panel-2);border-bottom:1.5px solid var(--line);
+  }
+  .ico{font-size:20px;line-height:1}
+  .card h2{
+    margin:0;font-family:var(--head);font-stretch:condensed;font-weight:700;font-size:19px;
+    letter-spacing:.1em;text-transform:uppercase;
+  }
+  .card h2::before{
+    content:counter(sec,decimal-leading-zero);margin-right:10px;font:600 12px var(--mono);
+    letter-spacing:.06em;color:var(--signal);vertical-align:3px;
+  }
+  .count{margin-left:auto;font:600 12px var(--mono);color:var(--muted)}
+  .tiles{padding:6px 0}
+  .tile{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:9px 16px 9px 13px;border-left:3px solid transparent;border-bottom:1px solid var(--line);
+    text-decoration:none;font-size:14.5px;line-height:1.35;
+    transition:background .15s,color .15s,border-color .15s;
+  }
+  .tile:last-child{border-bottom:0}
+  .tile:hover,.tile:focus-visible{background:var(--od);color:var(--on-od);border-left-color:var(--signal)}
+  .tile.tbd{cursor:default;color:var(--muted)}
+  .tile.tbd:hover{background:transparent;color:var(--muted);border-left-color:transparent}
+  .tile .tbd-note{flex:none;font:700 11px var(--mono);letter-spacing:.08em;color:var(--signal)}
+  .tile svg{flex:none;color:var(--signal);opacity:0;transition:opacity .15s}
+  .tile:hover svg,.tile:focus-visible svg{opacity:1}
+  #uta,#morale{flex:1 1 100%}
+
+  /* UTA weekends */
+  /* expandable UTA header */
+  .uta-toggle{width:100%;margin:0;border:0;border-bottom:1.5px solid var(--line);font:inherit;color:inherit;text-align:left;cursor:pointer}
+  .uta-toggle[aria-expanded="false"]{border-bottom-color:transparent}
+  .uta-toggle:hover{background:var(--od);color:var(--on-od)}
+  .uta-toggle:hover .hint{color:var(--on-od)}
+  .hint{margin-left:auto;font:600 12.5px var(--mono);color:var(--muted)}
+  .tip{
+    margin-left:12px;padding:3px 10px;border:1px solid var(--signal);color:var(--signal);
+    font:600 11.5px var(--head);font-stretch:condensed;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;
+    transition:background .15s,color .15s;
+  }
+  .uta-toggle:hover .tip{background:var(--signal);color:#fff}
+  .chev{display:grid;place-items:center;margin-left:10px;color:var(--signal);transition:transform .2s}
+  .uta-toggle[aria-expanded="true"] .chev{transform:rotate(180deg)}
+  .uta-wrap[hidden]{display:none}
+  .uta-wrap{overflow-x:auto;padding:8px 12px 10px}
+  .uta{width:100%;border-collapse:collapse;font-size:15px}
+  .uta th{
+    text-align:left;padding:10px 14px;font:600 12.5px var(--head);font-stretch:condensed;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--on-od);background:var(--od);
+  }
+  .uta td{padding:13px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+  .uta tbody tr:nth-child(even) td{background:rgba(120,110,70,.07)}
+  .uta tr:last-child td{border-bottom:0}
+  .uta .m{font-weight:650}
+  .uta td:nth-child(2){font-family:var(--mono);font-size:14.5px}
+  .uta tr.past td{color:var(--muted)}
+  .uta tr.next td{background:rgba(194,98,29,.16);box-shadow:inset 0 1px 0 var(--signal),inset 0 -1px 0 var(--signal)}
+  .uta tr.next td:first-child{box-shadow:inset 4px 0 0 var(--signal),inset 0 1px 0 var(--signal),inset 0 -1px 0 var(--signal)}
+  .badge{
+    display:inline-block;margin-left:10px;padding:2px 9px;background:var(--signal);color:#fff;
+    font:700 11.5px var(--head);font-stretch:condensed;letter-spacing:.14em;text-transform:uppercase;vertical-align:2px;
+  }
+  .addcal{
+    display:inline-block;padding:8px 13px;border:1px solid var(--line);background:var(--panel-2);color:var(--ink);
+    font-size:13.5px;font-weight:600;text-decoration:none;white-space:nowrap;transition:background .15s,color .15s,border-color .15s;
+  }
+  .addcal:hover{background:var(--od);color:var(--on-od);border-color:var(--od)}
+
+  .uta td:last-child,.uta th:last-child{text-align:right}
+  .uta-foot{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:16px 14px 6px}
+  .uta-help{font-size:13px;color:var(--muted)}
+  #morale-panel .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:0 14px;padding:8px 12px}
+  .ver{display:inline-block;margin-top:14px;padding:3px 11px;border:1px solid var(--line);font:600 12px var(--mono);color:var(--muted)}
+  footer{
+    max-width:1320px;margin:0 auto;padding:0 24px calc(48px + env(safe-area-inset-bottom,0px));
+    color:var(--muted);font-size:14px;
+  }
+  .foot-in{display:flex;flex-wrap:wrap;gap:10px 24px;align-items:center;justify-content:space-between;padding:18px 16px;border-top:1.5px solid var(--line);background:color-mix(in srgb,var(--bg) 88%,transparent)}
+  .mails{display:flex;flex-wrap:wrap;gap:10px 22px}
+  footer a{color:var(--signal);text-decoration:none;font:600 14px var(--mono)}
+  footer a:hover{text-decoration:underline}
+
+
+  /* idle soldier */
+  .sol{position:fixed;left:0;top:0;width:64px;height:112px;z-index:100;pointer-events:none;display:none;will-change:transform}
+  .sol svg{width:100%;height:100%;overflow:visible;display:block}
+  .sol canvas.gore,#rocks .rock canvas.gore{position:absolute;left:0;top:0;pointer-events:none}
+  .sol.flip canvas.gore{transform:scaleX(-1)}
+  .sol.crouch canvas.gore{transform-origin:50% 100%;transform:scaleY(.62)}
+  .sol.flip.crouch canvas.gore{transform:scaleX(-1) scaleY(.62)}
+  .spk{position:fixed;left:0;top:0;width:46px;height:32px;will-change:transform}
+  .spk svg{width:46px;height:32px}
+  .spk .pb{fill:#555}
+  .spk.on .pb{fill:#4ade80}
+  .spk.on svg{animation:spkP .36s ease-in-out infinite}
+  @keyframes spkP{50%{transform:scale(1.1)}}
+  .spk.on.hi svg{animation:spkP2 .17s ease-in-out infinite}
+  @keyframes spkP2{50%{transform:scale(1.28)}}
+  .note{position:fixed;font-size:19px;line-height:1;pointer-events:none;animation:noteA 2.3s ease-out forwards}
+  @keyframes noteA{0%{opacity:0;translate:0 0;scale:.6}15%{opacity:1}100%{opacity:0;translate:var(--nx,10px) -95px;scale:1.25}}
+  .cap{position:fixed;padding:3px 9px;border-radius:4px;background:rgba(0,0,0,.78);color:#ffe27a;font:700 12px/1.2 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.04em;white-space:nowrap;transform:translateX(-50%);animation:capA 6s ease-out forwards}
+  @keyframes capA{0%{opacity:0}8%{opacity:1}85%{opacity:1}100%{opacity:0}}
+  .sol.flip svg{transform:scaleX(-1)}
+  .sol .bub{
+    position:absolute;bottom:100%;left:50%;margin-bottom:6px;width:max-content;max-width:190px;
+    padding:6px 10px;background:var(--panel);color:var(--ink);border:1.5px solid var(--od);box-shadow:var(--shadow);
+    font:600 12px/1.3 var(--mono);opacity:0;transform:translate(-50%,4px);transition:opacity .25s,transform .25s;
+  }
+  .sol.talk .bub{opacity:1;transform:translate(-50%,0)}
+  .sol.flip .bub{transform:translate(-50%,4px)}
+  .sol.flip.talk .bub{transform:translate(-50%,0)}
+  .sl-leg-f,.sl-leg-b{transform-origin:40px 80px}
+  .sl-arm-f,.sl-arm-b{transform-origin:40px 44px}
+  .sl-fore-f{transform-origin:40px 60px;transform:rotate(-18deg)}
+  .sl-fore-b{transform-origin:40px 60px;transform:rotate(-12deg)}
+  .sl-all{transform-origin:40px 140px}
+  .sol.walk .sl-leg-f,.sol.walk .sl-arm-b{animation:slSwing .7s ease-in-out infinite}
+  .sol.walk .sl-leg-b,.sol.walk .sl-arm-f{animation:slSwing .7s ease-in-out -.35s infinite}
+  .sol.walk .sl-all{animation:slBob .35s ease-in-out infinite}
+  .sol.run .sl-leg-f,.sol.run .sl-arm-b{animation-duration:.4s}
+  .sol.run .sl-leg-b,.sol.run .sl-arm-f{animation-duration:.4s;animation-delay:-.2s}
+  .sol.run .sl-all{animation-duration:.2s}
+  .sol .sl-arm-f,.sol .sl-fore-f{transition:transform .35s ease}
+  .sol.salute .sl-arm-f{transform:rotate(-110deg)}
+  .sol.salute .sl-fore-f{transform:rotate(-90deg)}
+  .sol.idle .sl-all{animation:slBreathe 2.4s ease-in-out infinite}
+  @keyframes slSwing{0%,100%{transform:rotate(-30deg)}50%{transform:rotate(30deg)}}
+  @keyframes slBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+  @keyframes slBreathe{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.012)}}
+
+
+  /* two soldiers */
+  .skin{fill:var(--skin,#d9aa84)} .skin2{fill:var(--skin2,#c99a76)}
+  .sol.b{--skin:#93603f;--skin2:#7f5133}
+  .sol.b svg{filter:hue-rotate(-14deg) brightness(1.12) saturate(.9)}
+  .sl-all{transition:transform .25s ease}
+  .sol.crouch .sl-all{animation:none!important;transform:scaleY(.62)}
+  .sol.crouch .bub{margin-bottom:-38px}
+  #rocks{position:fixed;inset:0;z-index:101;pointer-events:none;overflow:hidden}
+  #rocks .rock{position:fixed;left:0;top:0;width:150px;height:60px}
+  #rocks .rock svg{display:block;width:100%;height:100%}
+  #decals{position:fixed;inset:0;width:100%;height:100%;z-index:98;pointer-events:none}
+  #scene .nuke{position:fixed;width:50px;height:50px;margin:-25px 0 0 -25px;border-radius:50%;background:radial-gradient(circle,#fff 0,#ffe27a 24%,#ff7a1a 55%,rgba(255,60,0,0) 72%);animation:nukeA .85s ease-out forwards}
+  @keyframes nukeA{from{scale:.2;opacity:1}to{scale:6;opacity:0}}
+  #scene .shock{position:fixed;width:50px;height:50px;margin:-25px 0 0 -25px;border-radius:50%;border:4px solid rgba(255,255,255,.65);animation:shockA .9s ease-out forwards}
+  @keyframes shockA{from{scale:.3;opacity:.9}to{scale:11;opacity:0}}
+  #scene .dust{position:fixed;width:46px;height:30px;margin:-15px 0 0 -23px;border-radius:50%;background:radial-gradient(circle,rgba(150,120,80,.85),rgba(150,120,80,0) 70%);animation:dustA 1.6s ease-out forwards}
+  @keyframes dustA{from{scale:.3;opacity:.9}to{scale:6;opacity:0;translate:0 -30px}}
+  #scene .knife{position:fixed;margin:-4px 0 0 0;transform-origin:0 50%;animation:knifeA .3s ease-in-out forwards}
+  @keyframes knifeA{from{rotate:calc(var(--s) * -80deg);opacity:1}80%{rotate:calc(var(--s) * 50deg);opacity:1}to{rotate:calc(var(--s) * 60deg);opacity:0}}
+  #scene .mag{position:fixed;width:5px;height:13px;margin:-6px 0 0 -2px;background:#2d2f2a;border-radius:1px;animation:magA .6s ease-in forwards}
+  @keyframes magA{to{translate:8px 52px;rotate:170deg;opacity:0}}
+  #scene .gren{position:fixed;left:0;top:0}
+  .gnuke{position:fixed;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;background:radial-gradient(circle,#fff 0,#ffe27a 28%,#ff7a1a 58%,rgba(255,60,0,0) 74%);animation:gnukeA .6s ease-out forwards}
+  @keyframes gnukeA{from{scale:.3;opacity:1}to{scale:5;opacity:0}}
+  .gshock{position:fixed;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;border:3px solid rgba(255,255,255,.6);animation:gshockA .7s ease-out forwards}
+  @keyframes gshockA{from{scale:.3;opacity:.9}to{scale:7;opacity:0}}
+  /* A-10 strafing run */
+  #scene .trc,#scene .hole,#scene .puff,#scene .spark{position:fixed;left:0;top:0}
+  #scene .trc{width:24px;height:3px;margin:-1.5px 0 0 -24px;transform-origin:100% 50%;border-radius:2px;
+    background:linear-gradient(90deg,rgba(255,170,40,0),#ffc94d 55%,#fffbe0);box-shadow:0 0 4px rgba(255,190,60,.8)}
+  #scene .hole{width:11px;height:5px;margin:-2.5px 0 0 -5.5px;border-radius:50%;
+    background:radial-gradient(ellipse,#2a2014 38%,rgba(110,92,62,.55) 68%,transparent 76%);animation:holeFade 6s forwards}
+  #scene .puff{width:26px;height:16px;margin:-10px 0 0 -13px;border-radius:50%;
+    background:radial-gradient(ellipse,rgba(150,128,90,.85),rgba(150,128,90,0) 70%);animation:puff .55s ease-out forwards}
+  #scene .spark span{position:absolute;width:3px;height:3px;border-radius:50%;background:#ffd36a;box-shadow:0 0 4px #ffb43a;animation:spk .35s ease-out forwards}
+  #scene .spark span:nth-child(2){animation-name:spk2}
+  #scene .flash{transform-origin:121px 28px;animation:flash .07s linear infinite alternate}
+  @keyframes holeFade{0%,65%{opacity:1}100%{opacity:0}}
+  @keyframes puff{from{scale:.3;opacity:.9}to{scale:1.7;opacity:0;translate:0 -6px}}
+  @keyframes spk{to{translate:-9px -14px;opacity:0}} @keyframes spk2{to{translate:8px -10px;opacity:0}}
+  @keyframes flash{from{transform:scaleX(.35)}to{transform:scaleX(1)}}
+  html.nocur,html.nocur *{cursor:none !important}
+  .zyn{display:none}
+  .sol[data-zyn] .zyn{display:inline}
+  .moabfl{position:fixed;width:300px;height:300px;margin:-150px 0 0 -150px;border-radius:50%;background:radial-gradient(circle,#fff 0,#fff6c8 20%,#ffb840 44%,rgba(230,90,20,.0) 72%);animation:moabfA 1.4s ease-out forwards}
+  @keyframes moabfA{from{scale:.2;opacity:1}to{scale:14;opacity:0}}
+  .mwave{position:fixed;width:100px;height:100px;margin:-50px 0 0 -50px;animation:mwaveA 1.6s ease-out forwards}
+  .mwave svg{display:block;overflow:visible}
+  .mwave circle{fill:none;stroke:rgba(255,248,226,.95);stroke-width:9;vector-effect:non-scaling-stroke;filter:drop-shadow(0 0 8px rgba(255,170,60,.95))}
+  .mwave.thin circle{stroke-width:4;stroke:rgba(255,190,90,.9)}
+  @keyframes mwaveA{from{scale:.05;opacity:1}75%{opacity:.9}to{scale:34;opacity:0}}
+  .mflash{position:fixed;inset:0;z-index:140;background:#fff;pointer-events:none;animation:mflashA .9s ease-out forwards}
+  @keyframes mflashA{0%{opacity:0}8%{opacity:1}22%{opacity:1}100%{opacity:0}}
+  .mwave.fat circle{stroke-width:30;stroke:rgba(255,236,190,.9)}
+  .mwave.glow circle{stroke-width:0;fill:rgba(255,205,120,.35);filter:none}
+  /* blood */
+  .cr .st{display:none}
+  .cr.nohead .st{display:inline}
+  .cr.nohead .hd{display:none}
+  .cr.dead .cf{transform-origin:50% 100%;animation:crFall .45s ease-in forwards}
+  .cr.dead.dl .cf{--rot:-84deg}
+  .cr.dead.dr .cf{--rot:84deg}
+  @keyframes crFall{to{transform:rotate(var(--rot,84deg)) translateY(4px)}}
+  .cr.dead{animation:crGone 1s linear 8s forwards}
+  @keyframes crGone{to{opacity:0}}
+  #scene .blood,#scene .drop{position:fixed;left:0;top:0}
+  #scene .blood{width:84px;height:17px;margin:-8px 0 0 -42px;border-radius:50%;
+    background:radial-gradient(ellipse,#7c0d0d 40%,#5a0808 62%,rgba(70,8,8,0) 74%);
+    animation:pool 3.2s ease-out forwards,poolFade 2.5s linear 8.5s forwards}
+  #scene .drop{width:4px;height:4px;margin:-2px;border-radius:50%;background:#a01212;animation:dropFly .6s ease-out forwards}
+  #scene .splat{position:fixed;left:0;top:0;border-radius:50%;background:#7c0d0d;animation:poolFade 2.5s linear 8s forwards}
+  #talk{position:fixed;inset:0;z-index:150;pointer-events:none;overflow:hidden}
+  #talk .bub{position:absolute;left:0;top:0;width:max-content;max-width:190px;padding:6px 10px;background:var(--panel);color:var(--ink);border:1.5px solid var(--od);box-shadow:var(--shadow);font:600 12px/1.3 var(--mono);opacity:0;transition:opacity .25s}
+  #talk .bub.on{opacity:1}
+  #talk .cbub{position:absolute;left:0;top:0;padding:4px 8px;white-space:nowrap;
+    font:700 12px/1.2 var(--mono);color:#ffe08a;background:#2b210f;border:1.5px solid #b8922f;box-shadow:var(--shadow)}
+  @keyframes pool{from{scale:.15 .15}to{scale:1 1}}
+  @keyframes poolFade{to{opacity:0}}
+  @keyframes dropFly{0%{translate:0 0;opacity:1}55%{translate:calc(var(--dx)*.7) var(--dy)}100%{translate:var(--dx) 6px;opacity:0}}
+  #scene .gib{position:fixed;left:0;top:0;animation:gibFly .95s forwards,poolFade 2.5s linear 8.5s forwards}
+  #scene .gib svg{display:block}
+  @keyframes gibFly{
+    0%{translate:0 0;rotate:0deg;animation-timing-function:cubic-bezier(.2,.8,.4,1)}
+    42%{translate:calc(var(--dx)*.55) var(--up);animation-timing-function:cubic-bezier(.6,0,.9,.6)}
+    100%{translate:var(--dx) var(--fall);rotate:var(--rot)}}
+  #scene .mist{position:fixed;left:0;top:0;width:36px;height:24px;margin:-12px 0 0 -18px;border-radius:50%;
+    background:radial-gradient(ellipse,rgba(170,20,20,.9),rgba(170,20,20,0) 70%);animation:puff .5s ease-out forwards}
+  .ff.jolt{animation:jolt .3s ease-out}
+  @keyframes jolt{0%{translate:0 0}25%{translate:3px -4px}55%{translate:-3px 1px}100%{translate:0 0}}
+  /* soldier: radio + desert-creature skit */
+  .sol .radio-g{opacity:0}
+  .sol.radio .radio-g{opacity:1}
+  .sol.radio .sl-arm-f{transform:rotate(-110deg)}
+  .sol.radio .sl-fore-f{transform:rotate(-90deg)}
+  .sol.below .bub{bottom:auto;top:100%;margin:6px 0 0}
+  .sol.shake svg{animation:slShake .45s linear 2}
+  @keyframes slShake{0%,100%{translate:0 0}20%{translate:-3px 1px}40%{translate:3px -1px}60%{translate:-2px 0}80%{translate:2px 1px}}
+  #scene{position:fixed;inset:0;z-index:99;pointer-events:none;overflow:hidden}
+  #scene .cr,#scene .plane,#scene .bomb,#scene .boom{position:fixed;left:0;top:0;will-change:transform}
+  #scene .cr{width:30px;height:36px}
+  #scene .cr svg,#scene .plane svg{display:block;overflow:visible}
+  .cf{width:100%;height:100%}
+  .ff.flip{transform:scaleX(-1)}
+  .cr.walk .cf{animation:crHop .5s ease-in-out infinite}
+  .cr.rush .cf{animation:crHop .22s ease-in-out infinite}
+  .cr.chat .cf{animation:crChat .3s linear infinite}
+  @keyframes crHop{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-6px) rotate(3deg)}}
+  @keyframes crChat{0%,100%{transform:translateX(0) rotate(0)}25%{transform:translateX(-1.5px) rotate(-4deg)}75%{transform:translateX(1.5px) rotate(4deg)}}
+  @keyframes crFly{to{transform:translateY(-70px) rotate(260deg) scale(.6);opacity:0}}
+  #scene .bomb{width:8px;height:18px}
+  #scene .boom{width:70px;height:70px;border-radius:50%;margin:-35px 0 0 -35px;
+    background:radial-gradient(circle,#fffbd0 0,#ffc247 30%,#e2631a 55%,rgba(120,40,10,.55) 72%,transparent 74%);
+    animation:boom .6s ease-out forwards}
+  #scene .dust{position:fixed;left:0;top:0;width:90px;height:60px;margin:-40px 0 0 -45px;border-radius:50%;
+    background:radial-gradient(ellipse,rgba(90,76,52,.7),rgba(90,76,52,0) 70%);animation:dust 1.1s ease-out forwards}
+  @keyframes boom{0%{scale:.2;opacity:1}60%{scale:1.5;opacity:1}100%{scale:1.9;opacity:0}}
+  @keyframes dust{0%{scale:.3;opacity:.9}100%{scale:1.8;opacity:0;translate:0 -14px}}
+  .pbub{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);margin-bottom:4px;padding:6px 12px;
+    background:var(--panel);color:var(--ink);border:1.5px solid var(--od);box-shadow:var(--shadow);
+    font:700 14px/1.2 var(--mono);white-space:nowrap}
+
+  @media (max-width:980px){
+    .card{flex-basis:calc((100% - 20px) / 2)}
+  }
+  @media (max-width:720px){
+    .hero .ifr{opacity:.4}
+    .uta-toggle .hint{display:none}
+    .uta-toggle .tip{margin-left:auto}
+    .hero{padding:calc(36px + env(safe-area-inset-top,0px)) 18px 44px}
+    .hero-in{padding-top:24px}
+    main{padding:26px 14px 56px}
+    .card{flex-basis:100%}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<svg class="ifr ifr-page" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+<g class="grat">
+<path d="M0 993.1h7M1600 993.1h-7"/>
+<path d="M0 918.1h7M1600 918.1h-7"/>
+<path d="M0 843.1h14M1600 843.1h-14"/>
+<path d="M0 768.1h7M1600 768.1h-7"/>
+<path d="M0 693.1h7M1600 693.1h-7"/>
+<path d="M0 618.1h14M1600 618.1h-14"/>
+<path d="M0 543.1h7M1600 543.1h-7"/>
+<path d="M0 468.1h7M1600 468.1h-7"/>
+<path d="M0 393.1h14M1600 393.1h-14"/>
+<path d="M0 318.1h7M1600 318.1h-7"/>
+<path d="M0 243.1h7M1600 243.1h-7"/>
+<path d="M0 168.1h14M1600 168.1h-14"/>
+<path d="M0 93.1h7M1600 93.1h-7"/>
+<path d="M0 18.1h7M1600 18.1h-7"/>
+<path d="M40.9 0v7M40.9 1000v-7"/>
+<path d="M99.7 0v14M99.7 1000v-14"/>
+<path d="M158.6 0v7M158.6 1000v-7"/>
+<path d="M217.5 0v7M217.5 1000v-7"/>
+<path d="M276.4 0v14M276.4 1000v-14"/>
+<path d="M335.3 0v7M335.3 1000v-7"/>
+<path d="M394.2 0v7M394.2 1000v-7"/>
+<path d="M453.1 0v14M453.1 1000v-14"/>
+<path d="M512.0 0v7M512.0 1000v-7"/>
+<path d="M570.8 0v7M570.8 1000v-7"/>
+<path d="M629.7 0v14M629.7 1000v-14"/>
+<path d="M688.6 0v7M688.6 1000v-7"/>
+<path d="M747.5 0v7M747.5 1000v-7"/>
+<path d="M806.4 0v14M806.4 1000v-14"/>
+<path d="M865.3 0v7M865.3 1000v-7"/>
+<path d="M924.2 0v7M924.2 1000v-7"/>
+<path d="M983.0 0v14M983.0 1000v-14"/>
+<path d="M1041.9 0v7M1041.9 1000v-7"/>
+<path d="M1100.8 0v7M1100.8 1000v-7"/>
+<path d="M1159.7 0v14M1159.7 1000v-14"/>
+<path d="M1218.6 0v7M1218.6 1000v-7"/>
+<path d="M1277.5 0v7M1277.5 1000v-7"/>
+<path d="M1336.4 0v14M1336.4 1000v-14"/>
+<path d="M1395.3 0v7M1395.3 1000v-7"/>
+<path d="M1454.1 0v7M1454.1 1000v-7"/>
+<path d="M1513.0 0v14M1513.0 1000v-14"/>
+<path d="M1571.9 0v7M1571.9 1000v-7"/>
+</g><g class="txt faint">
+<text x="18" y="838.1">37°45'</text>
+<text x="18" y="613.1">38°00'</text>
+<text x="18" y="388.1">38°15'</text>
+<text x="18" y="163.1">38°30'</text>
+<text x="103.7" y="28">123°00'</text>
+<text x="280.4" y="28">122°45'</text>
+<text x="457.1" y="28">122°30'</text>
+<text x="633.7" y="28">122°15'</text>
+<text x="810.4" y="28">122°00'</text>
+<text x="987.0" y="28">121°45'</text>
+<text x="1163.7" y="28">121°30'</text>
+<text x="1340.4" y="28">121°15'</text>
+<text x="1517.0" y="28">121°00'</text>
+</g>
+<path class="iso" d="M530 0C570 300 490 700 540 1000"/>
+<text class="txt faint" transform="translate(538 500) rotate(86)">17°</text>
+<path class="iso" d="M1240 0C1280 300 1200 700 1250 1000"/>
+<text class="txt faint" transform="translate(1248 500) rotate(86)">17°</text>
+<path class="wedge" d="M905.0 378.4L1054.9 373.2A195.0 195.0 0 0 1 799.7 565.5L846.1 422.8A45.0 45.0 0 0 0 905.0 378.4Z"/>
+<text class="txt faint" x="937" y="482" text-anchor="middle">13</text>
+<circle class="ring" cx="860" cy="380" r="180.0"/>
+<text class="txt faint" x="993" y="253">12</text>
+<circle class="classd" cx="860" cy="380" r="64.5"/>
+<text class="txt" x="763" y="321">26</text>
+<g class="air">
+<polyline points="542.7,459.1 775.6,578.8"/>
+<polyline points="775.6,578.8 644.6,863.7"/>
+<polyline points="644.6,863.7 435.5,749.0"/>
+<polyline points="435.5,749.0 542.7,459.1"/>
+<polyline points="775.6,578.8 1122.0,216.3"/>
+<polyline points="1122.0,216.3 1224.9,15.1"/>
+</g>
+<polyline class="route" points="991.6,257.2 860,380"/>
+<g class="txt">
+<path class="rt" d="M878.5 355.9L885.4 363.2"/>
+<path class="rt" d="M900.5 335.4L907.3 342.7"/>
+<path class="rt" d="M922.4 315.0L929.2 322.3"/>
+<path class="rt" d="M944.4 294.5L951.2 301.8"/>
+<path class="rt" d="M966.3 274.0L973.1 281.4"/>
+<path class="rt" d="M988.2 253.6L995.1 260.9"/>
+<g transform="translate(974 292)"><rect class="bx" x="-24" y="-9" width="48" height="18"/><text x="0" y="4" text-anchor="middle">214°</text></g>
+</g>
+<g class="txt">
+<g transform="translate(659 519) rotate(27.2)"><rect class="bx" x="-30" y="-8" width="60" height="16"/><text x="0" y="4" text-anchor="middle">100° 17</text></g>
+<g transform="translate(710 721) rotate(294.7)"><rect class="bx" x="-30" y="-8" width="60" height="16"/><text x="0" y="4" text-anchor="middle">188° 21</text></g>
+<g transform="translate(540 806) rotate(28.7)"><rect class="bx" x="-30" y="-8" width="60" height="16"/><text x="0" y="4" text-anchor="middle">282° 16</text></g>
+<g transform="translate(489 604) rotate(-69.7)"><rect class="bx" x="-30" y="-8" width="60" height="16"/><text x="0" y="4" text-anchor="middle">003° 21</text></g>
+<g transform="translate(949 398) rotate(-46.3)"><rect class="bx" x="-30" y="-8" width="60" height="16"/><text x="0" y="4" text-anchor="middle">027° 33</text></g>
+<g transform="translate(1173 116) rotate(-62.9)"><rect class="bx" x="-30" y="-8" width="60" height="16"/><text x="0" y="4" text-anchor="middle">010° 15</text></g>
+</g>
+<g class="txt">
+<g transform="translate(594 485) rotate(27.2)"><text class="mea" x="0" y="-8" text-anchor="middle">8000</text></g>
+<g transform="translate(724 552) rotate(27.2)"><text class="mea" x="0" y="-8" text-anchor="middle">8000</text></g>
+<g transform="translate(747 642) rotate(294.7)"><text class="mea" x="0" y="-8" text-anchor="middle">5000</text></g>
+<g transform="translate(673 801) rotate(294.7)"><text class="mea" x="0" y="-8" text-anchor="middle">10000</text></g>
+<g transform="translate(599 838) rotate(28.7)"><text class="mea" x="0" y="-8" text-anchor="middle">12000</text></g>
+<g transform="translate(481 774) rotate(28.7)"><text class="mea" x="0" y="-8" text-anchor="middle">6000</text></g>
+<g transform="translate(459 685) rotate(-69.7)"><text class="mea" x="0" y="-8" text-anchor="middle">8000</text></g>
+<g transform="translate(519 523) rotate(-69.7)"><text class="mea" x="0" y="-8" text-anchor="middle">4000</text></g>
+<g transform="translate(852 499) rotate(-46.3)"><text class="mea" x="0" y="-8" text-anchor="middle">10000</text></g>
+<g transform="translate(1046 296) rotate(-46.3)"><text class="mea" x="0" y="-8" text-anchor="middle">7000</text></g>
+<g transform="translate(1145 172) rotate(-62.9)"><text class="mea" x="0" y="-8" text-anchor="middle">9000</text></g>
+<g transform="translate(1202 59) rotate(-62.9)"><text class="mea" x="0" y="-8" text-anchor="middle">8000</text></g>
+<text class="mea" x="176" y="184">35</text>
+<text class="mea" x="913" y="611">481</text>
+<text class="mea" x="1441" y="770">3000</text>
+<text class="mea" x="1558" y="779">685</text>
+<text class="mea" x="357" y="782">828</text>
+<text class="mea" x="1155" y="611">4</text>
+<text class="mea" x="919" y="225">6500</text>
+<text class="mea" x="982" y="310">3000</text>
+<text class="mea" x="561" y="322">96</text>
+<text class="mea" x="205" y="519">23</text>
+<text class="mea" x="1278" y="605">5500</text>
+<text class="mea" x="920" y="235">972</text>
+<text class="mea" x="958" y="570">454</text>
+<text class="mea" x="693" y="514">5500</text>
+<text class="mea" x="709" y="269">4500</text>
+<text class="mea" x="95" y="964">439</text>
+<text class="mea" x="1192" y="641">17</text>
+<text class="mea" x="743" y="539">920</text>
+<text class="mea" x="322" y="281">166</text>
+<text class="mea" x="1214" y="899">3000</text>
+<text class="mea" x="891" y="788">442</text>
+<text class="mea" x="150" y="868">97</text>
+<text class="mea" x="868" y="615">33</text>
+<text class="mea" x="649" y="536">408</text>
+<text class="mea" x="1531" y="50">43</text>
+<text class="mea" x="682" y="454">76</text>
+</g>
+<g class="rose" transform="translate(542.7 459.1)"><circle r="52"/><circle r="44" class="thin"/>
+<path d="M0.0 -52.0L0.0 -38.0"/>
+<path d="M4.5 -51.8L4.1 -46.8"/>
+<path d="M9.0 -51.2L7.5 -42.3"/>
+<path d="M13.5 -50.2L12.2 -45.4"/>
+<path d="M17.8 -48.9L14.7 -40.4"/>
+<path d="M22.0 -47.1L19.9 -42.6"/>
+<path d="M26.0 -45.0L19.0 -32.9"/>
+<path d="M29.8 -42.6L27.0 -38.5"/>
+<path d="M33.4 -39.8L27.6 -32.9"/>
+<path d="M36.8 -36.8L33.2 -33.2"/>
+<path d="M39.8 -33.4L32.9 -27.6"/>
+<path d="M42.6 -29.8L38.5 -27.0"/>
+<path d="M45.0 -26.0L32.9 -19.0"/>
+<path d="M47.1 -22.0L42.6 -19.9"/>
+<path d="M48.9 -17.8L40.4 -14.7"/>
+<path d="M50.2 -13.5L45.4 -12.2"/>
+<path d="M51.2 -9.0L42.3 -7.5"/>
+<path d="M51.8 -4.5L46.8 -4.1"/>
+<path d="M52.0 0.0L38.0 0.0"/>
+<path d="M51.8 4.5L46.8 4.1"/>
+<path d="M51.2 9.0L42.3 7.5"/>
+<path d="M50.2 13.5L45.4 12.2"/>
+<path d="M48.9 17.8L40.4 14.7"/>
+<path d="M47.1 22.0L42.6 19.9"/>
+<path d="M45.0 26.0L32.9 19.0"/>
+<path d="M42.6 29.8L38.5 27.0"/>
+<path d="M39.8 33.4L32.9 27.6"/>
+<path d="M36.8 36.8L33.2 33.2"/>
+<path d="M33.4 39.8L27.6 32.9"/>
+<path d="M29.8 42.6L27.0 38.5"/>
+<path d="M26.0 45.0L19.0 32.9"/>
+<path d="M22.0 47.1L19.9 42.6"/>
+<path d="M17.8 48.9L14.7 40.4"/>
+<path d="M13.5 50.2L12.2 45.4"/>
+<path d="M9.0 51.2L7.5 42.3"/>
+<path d="M4.5 51.8L4.1 46.8"/>
+<path d="M0.0 52.0L0.0 38.0"/>
+<path d="M-4.5 51.8L-4.1 46.8"/>
+<path d="M-9.0 51.2L-7.5 42.3"/>
+<path d="M-13.5 50.2L-12.2 45.4"/>
+<path d="M-17.8 48.9L-14.7 40.4"/>
+<path d="M-22.0 47.1L-19.9 42.6"/>
+<path d="M-26.0 45.0L-19.0 32.9"/>
+<path d="M-29.8 42.6L-27.0 38.5"/>
+<path d="M-33.4 39.8L-27.6 32.9"/>
+<path d="M-36.8 36.8L-33.2 33.2"/>
+<path d="M-39.8 33.4L-32.9 27.6"/>
+<path d="M-42.6 29.8L-38.5 27.0"/>
+<path d="M-45.0 26.0L-32.9 19.0"/>
+<path d="M-47.1 22.0L-42.6 19.9"/>
+<path d="M-48.9 17.8L-40.4 14.7"/>
+<path d="M-50.2 13.5L-45.4 12.2"/>
+<path d="M-51.2 9.0L-42.3 7.5"/>
+<path d="M-51.8 4.5L-46.8 4.1"/>
+<path d="M-52.0 0.0L-38.0 0.0"/>
+<path d="M-51.8 -4.5L-46.8 -4.1"/>
+<path d="M-51.2 -9.0L-42.3 -7.5"/>
+<path d="M-50.2 -13.5L-45.4 -12.2"/>
+<path d="M-48.9 -17.8L-40.4 -14.7"/>
+<path d="M-47.1 -22.0L-42.6 -19.9"/>
+<path d="M-45.0 -26.0L-32.9 -19.0"/>
+<path d="M-42.6 -29.8L-38.5 -27.0"/>
+<path d="M-39.8 -33.4L-32.9 -27.6"/>
+<path d="M-36.8 -36.8L-33.2 -33.2"/>
+<path d="M-33.4 -39.8L-27.6 -32.9"/>
+<path d="M-29.8 -42.6L-27.0 -38.5"/>
+<path d="M-26.0 -45.0L-19.0 -32.9"/>
+<path d="M-22.0 -47.1L-19.9 -42.6"/>
+<path d="M-17.8 -48.9L-14.7 -40.4"/>
+<path d="M-13.5 -50.2L-12.2 -45.4"/>
+<path d="M-9.0 -51.2L-7.5 -42.3"/>
+<path d="M-4.5 -51.8L-4.1 -46.8"/>
+<text class="txt" x="0.0" y="-24.5" text-anchor="middle">00</text>
+<text class="txt" x="14.0" y="-20.7" text-anchor="middle">03</text>
+<text class="txt" x="24.2" y="-10.5" text-anchor="middle">06</text>
+<text class="txt" x="28.0" y="3.5" text-anchor="middle">09</text>
+<text class="txt" x="24.2" y="17.5" text-anchor="middle">12</text>
+<text class="txt" x="14.0" y="27.7" text-anchor="middle">15</text>
+<text class="txt" x="0.0" y="31.5" text-anchor="middle">18</text>
+<text class="txt" x="-14.0" y="27.7" text-anchor="middle">21</text>
+<text class="txt" x="-24.2" y="17.5" text-anchor="middle">24</text>
+<text class="txt" x="-28.0" y="3.5" text-anchor="middle">27</text>
+<text class="txt" x="-24.2" y="-10.5" text-anchor="middle">30</text>
+<text class="txt" x="-14.0" y="-20.7" text-anchor="middle">33</text>
+<polygon class="vor" points="0.0,-8.0 6.9,-4.0 6.9,4.0 0.0,8.0 -6.9,4.0 -6.9,-4.0"/><circle r="1.6" class="dot"/>
+<rect class="vor" x="-3" y="-2.2" width="6" height="4.4" transform="translate(5.3 -9.1) rotate(-60)"/>
+<rect class="vor" x="-3" y="-2.2" width="6" height="4.4" transform="translate(5.3 9.1) rotate(60)"/>
+<rect class="vor" x="-3" y="-2.2" width="6" height="4.4" transform="translate(-10.5 0.0) rotate(180)"/>
+</g>
+<g class="txt"><rect class="bx" x="432.7" y="403.1" width="52" height="30"/><text x="438.7" y="416.1">112.1</text><text class="mea" x="438.7" y="428.1">73</text></g>
+<g class="rose" transform="translate(775.6 578.8)"><circle r="42"/><circle r="34" class="thin"/>
+<path d="M0.0 -42.0L0.0 -28.0"/>
+<path d="M3.7 -41.8L3.2 -36.9"/>
+<path d="M7.3 -41.4L5.7 -32.5"/>
+<path d="M10.9 -40.6L9.6 -35.7"/>
+<path d="M14.4 -39.5L11.3 -31.0"/>
+<path d="M17.7 -38.1L15.6 -33.5"/>
+<path d="M21.0 -36.4L14.0 -24.2"/>
+<path d="M24.1 -34.4L21.2 -30.3"/>
+<path d="M27.0 -32.2L21.2 -25.3"/>
+<path d="M29.7 -29.7L26.2 -26.2"/>
+<path d="M32.2 -27.0L25.3 -21.2"/>
+<path d="M34.4 -24.1L30.3 -21.2"/>
+<path d="M36.4 -21.0L24.2 -14.0"/>
+<path d="M38.1 -17.7L33.5 -15.6"/>
+<path d="M39.5 -14.4L31.0 -11.3"/>
+<path d="M40.6 -10.9L35.7 -9.6"/>
+<path d="M41.4 -7.3L32.5 -5.7"/>
+<path d="M41.8 -3.7L36.9 -3.2"/>
+<path d="M42.0 0.0L28.0 0.0"/>
+<path d="M41.8 3.7L36.9 3.2"/>
+<path d="M41.4 7.3L32.5 5.7"/>
+<path d="M40.6 10.9L35.7 9.6"/>
+<path d="M39.5 14.4L31.0 11.3"/>
+<path d="M38.1 17.7L33.5 15.6"/>
+<path d="M36.4 21.0L24.2 14.0"/>
+<path d="M34.4 24.1L30.3 21.2"/>
+<path d="M32.2 27.0L25.3 21.2"/>
+<path d="M29.7 29.7L26.2 26.2"/>
+<path d="M27.0 32.2L21.2 25.3"/>
+<path d="M24.1 34.4L21.2 30.3"/>
+<path d="M21.0 36.4L14.0 24.2"/>
+<path d="M17.7 38.1L15.6 33.5"/>
+<path d="M14.4 39.5L11.3 31.0"/>
+<path d="M10.9 40.6L9.6 35.7"/>
+<path d="M7.3 41.4L5.7 32.5"/>
+<path d="M3.7 41.8L3.2 36.9"/>
+<path d="M0.0 42.0L0.0 28.0"/>
+<path d="M-3.7 41.8L-3.2 36.9"/>
+<path d="M-7.3 41.4L-5.7 32.5"/>
+<path d="M-10.9 40.6L-9.6 35.7"/>
+<path d="M-14.4 39.5L-11.3 31.0"/>
+<path d="M-17.7 38.1L-15.6 33.5"/>
+<path d="M-21.0 36.4L-14.0 24.2"/>
+<path d="M-24.1 34.4L-21.2 30.3"/>
+<path d="M-27.0 32.2L-21.2 25.3"/>
+<path d="M-29.7 29.7L-26.2 26.2"/>
+<path d="M-32.2 27.0L-25.3 21.2"/>
+<path d="M-34.4 24.1L-30.3 21.2"/>
+<path d="M-36.4 21.0L-24.2 14.0"/>
+<path d="M-38.1 17.7L-33.5 15.6"/>
+<path d="M-39.5 14.4L-31.0 11.3"/>
+<path d="M-40.6 10.9L-35.7 9.6"/>
+<path d="M-41.4 7.3L-32.5 5.7"/>
+<path d="M-41.8 3.7L-36.9 3.2"/>
+<path d="M-42.0 0.0L-28.0 0.0"/>
+<path d="M-41.8 -3.7L-36.9 -3.2"/>
+<path d="M-41.4 -7.3L-32.5 -5.7"/>
+<path d="M-40.6 -10.9L-35.7 -9.6"/>
+<path d="M-39.5 -14.4L-31.0 -11.3"/>
+<path d="M-38.1 -17.7L-33.5 -15.6"/>
+<path d="M-36.4 -21.0L-24.2 -14.0"/>
+<path d="M-34.4 -24.1L-30.3 -21.2"/>
+<path d="M-32.2 -27.0L-25.3 -21.2"/>
+<path d="M-29.7 -29.7L-26.2 -26.2"/>
+<path d="M-27.0 -32.2L-21.2 -25.3"/>
+<path d="M-24.1 -34.4L-21.2 -30.3"/>
+<path d="M-21.0 -36.4L-14.0 -24.2"/>
+<path d="M-17.7 -38.1L-15.6 -33.5"/>
+<path d="M-14.4 -39.5L-11.3 -31.0"/>
+<path d="M-10.9 -40.6L-9.6 -35.7"/>
+<path d="M-7.3 -41.4L-5.7 -32.5"/>
+<path d="M-3.7 -41.8L-3.2 -36.9"/>
+<polygon class="vor" points="0.0,-8.0 6.9,-4.0 6.9,4.0 0.0,8.0 -6.9,4.0 -6.9,-4.0"/><circle r="1.6" class="dot"/>
+<rect class="vor" x="-3" y="-2.2" width="6" height="4.4" transform="translate(5.3 -9.1) rotate(-60)"/>
+<rect class="vor" x="-3" y="-2.2" width="6" height="4.4" transform="translate(5.3 9.1) rotate(60)"/>
+<rect class="vor" x="-3" y="-2.2" width="6" height="4.4" transform="translate(-10.5 0.0) rotate(180)"/>
+</g>
+<g class="txt"><rect class="bx" x="823.6" y="532.8" width="52" height="30"/><text x="829.6" y="545.8">117.0</text><text class="mea" x="829.6" y="557.8">111</text></g>
+<g class="rose" transform="translate(1122.0 216.3)"><circle r="46"/><circle r="38" class="thin"/>
+<path d="M0.0 -46.0L0.0 -32.0"/>
+<path d="M4.0 -45.8L3.6 -40.8"/>
+<path d="M8.0 -45.3L6.4 -36.4"/>
+<path d="M11.9 -44.4L10.6 -39.6"/>
+<path d="M15.7 -43.2L12.7 -34.8"/>
+<path d="M19.4 -41.7L17.3 -37.2"/>
+<path d="M23.0 -39.8L16.0 -27.7"/>
+<path d="M26.4 -37.7L23.5 -33.6"/>
+<path d="M29.6 -35.2L23.8 -28.3"/>
+<path d="M32.5 -32.5L29.0 -29.0"/>
+<path d="M35.2 -29.6L28.3 -23.8"/>
+<path d="M37.7 -26.4L33.6 -23.5"/>
+<path d="M39.8 -23.0L27.7 -16.0"/>
+<path d="M41.7 -19.4L37.2 -17.3"/>
+<path d="M43.2 -15.7L34.8 -12.7"/>
+<path d="M44.4 -11.9L39.6 -10.6"/>
+<path d="M45.3 -8.0L36.4 -6.4"/>
+<path d="M45.8 -4.0L40.8 -3.6"/>
+<path d="M46.0 0.0L32.0 0.0"/>
+<path d="M45.8 4.0L40.8 3.6"/>
+<path d="M45.3 8.0L36.4 6.4"/>
+<path d="M44.4 11.9L39.6 10.6"/>
+<path d="M43.2 15.7L34.8 12.7"/>
+<path d="M41.7 19.4L37.2 17.3"/>
+<path d="M39.8 23.0L27.7 16.0"/>
+<path d="M37.7 26.4L33.6 23.5"/>
+<path d="M35.2 29.6L28.3 23.8"/>
+<path d="M32.5 32.5L29.0 29.0"/>
+<path d="M29.6 35.2L23.8 28.3"/>
+<path d="M26.4 37.7L23.5 33.6"/>
+<path d="M23.0 39.8L16.0 27.7"/>
+<path d="M19.4 41.7L17.3 37.2"/>
+<path d="M15.7 43.2L12.7 34.8"/>
+<path d="M11.9 44.4L10.6 39.6"/>
+<path d="M8.0 45.3L6.4 36.4"/>
+<path d="M4.0 45.8L3.6 40.8"/>
+<path d="M0.0 46.0L0.0 32.0"/>
+<path d="M-4.0 45.8L-3.6 40.8"/>
+<path d="M-8.0 45.3L-6.4 36.4"/>
+<path d="M-11.9 44.4L-10.6 39.6"/>
+<path d="M-15.7 43.2L-12.7 34.8"/>
+<path d="M-19.4 41.7L-17.3 37.2"/>
+<path d="M-23.0 39.8L-16.0 27.7"/>
+<path d="M-26.4 37.7L-23.5 33.6"/>
+<path d="M-29.6 35.2L-23.8 28.3"/>
+<path d="M-32.5 32.5L-29.0 29.0"/>
+<path d="M-35.2 29.6L-28.3 23.8"/>
+<path d="M-37.7 26.4L-33.6 23.5"/>
+<path d="M-39.8 23.0L-27.7 16.0"/>
+<path d="M-41.7 19.4L-37.2 17.3"/>
+<path d="M-43.2 15.7L-34.8 12.7"/>
+<path d="M-44.4 11.9L-39.6 10.6"/>
+<path d="M-45.3 8.0L-36.4 6.4"/>
+<path d="M-45.8 4.0L-40.8 3.6"/>
+<path d="M-46.0 0.0L-32.0 0.0"/>
+<path d="M-45.8 -4.0L-40.8 -3.6"/>
+<path d="M-45.3 -8.0L-36.4 -6.4"/>
+<path d="M-44.4 -11.9L-39.6 -10.6"/>
+<path d="M-43.2 -15.7L-34.8 -12.7"/>
+<path d="M-41.7 -19.4L-37.2 -17.3"/>
+<path d="M-39.8 -23.0L-27.7 -16.0"/>
+<path d="M-37.7 -26.4L-33.6 -23.5"/>
+<path d="M-35.2 -29.6L-28.3 -23.8"/>
+<path d="M-32.5 -32.5L-29.0 -29.0"/>
+<path d="M-29.6 -35.2L-23.8 -28.3"/>
+<path d="M-26.4 -37.7L-23.5 -33.6"/>
+<path d="M-23.0 -39.8L-16.0 -27.7"/>
+<path d="M-19.4 -41.7L-17.3 -37.2"/>
+<path d="M-15.7 -43.2L-12.7 -34.8"/>
+<path d="M-11.9 -44.4L-10.6 -39.6"/>
+<path d="M-8.0 -45.3L-6.4 -36.4"/>
+<path d="M-4.0 -45.8L-3.6 -40.8"/>
+<text class="txt" x="0.0" y="-18.5" text-anchor="middle">00</text>
+<text class="txt" x="11.0" y="-15.6" text-anchor="middle">03</text>
+<text class="txt" x="19.1" y="-7.5" text-anchor="middle">06</text>
+<text class="txt" x="22.0" y="3.5" text-anchor="middle">09</text>
+<text class="txt" x="19.1" y="14.5" text-anchor="middle">12</text>
+<text class="txt" x="11.0" y="22.6" text-anchor="middle">15</text>
+<text class="txt" x="0.0" y="25.5" text-anchor="middle">18</text>
+<text class="txt" x="-11.0" y="22.6" text-anchor="middle">21</text>
+<text class="txt" x="-19.1" y="14.5" text-anchor="middle">24</text>
+<text class="txt" x="-22.0" y="3.5" text-anchor="middle">27</text>
+<text class="txt" x="-19.1" y="-7.5" text-anchor="middle">30</text>
+<text class="txt" x="-11.0" y="-15.6" text-anchor="middle">33</text>
+<polygon class="vor" points="0.0,-8.0 6.9,-4.0 6.9,4.0 0.0,8.0 -6.9,4.0 -6.9,-4.0"/><circle r="1.6" class="dot"/>
+<rect class="vor" x="-3" y="-2.2" width="6" height="4.4" transform="translate(5.3 -9.1) rotate(-60)"/>
+<rect class="vor" x="-3" y="-2.2" width="6" height="4.4" transform="translate(5.3 9.1) rotate(60)"/>
+<rect class="vor" x="-3" y="-2.2" width="6" height="4.4" transform="translate(-10.5 0.0) rotate(180)"/>
+</g>
+<g class="txt"><rect class="bx" x="1174.0" y="166.3" width="52" height="30"/><text x="1180.0" y="179.3">115.2</text><text class="mea" x="1180.0" y="191.3">109</text></g>
+<g class="rose" transform="translate(1224.9 15.1)"><circle r="34"/><circle r="26" class="thin"/>
+<path d="M0.0 -34.0L0.0 -20.0"/>
+<path d="M3.0 -33.9L2.5 -28.9"/>
+<path d="M5.9 -33.5L4.3 -24.6"/>
+<path d="M8.8 -32.8L7.5 -28.0"/>
+<path d="M11.6 -31.9L8.6 -23.5"/>
+<path d="M14.4 -30.8L12.3 -26.3"/>
+<path d="M17.0 -29.4L10.0 -17.3"/>
+<path d="M19.5 -27.9L16.6 -23.8"/>
+<path d="M21.9 -26.0L16.1 -19.2"/>
+<path d="M24.0 -24.0L20.5 -20.5"/>
+<path d="M26.0 -21.9L19.2 -16.1"/>
+<path d="M27.9 -19.5L23.8 -16.6"/>
+<path d="M29.4 -17.0L17.3 -10.0"/>
+<path d="M30.8 -14.4L26.3 -12.3"/>
+<path d="M31.9 -11.6L23.5 -8.6"/>
+<path d="M32.8 -8.8L28.0 -7.5"/>
+<path d="M33.5 -5.9L24.6 -4.3"/>
+<path d="M33.9 -3.0L28.9 -2.5"/>
+<path d="M34.0 0.0L20.0 0.0"/>
+<path d="M33.9 3.0L28.9 2.5"/>
+<path d="M33.5 5.9L24.6 4.3"/>
+<path d="M32.8 8.8L28.0 7.5"/>
+<path d="M31.9 11.6L23.5 8.6"/>
+<path d="M30.8 14.4L26.3 12.3"/>
+<path d="M29.4 17.0L17.3 10.0"/>
+<path d="M27.9 19.5L23.8 16.6"/>
+<path d="M26.0 21.9L19.2 16.1"/>
+<path d="M24.0 24.0L20.5 20.5"/>
+<path d="M21.9 26.0L16.1 19.2"/>
+<path d="M19.5 27.9L16.6 23.8"/>
+<path d="M17.0 29.4L10.0 17.3"/>
+<path d="M14.4 30.8L12.3 26.3"/>
+<path d="M11.6 31.9L8.6 23.5"/>
+<path d="M8.8 32.8L7.5 28.0"/>
+<path d="M5.9 33.5L4.3 24.6"/>
+<path d="M3.0 33.9L2.5 28.9"/>
+<path d="M0.0 34.0L0.0 20.0"/>
+<path d="M-3.0 33.9L-2.5 28.9"/>
+<path d="M-5.9 33.5L-4.3 24.6"/>
+<path d="M-8.8 32.8L-7.5 28.0"/>
+<path d="M-11.6 31.9L-8.6 23.5"/>
+<path d="M-14.4 30.8L-12.3 26.3"/>
+<path d="M-17.0 29.4L-10.0 17.3"/>
+<path d="M-19.5 27.9L-16.6 23.8"/>
+<path d="M-21.9 26.0L-16.1 19.2"/>
+<path d="M-24.0 24.0L-20.5 20.5"/>
+<path d="M-26.0 21.9L-19.2 16.1"/>
+<path d="M-27.9 19.5L-23.8 16.6"/>
+<path d="M-29.4 17.0L-17.3 10.0"/>
+<path d="M-30.8 14.4L-26.3 12.3"/>
+<path d="M-31.9 11.6L-23.5 8.6"/>
+<path d="M-32.8 8.8L-28.0 7.5"/>
+<path d="M-33.5 5.9L-24.6 4.3"/>
+<path d="M-33.9 3.0L-28.9 2.5"/>
+<path d="M-34.0 0.0L-20.0 0.0"/>
+<path d="M-33.9 -3.0L-28.9 -2.5"/>
+<path d="M-33.5 -5.9L-24.6 -4.3"/>
+<path d="M-32.8 -8.8L-28.0 -7.5"/>
+<path d="M-31.9 -11.6L-23.5 -8.6"/>
+<path d="M-30.8 -14.4L-26.3 -12.3"/>
+<path d="M-29.4 -17.0L-17.3 -10.0"/>
+<path d="M-27.9 -19.5L-23.8 -16.6"/>
+<path d="M-26.0 -21.9L-19.2 -16.1"/>
+<path d="M-24.0 -24.0L-20.5 -20.5"/>
+<path d="M-21.9 -26.0L-16.1 -19.2"/>
+<path d="M-19.5 -27.9L-16.6 -23.8"/>
+<path d="M-17.0 -29.4L-10.0 -17.3"/>
+<path d="M-14.4 -30.8L-12.3 -26.3"/>
+<path d="M-11.6 -31.9L-8.6 -23.5"/>
+<path d="M-8.8 -32.8L-7.5 -28.0"/>
+<path d="M-5.9 -33.5L-4.3 -24.6"/>
+<path d="M-3.0 -33.9L-2.5 -28.9"/>
+<polygon class="vor" points="0.0,-8.0 6.9,-4.0 6.9,4.0 0.0,8.0 -6.9,4.0 -6.9,-4.0"/><circle r="1.6" class="dot"/>
+<rect class="vor" x="-3" y="-2.2" width="6" height="4.4" transform="translate(5.3 -9.1) rotate(-60)"/>
+<rect class="vor" x="-3" y="-2.2" width="6" height="4.4" transform="translate(5.3 9.1) rotate(60)"/>
+<rect class="vor" x="-3" y="-2.2" width="6" height="4.4" transform="translate(-10.5 0.0) rotate(180)"/>
+</g>
+<g class="txt"><rect class="bx" x="1264.9" y="-22.9" width="52" height="30"/><text x="1270.9" y="-9.9">109.2</text><text class="mea" x="1270.9" y="2.1">34</text></g>
+<g class="rose" transform="translate(644.6 863.7)"><circle r="40"/><circle r="32" class="thin"/>
+<path d="M0.0 -40.0L0.0 -26.0"/>
+<path d="M3.5 -39.8L3.1 -34.9"/>
+<path d="M6.9 -39.4L5.4 -30.5"/>
+<path d="M10.4 -38.6L9.1 -33.8"/>
+<path d="M13.7 -37.6L10.6 -29.1"/>
+<path d="M16.9 -36.3L14.8 -31.7"/>
+<path d="M20.0 -34.6L13.0 -22.5"/>
+<path d="M22.9 -32.8L20.1 -28.7"/>
+<path d="M25.7 -30.6L19.9 -23.7"/>
+<path d="M28.3 -28.3L24.7 -24.7"/>
+<path d="M30.6 -25.7L23.7 -19.9"/>
+<path d="M32.8 -22.9L28.7 -20.1"/>
+<path d="M34.6 -20.0L22.5 -13.0"/>
+<path d="M36.3 -16.9L31.7 -14.8"/>
+<path d="M37.6 -13.7L29.1 -10.6"/>
+<path d="M38.6 -10.4L33.8 -9.1"/>
+<path d="M39.4 -6.9L30.5 -5.4"/>
+<path d="M39.8 -3.5L34.9 -3.1"/>
+<path d="M40.0 0.0L26.0 0.0"/>
+<path d="M39.8 3.5L34.9 3.1"/>
+<path d="M39.4 6.9L30.5 5.4"/>
+<path d="M38.6 10.4L33.8 9.1"/>
+<path d="M37.6 13.7L29.1 10.6"/>
+<path d="M36.3 16.9L31.7 14.8"/>
+<path d="M34.6 20.0L22.5 13.0"/>
+<path d="M32.8 22.9L28.7 20.1"/>
+<path d="M30.6 25.7L23.7 19.9"/>
+<path d="M28.3 28.3L24.7 24.7"/>
+<path d="M25.7 30.6L19.9 23.7"/>
+<path d="M22.9 32.8L20.1 28.7"/>
+<path d="M20.0 34.6L13.0 22.5"/>
+<path d="M16.9 36.3L14.8 31.7"/>
+<path d="M13.7 37.6L10.6 29.1"/>
+<path d="M10.4 38.6L9.1 33.8"/>
+<path d="M6.9 39.4L5.4 30.5"/>
+<path d="M3.5 39.8L3.1 34.9"/>
+<path d="M0.0 40.0L0.0 26.0"/>
+<path d="M-3.5 39.8L-3.1 34.9"/>
+<path d="M-6.9 39.4L-5.4 30.5"/>
+<path d="M-10.4 38.6L-9.1 33.8"/>
+<path d="M-13.7 37.6L-10.6 29.1"/>
+<path d="M-16.9 36.3L-14.8 31.7"/>
+<path d="M-20.0 34.6L-13.0 22.5"/>
+<path d="M-22.9 32.8L-20.1 28.7"/>
+<path d="M-25.7 30.6L-19.9 23.7"/>
+<path d="M-28.3 28.3L-24.7 24.7"/>
+<path d="M-30.6 25.7L-23.7 19.9"/>
+<path d="M-32.8 22.9L-28.7 20.1"/>
+<path d="M-34.6 20.0L-22.5 13.0"/>
+<path d="M-36.3 16.9L-31.7 14.8"/>
+<path d="M-37.6 13.7L-29.1 10.6"/>
+<path d="M-38.6 10.4L-33.8 9.1"/>
+<path d="M-39.4 6.9L-30.5 5.4"/>
+<path d="M-39.8 3.5L-34.9 3.1"/>
+<path d="M-40.0 0.0L-26.0 0.0"/>
+<path d="M-39.8 -3.5L-34.9 -3.1"/>
+<path d="M-39.4 -6.9L-30.5 -5.4"/>
+<path d="M-38.6 -10.4L-33.8 -9.1"/>
+<path d="M-37.6 -13.7L-29.1 -10.6"/>
+<path d="M-36.3 -16.9L-31.7 -14.8"/>
+<path d="M-34.6 -20.0L-22.5 -13.0"/>
+<path d="M-32.8 -22.9L-28.7 -20.1"/>
+<path d="M-30.6 -25.7L-23.7 -19.9"/>
+<path d="M-28.3 -28.3L-24.7 -24.7"/>
+<path d="M-25.7 -30.6L-19.9 -23.7"/>
+<path d="M-22.9 -32.8L-20.1 -28.7"/>
+<path d="M-20.0 -34.6L-13.0 -22.5"/>
+<path d="M-16.9 -36.3L-14.8 -31.7"/>
+<path d="M-13.7 -37.6L-10.6 -29.1"/>
+<path d="M-10.4 -38.6L-9.1 -33.8"/>
+<path d="M-6.9 -39.4L-5.4 -30.5"/>
+<path d="M-3.5 -39.8L-3.1 -34.9"/>
+<polygon class="vor" points="0.0,-8.0 6.9,-4.0 6.9,4.0 0.0,8.0 -6.9,4.0 -6.9,-4.0"/><circle r="1.6" class="dot"/>
+<rect class="vor" x="-3" y="-2.2" width="6" height="4.4" transform="translate(5.3 -9.1) rotate(-60)"/>
+<rect class="vor" x="-3" y="-2.2" width="6" height="4.4" transform="translate(5.3 9.1) rotate(60)"/>
+<rect class="vor" x="-3" y="-2.2" width="6" height="4.4" transform="translate(-10.5 0.0) rotate(180)"/>
+</g>
+<g class="txt"><rect class="bx" x="690.6" y="819.7" width="52" height="30"/><text x="696.6" y="832.7">116.8</text><text class="mea" x="696.6" y="844.7">27</text></g>
+<g class="rose" transform="translate(435.5 749.0)"><circle r="34"/><circle r="26" class="thin"/>
+<path d="M0.0 -34.0L0.0 -20.0"/>
+<path d="M3.0 -33.9L2.5 -28.9"/>
+<path d="M5.9 -33.5L4.3 -24.6"/>
+<path d="M8.8 -32.8L7.5 -28.0"/>
+<path d="M11.6 -31.9L8.6 -23.5"/>
+<path d="M14.4 -30.8L12.3 -26.3"/>
+<path d="M17.0 -29.4L10.0 -17.3"/>
+<path d="M19.5 -27.9L16.6 -23.8"/>
+<path d="M21.9 -26.0L16.1 -19.2"/>
+<path d="M24.0 -24.0L20.5 -20.5"/>
+<path d="M26.0 -21.9L19.2 -16.1"/>
+<path d="M27.9 -19.5L23.8 -16.6"/>
+<path d="M29.4 -17.0L17.3 -10.0"/>
+<path d="M30.8 -14.4L26.3 -12.3"/>
+<path d="M31.9 -11.6L23.5 -8.6"/>
+<path d="M32.8 -8.8L28.0 -7.5"/>
+<path d="M33.5 -5.9L24.6 -4.3"/>
+<path d="M33.9 -3.0L28.9 -2.5"/>
+<path d="M34.0 0.0L20.0 0.0"/>
+<path d="M33.9 3.0L28.9 2.5"/>
+<path d="M33.5 5.9L24.6 4.3"/>
+<path d="M32.8 8.8L28.0 7.5"/>
+<path d="M31.9 11.6L23.5 8.6"/>
+<path d="M30.8 14.4L26.3 12.3"/>
+<path d="M29.4 17.0L17.3 10.0"/>
+<path d="M27.9 19.5L23.8 16.6"/>
+<path d="M26.0 21.9L19.2 16.1"/>
+<path d="M24.0 24.0L20.5 20.5"/>
+<path d="M21.9 26.0L16.1 19.2"/>
+<path d="M19.5 27.9L16.6 23.8"/>
+<path d="M17.0 29.4L10.0 17.3"/>
+<path d="M14.4 30.8L12.3 26.3"/>
+<path d="M11.6 31.9L8.6 23.5"/>
+<path d="M8.8 32.8L7.5 28.0"/>
+<path d="M5.9 33.5L4.3 24.6"/>
+<path d="M3.0 33.9L2.5 28.9"/>
+<path d="M0.0 34.0L0.0 20.0"/>
+<path d="M-3.0 33.9L-2.5 28.9"/>
+<path d="M-5.9 33.5L-4.3 24.6"/>
+<path d="M-8.8 32.8L-7.5 28.0"/>
+<path d="M-11.6 31.9L-8.6 23.5"/>
+<path d="M-14.4 30.8L-12.3 26.3"/>
+<path d="M-17.0 29.4L-10.0 17.3"/>
+<path d="M-19.5 27.9L-16.6 23.8"/>
+<path d="M-21.9 26.0L-16.1 19.2"/>
+<path d="M-24.0 24.0L-20.5 20.5"/>
+<path d="M-26.0 21.9L-19.2 16.1"/>
+<path d="M-27.9 19.5L-23.8 16.6"/>
+<path d="M-29.4 17.0L-17.3 10.0"/>
+<path d="M-30.8 14.4L-26.3 12.3"/>
+<path d="M-31.9 11.6L-23.5 8.6"/>
+<path d="M-32.8 8.8L-28.0 7.5"/>
+<path d="M-33.5 5.9L-24.6 4.3"/>
+<path d="M-33.9 3.0L-28.9 2.5"/>
+<path d="M-34.0 0.0L-20.0 0.0"/>
+<path d="M-33.9 -3.0L-28.9 -2.5"/>
+<path d="M-33.5 -5.9L-24.6 -4.3"/>
+<path d="M-32.8 -8.8L-28.0 -7.5"/>
+<path d="M-31.9 -11.6L-23.5 -8.6"/>
+<path d="M-30.8 -14.4L-26.3 -12.3"/>
+<path d="M-29.4 -17.0L-17.3 -10.0"/>
+<path d="M-27.9 -19.5L-23.8 -16.6"/>
+<path d="M-26.0 -21.9L-19.2 -16.1"/>
+<path d="M-24.0 -24.0L-20.5 -20.5"/>
+<path d="M-21.9 -26.0L-16.1 -19.2"/>
+<path d="M-19.5 -27.9L-16.6 -23.8"/>
+<path d="M-17.0 -29.4L-10.0 -17.3"/>
+<path d="M-14.4 -30.8L-12.3 -26.3"/>
+<path d="M-11.6 -31.9L-8.6 -23.5"/>
+<path d="M-8.8 -32.8L-7.5 -28.0"/>
+<path d="M-5.9 -33.5L-4.3 -24.6"/>
+<path d="M-3.0 -33.9L-2.5 -28.9"/>
+<polygon class="vor" points="0.0,-8.0 6.9,-4.0 6.9,4.0 0.0,8.0 -6.9,4.0 -6.9,-4.0"/><circle r="1.6" class="dot"/>
+<rect class="vor" x="-3" y="-2.2" width="6" height="4.4" transform="translate(5.3 -9.1) rotate(-60)"/>
+<rect class="vor" x="-3" y="-2.2" width="6" height="4.4" transform="translate(5.3 9.1) rotate(60)"/>
+<rect class="vor" x="-3" y="-2.2" width="6" height="4.4" transform="translate(-10.5 0.0) rotate(180)"/>
+</g>
+<g class="txt"><rect class="bx" x="343.5" y="711.0" width="52" height="30"/><text x="349.5" y="724.0">116.2</text><text class="mea" x="349.5" y="736.0">111</text></g>
+<path class="rwy" d="M858.3 382.8L878.3 364.5"/>
+<path class="rwy" d="M836.8 399.1L856.8 380.8"/>
+<path class="rwy" d="M872.2 371.7L878.6 365.8"/>
+<g class="txt"><text class="mea" x="878" y="430">63</text></g>
+<g class="apt" transform="translate(832.8 278.6)"><circle r="5"/>
+<path d="M-9 0h18"/>
+</g>
+<text class="txt" x="845.8" y="282.6">796</text>
+<g class="apt" transform="translate(1017.2 443.5)"><circle r="5"/>
+<path d="M-9 0h18"/>
+</g>
+<text class="txt" x="1030.2" y="447.5">907</text>
+<g class="apt" transform="translate(608.2 428.9)"><circle r="5"/>
+<path d="M-9 0h18"/>
+</g>
+<text class="txt" x="621.2" y="432.9">269</text>
+<g class="apt" transform="translate(957.2 139.4)"><circle r="5"/>
+<path d="M-9 0h18"/>
+</g>
+<text class="txt" x="970.2" y="143.4">264</text>
+<g class="apt" transform="translate(769.7 628.1)"><circle r="5"/>
+<path d="M-9 0h18"/>
+</g>
+<text class="txt" x="782.7" y="632.1">50</text>
+<g class="apt" transform="translate(904.8 97.0)"><circle r="5"/>
+<path d="M-9 0h18"/>
+</g>
+<text class="txt" x="917.8" y="101.0">154</text>
+<g class="apt" transform="translate(892.3 10.9)"><circle r="5"/>
+<path d="M-9 0h18"/>
+</g>
+<text class="txt" x="905.3" y="14.9">355</text>
+<g class="apt" transform="translate(1161.9 152.5)"><circle r="5"/>
+<path d="M-9 0h18"/>
+</g>
+<text class="txt" x="1174.9" y="156.5">499</text>
+<g class="apt" transform="translate(1076.0 769.6)"><circle r="5"/>
+<path d="M-9 0h18"/>
+</g>
+<text class="txt" x="1089.0" y="773.6">14</text>
+<g class="apt" transform="translate(1093.3 -8.3)"><circle r="8"/>
+<path d="M-14 0h28M0 -14v28"/>
+</g>
+<text class="txt" x="1109.3" y="-4.3">106</text>
+<g class="apt" transform="translate(411.7 491.8)"><circle r="5"/>
+<path d="M-9 0h18"/>
+</g>
+<text class="txt" x="424.7" y="495.8">46</text>
+<g class="apt" transform="translate(1325.4 428.9)"><circle r="5"/>
+<path d="M-9 0h18"/>
+</g>
+<text class="txt" x="1338.4" y="432.9">180</text>
+<polygon class="fix" points="387.3,516.2 393.8,528.2 380.8,528.2"/><text class="txt" x="398.3" y="527.2">776</text>
+</svg>
+
+<header class="hero">
+<svg class="ifr" viewBox="0 0 1600 440" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+<style>
+  .ifr *{vector-effect:non-scaling-stroke}
+  .ifr .grat path{stroke:var(--chart,#d9cfa8);stroke-opacity:0.63;stroke-width:1;fill:none}
+  .ifr .air polyline{stroke:var(--chart,#d9cfa8);stroke-opacity:0.59;stroke-width:1.4;fill:none}
+  .ifr .route{stroke:var(--signal,#c2621d);stroke-opacity:1;stroke-width:2.2;fill:none;stroke-linejoin:round}
+  .ifr .rt{stroke:var(--signal,#c2621d);stroke-opacity:1;stroke-width:1.6;fill:none}
+  .ifr .iso{stroke:var(--chart,#d9cfa8);stroke-opacity:0.39;stroke-width:1.1;stroke-dasharray:7 6;fill:none}
+  .ifr .ring{stroke:var(--chart,#d9cfa8);stroke-opacity:0.42;stroke-width:1.1;stroke-dasharray:2 6;fill:none}
+  .ifr .classd{stroke:var(--chart,#d9cfa8);stroke-opacity:0.98;stroke-width:1.6;stroke-dasharray:5 4;fill:none}
+  .ifr .wedge{stroke:var(--chart,#d9cfa8);stroke-opacity:0.56;stroke-width:1.1;stroke-dasharray:3 5;fill:var(--chart,#d9cfa8);fill-opacity:0.07}
+  .ifr .rwy{stroke:var(--chart,#d9cfa8);stroke-opacity:1;stroke-width:3;fill:none}
+  .ifr .rose circle,.ifr .rose path{stroke:var(--chart,#d9cfa8);stroke-opacity:0.59;stroke-width:1;fill:none}
+  .ifr .rose .thin{stroke-opacity:0.28}
+  .ifr .vor{stroke:var(--chart,#d9cfa8);stroke-opacity:1;stroke-width:1.4;fill:none}
+  .ifr .dot{fill:var(--chart,#d9cfa8);stroke:none;fill-opacity:1}
+  .ifr .apt circle,.ifr .apt path{stroke:var(--chart,#d9cfa8);stroke-opacity:1;stroke-width:1.6;fill:none}
+  .ifr .fix{stroke:var(--chart,#d9cfa8);stroke-opacity:0.98;stroke-width:1.3;fill:none}
+  .ifr .bx{fill:var(--chart-box,var(--od-deep,#2b321e));stroke:var(--chart,#d9cfa8);stroke-opacity:0.56;stroke-width:1}
+  .ifr .txt{font:600 10.5px ui-monospace,"SF Mono",Menlo,Consolas,monospace;fill:var(--chart,#d9cfa8);fill-opacity:0.87;letter-spacing:.04em}
+  .ifr .txt.faint{fill-opacity:0.53}
+  .ifr .txt .mea,.ifr .mea{font-size:9.5px;fill-opacity:0.7}
+</style>
+<g class="grat">
+<path d="M0 393.1h7M1600 393.1h-7"/>
+<path d="M0 318.1h7M1600 318.1h-7"/>
+<path d="M0 243.1h14M1600 243.1h-14"/>
+<path d="M0 168.1h7M1600 168.1h-7"/>
+<path d="M0 93.1h7M1600 93.1h-7"/>
+<path d="M0 18.1h14M1600 18.1h-14"/>
+<path d="M43.1 0v14M43.1 440v-14"/>
+<path d="M102.0 0v7M102.0 440v-7"/>
+<path d="M160.9 0v7M160.9 440v-7"/>
+<path d="M219.7 0v14M219.7 440v-14"/>
+<path d="M278.6 0v7M278.6 440v-7"/>
+<path d="M337.5 0v7M337.5 440v-7"/>
+<path d="M396.4 0v14M396.4 440v-14"/>
+<path d="M455.3 0v7M455.3 440v-7"/>
+<path d="M514.2 0v7M514.2 440v-7"/>
+<path d="M573.1 0v14M573.1 440v-14"/>
+<path d="M632.0 0v7M632.0 440v-7"/>
+<path d="M690.8 0v7M690.8 440v-7"/>
+<path d="M749.7 0v14M749.7 440v-14"/>
+<path d="M808.6 0v7M808.6 440v-7"/>
+<path d="M867.5 0v7M867.5 440v-7"/>
+<path d="M926.4 0v14M926.4 440v-14"/>
+<path d="M985.3 0v7M985.3 440v-7"/>
+<path d="M1044.2 0v7M1044.2 440v-7"/>
+<path d="M1103.0 0v14M1103.0 440v-14"/>
+<path d="M1161.9 0v7M1161.9 440v-7"/>
+<path d="M1220.8 0v7M1220.8 440v-7"/>
+<path d="M1279.7 0v14M1279.7 440v-14"/>
+<path d="M1338.6 0v7M1338.6 440v-7"/>
+<path d="M1397.5 0v7M1397.5 440v-7"/>
+<path d="M1456.4 0v14M1456.4 440v-14"/>
+<path d="M1515.3 0v7M1515.3 440v-7"/>
+<path d="M1574.1 0v7M1574.1 440v-7"/>
+</g><g class="txt faint">
+<text x="18" y="238.1">38°15'</text>
+<text x="18" y="13.1">38°30'</text>
+<text x="47.1" y="28">123°15'</text>
+<text x="223.7" y="28">123°00'</text>
+<text x="400.4" y="28">122°45'</text>
+<text x="577.1" y="28">122°30'</text>
+<text x="753.7" y="28">122°15'</text>
+<text x="930.4" y="28">122°00'</text>
+<text x="1107.0" y="28">121°45'</text>
+<text x="1283.7" y="28">121°30'</text>
+<text x="1460.4" y="28">121°15'</text>
+</g>
+<path class="iso" d="M650 0C690 132 610 308 660 440"/>
+<text class="txt faint" transform="translate(658 220) rotate(86)">17°</text>
+<path class="iso" d="M1360 0C1400 132 1320 308 1370 440"/>
+<text class="txt faint" transform="translate(1368 220) rotate(86)">17°</text>
+<path class="wedge" d="M1025.0 228.4L1174.9 223.2A195.0 195.0 0 0 1 919.7 415.5L966.1 272.8A45.0 45.0 0 0 0 1025.0 228.4Z"/>
+<text class="txt faint" x="1057" y="332" text-anchor="middle">13</text>
+<circle class="ring" cx="980" cy="230" r="180.0"/>
+<text class="txt faint" x="1113" y="103">12</text>
+<circle class="classd" cx="980" cy="230" r="64.5"/>
+<text class="txt" x="883" y="171">26</text>
+<g class="air">
+<polyline points="662.7,309.1 895.6,428.8"/>
+<polyline points="895.6,428.8 764.6,713.7"/>
+<polyline points="764.6,713.7 555.5,599.0"/>
+<polyline points="555.5,599.0 662.7,309.1"/>
+<polyline points="895.6,428.8 1242.0,66.3"/>
+<polyline points="1242.0,66.3 1344.9,-134.9"/>
+</g>
+<polyline class="route" points="1111.6,107.2 980,230"/>
+<g class="txt">
+<path class="rt" d="M998.5 205.9L1005.4 213.2"/>
+<path class="rt" d="M1020.5 185.4L1027.3 192.7"/>
+<path class="rt" d="M1042.4 165.0L1049.2 172.3"/>
+<path class="rt" d="M1064.4 144.5L1071.2 151.8"/>
+<path class="rt" d="M1086.3 124.0L1093.1 131.4"/>
+<path class="rt" d="M1108.2 103.6L1115.1 110.9"/>
+<g transform="translate(1094 142)"><rect class="bx" x="-24" y="-9" width="48" height="18"/><text x="0" y="4" text-anchor="middle">214°</text></g>
+</g>
+<g class="txt">
+<g transform="translate(779 369) rotate(27.2)"><rect class="bx" x="-30" y="-8" width="60" height="16"/><text x="0" y="4" text-anchor="middle">100° 17</text></g>
+<g transform="translate(1069 248) rotate(-46.3)"><rect class="bx" x="-30" y="-8" width="60" height="16"/><text x="0" y="4" text-anchor="middle">027° 33</text></g>
+</g>
+<g class="txt">
+<g transform="translate(714 335) rotate(27.2)"><text class="mea" x="0" y="-8" text-anchor="middle">8000</text></g>
+<g transform="translate(844 402) rotate(27.2)"><text class="mea" x="0" y="-8" text-anchor="middle">8000</text></g>
+<g transform="translate(639 373) rotate(-69.7)"><text class="mea" x="0" y="-8" text-anchor="middle">5000</text></g>
+<g transform="translate(972 349) rotate(-46.3)"><text class="mea" x="0" y="-8" text-anchor="middle">10000</text></g>
+<g transform="translate(1166 146) rotate(-46.3)"><text class="mea" x="0" y="-8" text-anchor="middle">12000</text></g>
+<g transform="translate(1265 22) rotate(-62.9)"><text class="mea" x="0" y="-8" text-anchor="middle">6000</text></g>
+<text class="mea" x="462" y="56">332</text>
+<text class="mea" x="176" y="98">35</text>
+<text class="mea" x="913" y="271">481</text>
+<text class="mea" x="1441" y="335">3000</text>
+<text class="mea" x="1558" y="339">685</text>
+<text class="mea" x="357" y="340">828</text>
+<text class="mea" x="1155" y="271">4</text>
+<text class="mea" x="919" y="115">6500</text>
+<text class="mea" x="982" y="149">3000</text>
+<text class="mea" x="561" y="154">96</text>
+<text class="mea" x="205" y="234">23</text>
+<text class="mea" x="1278" y="268">5500</text>
+<text class="mea" x="920" y="119">972</text>
+<text class="mea" x="958" y="254">454</text>
+<text class="mea" x="693" y="231">5500</text>
+<text class="mea" x="709" y="133">4500</text>
+<text class="mea" x="95" y="413">439</text>
+<text class="mea" x="1192" y="283">17</text>
+<text class="mea" x="743" y="242">920</text>
+<text class="mea" x="322" y="137">166</text>
+<text class="mea" x="1214" y="387">3000</text>
+<text class="mea" x="891" y="342">442</text>
+<text class="mea" x="150" y="375">97</text>
+<text class="mea" x="868" y="272">33</text>
+<text class="mea" x="649" y="240">408</text>
+<text class="mea" x="1531" y="44">43</text>
+</g>
+<g class="rose" transform="translate(662.7 309.1)"><circle r="52"/><circle r="44" class="thin"/>
+<path d="M0.0 -52.0L0.0 -38.0"/>
+<path d="M4.5 -51.8L4.1 -46.8"/>
+<path d="M9.0 -51.2L7.5 -42.3"/>
+<path d="M13.5 -50.2L12.2 -45.4"/>
+<path d="M17.8 -48.9L14.7 -40.4"/>
+<path d="M22.0 -47.1L19.9 -42.6"/>
+<path d="M26.0 -45.0L19.0 -32.9"/>
+<path d="M29.8 -42.6L27.0 -38.5"/>
+<path d="M33.4 -39.8L27.6 -32.9"/>
+<path d="M36.8 -36.8L33.2 -33.2"/>
+<path d="M39.8 -33.4L32.9 -27.6"/>
+<path d="M42.6 -29.8L38.5 -27.0"/>
+<path d="M45.0 -26.0L32.9 -19.0"/>
+<path d="M47.1 -22.0L42.6 -19.9"/>
+<path d="M48.9 -17.8L40.4 -14.7"/>
+<path d="M50.2 -13.5L45.4 -12.2"/>
+<path d="M51.2 -9.0L42.3 -7.5"/>
+<path d="M51.8 -4.5L46.8 -4.1"/>
+<path d="M52.0 0.0L38.0 0.0"/>
+<path d="M51.8 4.5L46.8 4.1"/>
+<path d="M51.2 9.0L42.3 7.5"/>
+<path d="M50.2 13.5L45.4 12.2"/>
+<path d="M48.9 17.8L40.4 14.7"/>
+<path d="M47.1 22.0L42.6 19.9"/>
+<path d="M45.0 26.0L32.9 19.0"/>
+<path d="M42.6 29.8L38.5 27.0"/>
+<path d="M39.8 33.4L32.9 27.6"/>
+<path d="M36.8 36.8L33.2 33.2"/>
+<path d="M33.4 39.8L27.6 32.9"/>
+<path d="M29.8 42.6L27.0 38.5"/>
+<path d="M26.0 45.0L19.0 32.9"/>
+<path d="M22.0 47.1L19.9 42.6"/>
+<path d="M17.8 48.9L14.7 40.4"/>
+<path d="M13.5 50.2L12.2 45.4"/>
+<path d="M9.0 51.2L7.5 42.3"/>
+<path d="M4.5 51.8L4.1 46.8"/>
+<path d="M0.0 52.0L0.0 38.0"/>
+<path d="M-4.5 51.8L-4.1 46.8"/>
+<path d="M-9.0 51.2L-7.5 42.3"/>
+<path d="M-13.5 50.2L-12.2 45.4"/>
+<path d="M-17.8 48.9L-14.7 40.4"/>
+<path d="M-22.0 47.1L-19.9 42.6"/>
+<path d="M-26.0 45.0L-19.0 32.9"/>
+<path d="M-29.8 42.6L-27.0 38.5"/>
+<path d="M-33.4 39.8L-27.6 32.9"/>
+<path d="M-36.8 36.8L-33.2 33.2"/>
+<path d="M-39.8 33.4L-32.9 27.6"/>
+<path d="M-42.6 29.8L-38.5 27.0"/>
+<path d="M-45.0 26.0L-32.9 19.0"/>
+<path d="M-47.1 22.0L-42.6 19.9"/>
+<path d="M-48.9 17.8L-40.4 14.7"/>
+<path d="M-50.2 13.5L-45.4 12.2"/>
+<path d="M-51.2 9.0L-42.3 7.5"/>
+<path d="M-51.8 4.5L-46.8 4.1"/>
+<path d="M-52.0 0.0L-38.0 0.0"/>
+<path d="M-51.8 -4.5L-46.8 -4.1"/>
+<path d="M-51.2 -9.0L-42.3 -7.5"/>
+<path d="M-50.2 -13.5L-45.4 -12.2"/>
+<path d="M-48.9 -17.8L-40.4 -14.7"/>
+<path d="M-47.1 -22.0L-42.6 -19.9"/>
+<path d="M-45.0 -26.0L-32.9 -19.0"/>
+<path d="M-42.6 -29.8L-38.5 -27.0"/>
+<path d="M-39.8 -33.4L-32.9 -27.6"/>
+<path d="M-36.8 -36.8L-33.2 -33.2"/>
+<path d="M-33.4 -39.8L-27.6 -32.9"/>
+<path d="M-29.8 -42.6L-27.0 -38.5"/>
+<path d="M-26.0 -45.0L-19.0 -32.9"/>
+<path d="M-22.0 -47.1L-19.9 -42.6"/>
+<path d="M-17.8 -48.9L-14.7 -40.4"/>
+<path d="M-13.5 -50.2L-12.2 -45.4"/>
+<path d="M-9.0 -51.2L-7.5 -42.3"/>
+<path d="M-4.5 -51.8L-4.1 -46.8"/>
+<text class="txt" x="0.0" y="-24.5" text-anchor="middle">00</text>
+<text class="txt" x="14.0" y="-20.7" text-anchor="middle">03</text>
+<text class="txt" x="24.2" y="-10.5" text-anchor="middle">06</text>
+<text class="txt" x="28.0" y="3.5" text-anchor="middle">09</text>
+<text class="txt" x="24.2" y="17.5" text-anchor="middle">12</text>
+<text class="txt" x="14.0" y="27.7" text-anchor="middle">15</text>
+<text class="txt" x="0.0" y="31.5" text-anchor="middle">18</text>
+<text class="txt" x="-14.0" y="27.7" text-anchor="middle">21</text>
+<text class="txt" x="-24.2" y="17.5" text-anchor="middle">24</text>
+<text class="txt" x="-28.0" y="3.5" text-anchor="middle">27</text>
+<text class="txt" x="-24.2" y="-10.5" text-anchor="middle">30</text>
+<text class="txt" x="-14.0" y="-20.7" text-anchor="middle">33</text>
+<polygon class="vor" points="0.0,-8.0 6.9,-4.0 6.9,4.0 0.0,8.0 -6.9,4.0 -6.9,-4.0"/><circle r="1.6" class="dot"/>
+<rect class="vor" x="-3" y="-2.2" width="6" height="4.4" transform="translate(5.3 -9.1) rotate(-60)"/>
+<rect class="vor" x="-3" y="-2.2" width="6" height="4.4" transform="translate(5.3 9.1) rotate(60)"/>
+<rect class="vor" x="-3" y="-2.2" width="6" height="4.4" transform="translate(-10.5 0.0) rotate(180)"/>
+</g>
+<g class="txt"><rect class="bx" x="552.7" y="253.1" width="52" height="30"/><text x="558.7" y="266.1">112.1</text><text class="mea" x="558.7" y="278.1">75</text></g>
+<g class="rose" transform="translate(895.6 428.8)"><circle r="42"/><circle r="34" class="thin"/>
+<path d="M0.0 -42.0L0.0 -28.0"/>
+<path d="M3.7 -41.8L3.2 -36.9"/>
+<path d="M7.3 -41.4L5.7 -32.5"/>
+<path d="M10.9 -40.6L9.6 -35.7"/>
+<path d="M14.4 -39.5L11.3 -31.0"/>
+<path d="M17.7 -38.1L15.6 -33.5"/>
+<path d="M21.0 -36.4L14.0 -24.2"/>
+<path d="M24.1 -34.4L21.2 -30.3"/>
+<path d="M27.0 -32.2L21.2 -25.3"/>
+<path d="M29.7 -29.7L26.2 -26.2"/>
+<path d="M32.2 -27.0L25.3 -21.2"/>
+<path d="M34.4 -24.1L30.3 -21.2"/>
+<path d="M36.4 -21.0L24.2 -14.0"/>
+<path d="M38.1 -17.7L33.5 -15.6"/>
+<path d="M39.5 -14.4L31.0 -11.3"/>
+<path d="M40.6 -10.9L35.7 -9.6"/>
+<path d="M41.4 -7.3L32.5 -5.7"/>
+<path d="M41.8 -3.7L36.9 -3.2"/>
+<path d="M42.0 0.0L28.0 0.0"/>
+<path d="M41.8 3.7L36.9 3.2"/>
+<path d="M41.4 7.3L32.5 5.7"/>
+<path d="M40.6 10.9L35.7 9.6"/>
+<path d="M39.5 14.4L31.0 11.3"/>
+<path d="M38.1 17.7L33.5 15.6"/>
+<path d="M36.4 21.0L24.2 14.0"/>
+<path d="M34.4 24.1L30.3 21.2"/>
+<path d="M32.2 27.0L25.3 21.2"/>
+<path d="M29.7 29.7L26.2 26.2"/>
+<path d="M27.0 32.2L21.2 25.3"/>
+<path d="M24.1 34.4L21.2 30.3"/>
+<path d="M21.0 36.4L14.0 24.2"/>
+<path d="M17.7 38.1L15.6 33.5"/>
+<path d="M14.4 39.5L11.3 31.0"/>
+<path d="M10.9 40.6L9.6 35.7"/>
+<path d="M7.3 41.4L5.7 32.5"/>
+<path d="M3.7 41.8L3.2 36.9"/>
+<path d="M0.0 42.0L0.0 28.0"/>
+<path d="M-3.7 41.8L-3.2 36.9"/>
+<path d="M-7.3 41.4L-5.7 32.5"/>
+<path d="M-10.9 40.6L-9.6 35.7"/>
+<path d="M-14.4 39.5L-11.3 31.0"/>
+<path d="M-17.7 38.1L-15.6 33.5"/>
+<path d="M-21.0 36.4L-14.0 24.2"/>
+<path d="M-24.1 34.4L-21.2 30.3"/>
+<path d="M-27.0 32.2L-21.2 25.3"/>
+<path d="M-29.7 29.7L-26.2 26.2"/>
+<path d="M-32.2 27.0L-25.3 21.2"/>
+<path d="M-34.4 24.1L-30.3 21.2"/>
+<path d="M-36.4 21.0L-24.2 14.0"/>
+<path d="M-38.1 17.7L-33.5 15.6"/>
+<path d="M-39.5 14.4L-31.0 11.3"/>
+<path d="M-40.6 10.9L-35.7 9.6"/>
+<path d="M-41.4 7.3L-32.5 5.7"/>
+<path d="M-41.8 3.7L-36.9 3.2"/>
+<path d="M-42.0 0.0L-28.0 0.0"/>
+<path d="M-41.8 -3.7L-36.9 -3.2"/>
+<path d="M-41.4 -7.3L-32.5 -5.7"/>
+<path d="M-40.6 -10.9L-35.7 -9.6"/>
+<path d="M-39.5 -14.4L-31.0 -11.3"/>
+<path d="M-38.1 -17.7L-33.5 -15.6"/>
+<path d="M-36.4 -21.0L-24.2 -14.0"/>
+<path d="M-34.4 -24.1L-30.3 -21.2"/>
+<path d="M-32.2 -27.0L-25.3 -21.2"/>
+<path d="M-29.7 -29.7L-26.2 -26.2"/>
+<path d="M-27.0 -32.2L-21.2 -25.3"/>
+<path d="M-24.1 -34.4L-21.2 -30.3"/>
+<path d="M-21.0 -36.4L-14.0 -24.2"/>
+<path d="M-17.7 -38.1L-15.6 -33.5"/>
+<path d="M-14.4 -39.5L-11.3 -31.0"/>
+<path d="M-10.9 -40.6L-9.6 -35.7"/>
+<path d="M-7.3 -41.4L-5.7 -32.5"/>
+<path d="M-3.7 -41.8L-3.2 -36.9"/>
+<polygon class="vor" points="0.0,-8.0 6.9,-4.0 6.9,4.0 0.0,8.0 -6.9,4.0 -6.9,-4.0"/><circle r="1.6" class="dot"/>
+<rect class="vor" x="-3" y="-2.2" width="6" height="4.4" transform="translate(5.3 -9.1) rotate(-60)"/>
+<rect class="vor" x="-3" y="-2.2" width="6" height="4.4" transform="translate(5.3 9.1) rotate(60)"/>
+<rect class="vor" x="-3" y="-2.2" width="6" height="4.4" transform="translate(-10.5 0.0) rotate(180)"/>
+</g>
+<g class="txt"><rect class="bx" x="943.6" y="382.8" width="52" height="30"/><text x="949.6" y="395.8">117.0</text><text class="mea" x="949.6" y="407.8">57</text></g>
+<g class="rose" transform="translate(1242.0 66.3)"><circle r="46"/><circle r="38" class="thin"/>
+<path d="M0.0 -46.0L0.0 -32.0"/>
+<path d="M4.0 -45.8L3.6 -40.8"/>
+<path d="M8.0 -45.3L6.4 -36.4"/>
+<path d="M11.9 -44.4L10.6 -39.6"/>
+<path d="M15.7 -43.2L12.7 -34.8"/>
+<path d="M19.4 -41.7L17.3 -37.2"/>
+<path d="M23.0 -39.8L16.0 -27.7"/>
+<path d="M26.4 -37.7L23.5 -33.6"/>
+<path d="M29.6 -35.2L23.8 -28.3"/>
+<path d="M32.5 -32.5L29.0 -29.0"/>
+<path d="M35.2 -29.6L28.3 -23.8"/>
+<path d="M37.7 -26.4L33.6 -23.5"/>
+<path d="M39.8 -23.0L27.7 -16.0"/>
+<path d="M41.7 -19.4L37.2 -17.3"/>
+<path d="M43.2 -15.7L34.8 -12.7"/>
+<path d="M44.4 -11.9L39.6 -10.6"/>
+<path d="M45.3 -8.0L36.4 -6.4"/>
+<path d="M45.8 -4.0L40.8 -3.6"/>
+<path d="M46.0 0.0L32.0 0.0"/>
+<path d="M45.8 4.0L40.8 3.6"/>
+<path d="M45.3 8.0L36.4 6.4"/>
+<path d="M44.4 11.9L39.6 10.6"/>
+<path d="M43.2 15.7L34.8 12.7"/>
+<path d="M41.7 19.4L37.2 17.3"/>
+<path d="M39.8 23.0L27.7 16.0"/>
+<path d="M37.7 26.4L33.6 23.5"/>
+<path d="M35.2 29.6L28.3 23.8"/>
+<path d="M32.5 32.5L29.0 29.0"/>
+<path d="M29.6 35.2L23.8 28.3"/>
+<path d="M26.4 37.7L23.5 33.6"/>
+<path d="M23.0 39.8L16.0 27.7"/>
+<path d="M19.4 41.7L17.3 37.2"/>
+<path d="M15.7 43.2L12.7 34.8"/>
+<path d="M11.9 44.4L10.6 39.6"/>
+<path d="M8.0 45.3L6.4 36.4"/>
+<path d="M4.0 45.8L3.6 40.8"/>
+<path d="M0.0 46.0L0.0 32.0"/>
+<path d="M-4.0 45.8L-3.6 40.8"/>
+<path d="M-8.0 45.3L-6.4 36.4"/>
+<path d="M-11.9 44.4L-10.6 39.6"/>
+<path d="M-15.7 43.2L-12.7 34.8"/>
+<path d="M-19.4 41.7L-17.3 37.2"/>
+<path d="M-23.0 39.8L-16.0 27.7"/>
+<path d="M-26.4 37.7L-23.5 33.6"/>
+<path d="M-29.6 35.2L-23.8 28.3"/>
+<path d="M-32.5 32.5L-29.0 29.0"/>
+<path d="M-35.2 29.6L-28.3 23.8"/>
+<path d="M-37.7 26.4L-33.6 23.5"/>
+<path d="M-39.8 23.0L-27.7 16.0"/>
+<path d="M-41.7 19.4L-37.2 17.3"/>
+<path d="M-43.2 15.7L-34.8 12.7"/>
+<path d="M-44.4 11.9L-39.6 10.6"/>
+<path d="M-45.3 8.0L-36.4 6.4"/>
+<path d="M-45.8 4.0L-40.8 3.6"/>
+<path d="M-46.0 0.0L-32.0 0.0"/>
+<path d="M-45.8 -4.0L-40.8 -3.6"/>
+<path d="M-45.3 -8.0L-36.4 -6.4"/>
+<path d="M-44.4 -11.9L-39.6 -10.6"/>
+<path d="M-43.2 -15.7L-34.8 -12.7"/>
+<path d="M-41.7 -19.4L-37.2 -17.3"/>
+<path d="M-39.8 -23.0L-27.7 -16.0"/>
+<path d="M-37.7 -26.4L-33.6 -23.5"/>
+<path d="M-35.2 -29.6L-28.3 -23.8"/>
+<path d="M-32.5 -32.5L-29.0 -29.0"/>
+<path d="M-29.6 -35.2L-23.8 -28.3"/>
+<path d="M-26.4 -37.7L-23.5 -33.6"/>
+<path d="M-23.0 -39.8L-16.0 -27.7"/>
+<path d="M-19.4 -41.7L-17.3 -37.2"/>
+<path d="M-15.7 -43.2L-12.7 -34.8"/>
+<path d="M-11.9 -44.4L-10.6 -39.6"/>
+<path d="M-8.0 -45.3L-6.4 -36.4"/>
+<path d="M-4.0 -45.8L-3.6 -40.8"/>
+<text class="txt" x="0.0" y="-18.5" text-anchor="middle">00</text>
+<text class="txt" x="11.0" y="-15.6" text-anchor="middle">03</text>
+<text class="txt" x="19.1" y="-7.5" text-anchor="middle">06</text>
+<text class="txt" x="22.0" y="3.5" text-anchor="middle">09</text>
+<text class="txt" x="19.1" y="14.5" text-anchor="middle">12</text>
+<text class="txt" x="11.0" y="22.6" text-anchor="middle">15</text>
+<text class="txt" x="0.0" y="25.5" text-anchor="middle">18</text>
+<text class="txt" x="-11.0" y="22.6" text-anchor="middle">21</text>
+<text class="txt" x="-19.1" y="14.5" text-anchor="middle">24</text>
+<text class="txt" x="-22.0" y="3.5" text-anchor="middle">27</text>
+<text class="txt" x="-19.1" y="-7.5" text-anchor="middle">30</text>
+<text class="txt" x="-11.0" y="-15.6" text-anchor="middle">33</text>
+<polygon class="vor" points="0.0,-8.0 6.9,-4.0 6.9,4.0 0.0,8.0 -6.9,4.0 -6.9,-4.0"/><circle r="1.6" class="dot"/>
+<rect class="vor" x="-3" y="-2.2" width="6" height="4.4" transform="translate(5.3 -9.1) rotate(-60)"/>
+<rect class="vor" x="-3" y="-2.2" width="6" height="4.4" transform="translate(5.3 9.1) rotate(60)"/>
+<rect class="vor" x="-3" y="-2.2" width="6" height="4.4" transform="translate(-10.5 0.0) rotate(180)"/>
+</g>
+<g class="txt"><rect class="bx" x="1294.0" y="16.3" width="52" height="30"/><text x="1300.0" y="29.3">115.2</text><text class="mea" x="1300.0" y="41.3">77</text></g>
+<path class="rwy" d="M978.3 232.8L998.3 214.5"/>
+<path class="rwy" d="M956.8 249.1L976.8 230.8"/>
+<path class="rwy" d="M992.2 221.7L998.6 215.8"/>
+<g class="txt"><text class="mea" x="998" y="280">63</text></g>
+<g class="apt" transform="translate(952.8 128.6)"><circle r="5"/>
+<path d="M-9 0h18"/>
+</g>
+<text class="txt" x="965.8" y="132.6">798</text>
+<g class="apt" transform="translate(1137.2 293.5)"><circle r="5"/>
+<path d="M-9 0h18"/>
+</g>
+<text class="txt" x="1150.2" y="297.5">602</text>
+<g class="apt" transform="translate(728.2 278.9)"><circle r="5"/>
+<path d="M-9 0h18"/>
+</g>
+<text class="txt" x="741.2" y="282.9">365</text>
+<g class="apt" transform="translate(1077.2 -10.6)"><circle r="5"/>
+<path d="M-9 0h18"/>
+</g>
+<text class="txt" x="1090.2" y="-6.6">717</text>
+<g class="apt" transform="translate(1281.9 2.5)"><circle r="5"/>
+<path d="M-9 0h18"/>
+</g>
+<text class="txt" x="1294.9" y="6.5">805</text>
+<g class="apt" transform="translate(531.7 341.8)"><circle r="5"/>
+<path d="M-9 0h18"/>
+</g>
+<text class="txt" x="544.7" y="345.8">862</text>
+<g class="apt" transform="translate(1445.4 278.9)"><circle r="5"/>
+<path d="M-9 0h18"/>
+</g>
+<text class="txt" x="1458.4" y="282.9">903</text>
+<polygon class="fix" points="507.3,366.2 513.8,378.2 500.8,378.2"/><text class="txt" x="518.3" y="377.2">645</text>
+</svg>
+<div class="hero-fade"></div>
+<div class="hero-in">
+  <h1>312AS<small>312th Airlift Squadron · C-5 Galaxy · Travis AFB</small></h1>
+</div></header>
+
+
+<canvas id="decals" aria-hidden="true"></canvas>
+<div id="scene" aria-hidden="true"></div>
+<template id="sol-tpl"><div class="sol" aria-hidden="true">
+  <div class="bub"></div>
+  <svg viewBox="0 0 80 140" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="40" cy="138" rx="20" ry="3" fill="#000" opacity=".22"/>
+    <g class="sl-all">
+      <!-- back arm -->
+      <g class="sl-arm-b">
+        <rect x="36" y="42" width="8" height="18" rx="4" fill="#5d6540"/>
+        <g class="sl-fore-b"><rect x="36" y="57" width="8" height="18" rx="4" fill="#5d6540"/><circle cx="40" cy="77" r="4" class="skin2"/></g>
+      </g>
+      <!-- back leg -->
+      <g class="sl-leg-b">
+        <rect x="35" y="76" width="11" height="46" rx="4" fill="#6c744b"/>
+        <path d="M33 118h16l3 8v6H33z" fill="#1d1a14"/>
+      </g>
+      <!-- rucksack -->
+      <rect x="22" y="40" width="12" height="32" rx="4" fill="#7d7451"/>
+      <!-- torso -->
+      <rect x="28" y="38" width="24" height="44" rx="6" fill="#7a8556"/>
+      <g fill="#a39a6d" opacity=".75"><ellipse cx="35" cy="48" rx="4" ry="3"/><ellipse cx="46" cy="58" rx="4" ry="3"/><ellipse cx="36" cy="68" rx="4" ry="3"/><ellipse cx="45" cy="44" rx="3" ry="2.4"/></g>
+      <g fill="#4b5434" opacity=".8"><ellipse cx="44" cy="50" rx="3.5" ry="2.6"/><ellipse cx="33" cy="58" rx="3.5" ry="2.6"/><ellipse cx="44" cy="72" rx="3.5" ry="2.6"/></g>
+      <rect x="28" y="76" width="24" height="5" fill="#2f2a1e"/>
+      <rect x="45" y="47" width="6" height="3" fill="#e8e0c0" opacity=".9"/>
+      <!-- front leg -->
+      <g class="sl-leg-f">
+        <rect x="34" y="76" width="11" height="46" rx="4" fill="#7a8556"/>
+        <g fill="#a39a6d" opacity=".7"><ellipse cx="39" cy="90" rx="3.5" ry="2.6"/><ellipse cx="40" cy="108" rx="3.5" ry="2.6"/></g>
+        <path d="M32 118h16l4 8v6H32z" fill="#241f17"/>
+      </g>
+      <!-- neck + head -->
+      <rect x="36" y="31" width="8" height="9" class="skin2"/>
+      <circle cx="40" cy="24" r="11" class="skin"/>
+      <circle cx="50.5" cy="25" r="2.2" class="skin"/>
+      <circle cx="46" cy="22" r="1.4" fill="#2a2118"/>
+      <path d="M41 30q5 2 9 0" stroke="#8a5a40" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+      <g class="zyn"><rect x="43" y="28.2" width="10" height="5" rx="2.5" fill="#fff" stroke="#b9bfc4" stroke-width=".7"/></g>
+      <!-- helmet -->
+      <path d="M28 21a12 12 0 0 1 24 0v-1h3.5v3.4H26z" fill="#69724a"/>
+      <path d="M28 21a12 12 0 0 1 24 0z" fill="#69724a"/>
+      <g fill="#a39a6d" opacity=".7"><ellipse cx="35" cy="15" rx="3" ry="2"/><ellipse cx="45" cy="13" rx="3" ry="2"/></g>
+      <rect x="27" y="20.5" width="27" height="3" rx="1.5" fill="#4b5434"/>
+      <!-- front arm (rendered last so the salute is on top) -->
+      <g class="sl-arm-f">
+        <rect x="36" y="42" width="8" height="18" rx="4" fill="#7a8556"/>
+        <g class="sl-fore-f"><rect x="36" y="57" width="8" height="21" rx="4" fill="#7a8556"/><circle cx="40" cy="79" r="4.2" class="skin"/><g class="radio-g"><rect x="40" y="68" width="5.5" height="12" rx="1.3" fill="#25282a"/><rect x="41" y="70" width="3.5" height="3" fill="#7fbf7a"/><path d="M43.5 80l1 8" stroke="#25282a" stroke-width="1.2"/></g></g>
+      </g>
+    </g>
+  </svg>
+</div></template>
+<div id="rocks" aria-hidden="true"></div>
+<div id="talk" aria-hidden="true"></div>
+
+<main>
+  <div class="stack" id="stack"></div>
+</main>
+
+<footer>
+  <div class="foot-in">
+    <span>Have a suggestion or want to help? Send a note.</span>
+    <span class="mails">
+      <a href="mailto:cale.simmons@gmail.com">cale.simmons@gmail.com</a>
+      <a href="mailto:cale.simmons.2@us.af.mil">cale.simmons.2@us.af.mil</a>
+    </span>
+  </div>
+  <div class="ver">312AS website · v84</div>
+</footer>
+
+<script>
+/* Link labels come from the live page; "#" means the real URL still needs to be added. */
+const SECTIONS = [
+  ["✈️ Mission", [
+    ["GDSS","https://gdss.cce.af.mil/gdss2web/gdss2main.php"],["C2D2","https://c2d2.apps.dso.mil/"],["Stepbrief","https://www.stepbrief.net/"],["BaseOps.net","https://www.baseops.net"],
+    ["Travis MX Page","http://60mxg.travis.af.mil/mi/standardreports/sitrepmap/default.aspx"],["One-Stop MSR MM Channel","https://chat.il4.dso.mil/usaf-60amw/channels/one-stop"],["Canned Form F","https://usaf.dps.mil/teams/12679/ACPL/Local_Folders/Forms/AllItems.aspx?id=%2Fteams%2F12679%2FACPL%2FLocal%5FFolders%2FLocal%5FKSUU%5FC5M%2FE%2DMission%20Kit%2F22%20AS%20EFB%2FStan%20Eval%2FCanned%20Form%20F%20Book&viewid=ae4bc5b9%2D5c64%2D4208%2Da755%2D66b5b33b1213"],
+    ["No Go Requests Process","no%20gos%20guide/nogo-requests.html"],["Pilot 4023s","https://acrobat.adobe.com/id/urn:aaid:sc:US:68abef5a-14dc-497c-a0e5-6777fc064eec"],["Blank 1522s","https://acrobat.adobe.com/id/urn:aaid:sc:US:e6a7f85a-6103-4b4e-894c-d44f418e3ffc"]]],
+  ["🛬 Pre / Post Mission", [
+    ["GTIMS Setup (no chrome)","https://gtims.maf.af.mil/"],["Puckboard","https://puckboard.apps.dso.mil/"],["Puckboard (Currency)","https://puckboard.apps.dso.mil/usaf/312th-airlift-squadron/currency"],["ARMS","https://arms.sso.cce.af.mil/aircrewSummary/servlet/ArmsServlet"],
+    ["Mattermost","https://chat.il4.dso.mil/"],["AROWS-R","https://arowsr.afrc.af.mil/arows-r/"],["ARCNET","https://arcnet.sso.cce.af.mil/arcnet/"],["ARCNET Readiness Report","https://arcnet.sso.cce.af.mil/resnet/Reporting/ReportView.aspx?report=PIMR"],
+    ["349th Training Scheduling","https://60thairmobilitywingtraining.setmore.com/"],["OGV Home Site","https://usaf.dps.mil/teams/60OG/OGV/SitePages/Home.aspx"],["Envision.AF.mil","http://envision.af.mil/"],
+    ["312th Member Currency","https://app.mil.powerbigov.us/groups/8cda9ae6-41bd-4abc-93c8-f9670f42ce30/reports/7ab4e387-39c4-4de4-9af9-4a819d9419f8/08e9c8551cbb47500015"]]],
+  ["💳 Finance", [
+    ["Defense Travel System (DTS)","https://dtsproweb.defensetravel.osd.mil"],
+    ["Oanda (DTS currency)","https://www.oanda.com/currency-converter/"],
+    ["349th CSP and Comptroller Services Portal","https://csp.cce.af.mil/"],["CitiBank Commercial (GTC)","https://home.cards.citidirect.com/"],
+    ["MyPay","https://mypay.dfas.mil"],["UTAPS","https://utapsweb.afrc.af.mil/utapsweb/"],
+    ["ILP Rates","https://www.travel.dod.mil/Programs/Lodging/"],["RPA Request Form","https://usaf.dps.mil/sites/349AMW/OG/312ALS/_layouts/15/listforms.aspx?cid=ZjIyZTVlNWQtODIwYi00MjczLTg4MzMtODk0YjJhODQ1MmI4&nav=ZGE1YWYxOTYtMWYwZi00MWU5LWJiMTAtMmNmZWEzMGQzNDUz"]]],
+  ["📋 Guides", [
+    ["312th Printer Setup / Network Drives","printer-set-up/"],["Travis AFB Bldgs Map","https://maps.af.mil/"],
+    ["Set up Mattermost / Puckboard","mm-set-up/"],
+    ["Finance Guides","finance-help/"],
+    ["iPad Desktop Anywhere Setup","https://www.312as.com/desktop-anywhere-set-up"],["ALRS Guide","alrs-guide/"],
+    ["Help I Just Moved","moved/"],["Help, Fix My iPad","ipad-vpn/"],["VPN Help, I can't get on AF websites","help-af-sites/"],
+    ["myAuth Account Creation Guide","https://lms-jets.cce.af.mil/moodle/"],["How to Add PME Points to Retirement","pme-points/"],
+    ["New Person's Guide","how-to-be-a-reservist/"],["Power BI Currency Setup","power-bi/"],["Fix My Pubs","fix-my-pubs/"]]],
+  ["🎲 Random", [
+    ["Air Force Portal","https://www.my.af.mil"],["vFSS","https://vfss.af.mil"],["My Vector Splash Page (VMPF)","https://af.okta.mil/app/UserHome?session_hint=AUTHENTICATED"],
+    ["Aircrew Pubs","https://usaf.dps.mil/teams/12679/Aircrew%20Pubs%20Library/Forms/Better.aspx?viewpath=%2Fteams%2F12679%2FAircrew%20Pubs%20Library%2FForms%2FBetter%2Easpx&id=%2Fteams%2F12679%2FAircrew%20Pubs%20Library%2FMaster%5FLibrary%5FVerified&viewid=8d6a520c%2Dd6ea%2D"],["Travis Sharepoint 60th","https://usaf.dps.mil/teams/60AMW/60thAirMobilityWingHome/"],["Travis Sharepoint 349th","https://usaf.dps.mil/sites/349AMW/SitePages/Home.aspx"],
+    ["My Learning (ADLS)","https://usaf.percipio.com/"],["IMR","https://asimsimr.health.mil/imr/MyIMR.aspx"],["My FSS","https://myfss.us.af.mil/USAFCommunity/s/login/?ec=302&startURL=%2FUSAFCommunity%2Fs%2F"],
+    ["MyFitness","https://myfss.us.af.mil/USAFCommunity/s/usaf-fitness-management"],["AF Webmail","https://webmail.apps.mil/mail/"],["One Drive","https://usaf-my.dps.mil/"],
+    ["Milconnect","https://milconnect.dmdc.osd.mil"],["Travis Alt Chamber / 60 AMW site","https://60thairmobilitywingtraining.setmore.com/"],
+    ["Narrative Buddy (OPR/EPR ChatGPT)","https://narrative-buddy.com/"],["AirForceHub","https://airforcehub.com/"],
+    ["MENLO Security (add blocked sites)","https://safe.menlosecurity.com/"],["ALRS Desktop App","https://alrsweb.com/Identity/Account/Login"],
+    ["Lodging Help Request/Ticket","https://play.apps.appsplatform.us/play/e/default-8331b18d-2d87-48ef-a35f-ac8818ebf9b4/a/19d20c65-74fe-406c-b56c-4b98826a8d9c?tenantId=8331b18d-2d87-48ef-a35f-ac8818ebf9b4&source=sharebutton&sourcetime=1696268481812"],["My Learning (ADLS) ②","https://usaf.percipio.com/"]]]
+];
+const ARROW = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>';
+
+const stack = document.getElementById("stack");
+const cards = [];
+
+SECTIONS.forEach(([title, links], i) => {
+  const [icon, ...rest] = title.split(" ");
+  const name = rest.join(" ");
+  const id = "s" + i;
+
+  const card = document.createElement("section");
+  card.className = "card"; card.id = id;
+
+  const head = document.createElement("div"); head.className = "card-h";
+  const ico = document.createElement("div"); ico.className = "ico"; ico.textContent = icon;
+  const h2 = document.createElement("h2"); h2.textContent = name;
+  const count = document.createElement("span"); count.className = "count"; count.textContent = links.length;
+  head.append(ico, h2, count);
+
+  const tiles = document.createElement("div"); tiles.className = "tiles";
+  links.forEach(([label, href]) => {
+    const a = document.createElement("a"); a.className = "tile"; a.href = href;
+    if (href !== "#") { a.target = "_blank"; a.rel = "noopener"; }
+    const t = document.createElement("span"); t.textContent = label;
+    a.appendChild(t); a.insertAdjacentHTML("beforeend", ARROW);
+    tiles.appendChild(a);
+  });
+
+  card.append(head, tiles); stack.appendChild(card);
+  cards.push({ card, count, total: links.length });
+
+});
+
+/* 349th UTA weekends (FY2027) */
+const UTA = [
+  { month:"October",   primary:["2026-10-03","2026-10-04"] },
+  { month:"November",  primary:["2026-11-07","2026-11-08"] },
+  { month:"December",  primary:["2026-12-05","2026-12-06"] },
+  { month:"January",   primary:["2027-01-09","2027-01-10"] },
+  { month:"February",  primary:["2027-02-06","2027-02-07"] },
+  { month:"March",     primary:["2027-03-06","2027-03-07"] },
+  { month:"April",     primary:["2027-04-10","2027-04-11"] },
+  { month:"May",       primary:["2027-05-15","2027-05-16"] },
+  { month:"June",      primary:["2027-06-05","2027-06-06"] },
+  { month:"July",      primary:["2027-07-10","2027-07-11"] },
+  { month:"August",    primary:["2027-08-07","2027-08-08"] },
+  { month:"September", primary:["2027-09-11","2027-09-12"] }
+];
+
+function dayAt(iso){ return new Date(iso + "T12:00:00"); }
+function range(a, b){
+  const da = dayAt(a), db = dayAt(b);
+  return da.toLocaleDateString("en-US",{month:"short",day:"numeric"}) + "\u2013" +
+         db.toLocaleDateString("en-US",{day:"numeric"});
+}
+function gcal(title, start, end){
+  return "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + encodeURIComponent(title) +
+         "&dates=" + ymd(start, 0) + "/" + ymd(end, 1) +      // end date is exclusive
+         "&details=349th+AMW+UTA+Weekend&location=Travis+AFB,+CA";
+}
+
+const uta = document.createElement("section");
+uta.className = "card"; uta.id = "uta";
+uta.innerHTML =
+  '<button type="button" class="card-h uta-toggle" aria-expanded="false" aria-controls="uta-panel">' +
+  '<span class="ico">\uD83D\uDCC5</span><h2>349th UTA Weekends 2026-2027</h2>' +
+  '<span class="hint" id="uta-hint"></span>' +
+  '<span class="tip" id="uta-tip">Click to expand</span>' +
+  '<span class="chev" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></button>' +
+  '<div class="uta-wrap" id="uta-panel" hidden><table class="uta"><thead><tr>' +
+  '<th>Month</th><th>UTA date</th><th>Add to calendar</th></tr></thead><tbody></tbody></table>' +
+  '<div class="uta-foot"><a class="addcal" id="ics-link" download="312as-uta-2026-2027.ics" href="#">Download all UTA dates (.ics)</a>' +
+  '<span class="uta-help">Google Calendar: on a computer, open Settings \u2192 Import &amp; export \u2192 Import, then pick this file.</span></div></div>';
+
+const today = new Date();
+let nextSet = false;
+const utaBody = uta.querySelector("tbody");
+UTA.forEach(u => {
+  const tr = document.createElement("tr");
+  const isPast = dayAt(u.primary[1]) < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  if (isPast) tr.className = "past";
+  else if (!nextSet) { tr.className = "next"; nextSet = true; }
+
+  const year = u.primary[0].slice(0,4);
+  const c1 = document.createElement("td"); c1.className = "m"; c1.textContent = u.month + " " + year;
+  if (tr.className === "next") {
+    uta.querySelector("#uta-hint").textContent = "Next: " + range(u.primary[0], u.primary[1]);
+    const b = document.createElement("span"); b.className = "badge"; b.textContent = "Next"; c1.appendChild(b);
+  }
+  const c2 = document.createElement("td"); c2.textContent = range(u.primary[0], u.primary[1]);
+  const c3 = document.createElement("td");
+  if (!isPast) {                         // only the weekends still ahead get a link
+    const a = document.createElement("a");
+    a.className = "addcal"; a.target = "_blank"; a.rel = "noopener";
+    a.textContent = "Add to Google Calendar";
+    a.href = gcal("349 AMW UTA \u2013 " + u.month, u.primary[0], u.primary[1]);
+    c3.appendChild(a);
+  }
+  tr.append(c1, c2, c3); utaBody.appendChild(tr);
+});
+stack.appendChild(uta);
+
+/* one .ics file with every UTA weekend (imports into Google Calendar, Apple Calendar, Outlook) */
+function ymd(iso, plus){
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d + plus)).toISOString().slice(0, 10).replace(/-/g, "");
+}
+function buildICS(){
+  const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+Z$/, "Z");
+  const L = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//312AS//UTA Weekends//EN", "CALSCALE:GREGORIAN",
+             "X-WR-CALNAME:349th UTA Weekends 2026-2027"];
+  UTA.forEach(u => {
+    L.push("BEGIN:VEVENT",
+      "UID:uta-" + ymd(u.primary[0], 0) + "@312as.org",
+      "DTSTAMP:" + stamp,
+      "DTSTART;VALUE=DATE:" + ymd(u.primary[0], 0),
+      "DTEND;VALUE=DATE:" + ymd(u.primary[1], 1),        // end date is exclusive
+      "SUMMARY:349 AMW UTA \u2013 " + u.month,
+      "LOCATION:Travis AFB\\, CA",
+      "DESCRIPTION:349th AMW UTA weekend",
+      "END:VEVENT");
+  });
+  L.push("END:VCALENDAR");
+  return L.join("\r\n") + "\r\n";
+}
+uta.querySelector("#ics-link").href =
+  URL.createObjectURL(new Blob([buildICS()], { type: "text/calendar;charset=utf-8" }));
+
+/* Morale (expandable, at the very bottom) */
+const MORALE = [
+  ["KSUU Runway Wind", "KSUU_Wind/"],
+  ["Pilot Game",       "Pilot_game/"],
+  ["FE Game",          "FE_Game/"],
+  ["LM Game",          "LM_Game/"],
+  ["C-5 Plane Spotters", "C5_Tracker/"],
+  ["312th Airlift ACARS", null]   /* TBD: link removed until ready */
+];
+const morale = document.createElement("section");
+morale.className = "card"; morale.id = "morale";
+morale.innerHTML =
+  '<button type="button" class="card-h uta-toggle" aria-expanded="false" aria-controls="morale-panel">' +
+  '<span class="ico">\uD83C\uDF89</span><h2>Morale</h2><span class="hint"></span>' +
+  '<span class="tip">Click to expand</span>' +
+  '<span class="chev" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></button>' +
+  '<div id="morale-panel" hidden><div class="tiles"></div></div>';
+const moraleTiles = morale.querySelector(".tiles");
+MORALE.forEach(([label, href]) => {
+  const t = document.createElement("span"); t.textContent = label;
+  if (!href) {                       /* no link yet: plain tile with a TBD note */
+    const d = document.createElement("div"); d.className = "tile tbd";
+    const n = document.createElement("span"); n.className = "tbd-note"; n.textContent = "TBD";
+    d.appendChild(t); d.appendChild(n);
+    moraleTiles.appendChild(d);
+    return;
+  }
+  const a = document.createElement("a"); a.className = "tile"; a.href = href;
+  a.target = "_blank"; a.rel = "noopener";
+  a.appendChild(t); a.insertAdjacentHTML("beforeend", ARROW);
+  moraleTiles.appendChild(a);
+});
+stack.appendChild(morale);
+
+/* shared expand / collapse for the UTA and Morale cards */
+function wireExpander(card){
+  const btn = card.querySelector(".uta-toggle"), panel = btn.nextElementSibling, tip = card.querySelector(".tip");
+  btn.addEventListener("click", () => {
+    const open = btn.getAttribute("aria-expanded") === "true";
+    btn.setAttribute("aria-expanded", String(!open));
+    tip.textContent = open ? "Click to expand" : "Click to collapse";
+    panel.hidden = open;
+  });
+}
+wireExpander(uta); wireExpander(morale);
+
+
+/* Idle soldiers: after 15 s with no mouse movement, two soldiers walk in next to the cursor, then a skit plays */
+(function(){
+  const IDLE_MS = 2000 /* TESTING: set back to 15000 for the real page */, W = 64, H = 112, WALK = 330, RUN = 380, GAP = 58;
+  const SCRIPTS = [
+    ["Oorah, sir. Ready the fuck to serve.", "Semper fucking Fi, brother. Hell of a day.", "Improvise, adapt, overcome. We’ve done it all, shitbird.", "Semper Gumby — flexible as fuck.", "Marines don’t get lost. We get “tactically relocated,” goddammit."],
+    ["Oorah, sir. Ready the fuck to serve.", "Four engines, 28 wheels, room for a whole damn platoon.", "Airmen get us there. Marines get shit done.", "Marines eat crayons. Airmen eat catered lunch. Fuck, that’s a good deal.", "Semper Fi to the flyboys, those lucky bastards."],
+    ["Oorah, sir. Ready the fuck to serve.", "Devil Dog, you hear that goddamn C-5 spooling up?", "Biggest fucking taxi we ever called.", "Did you know the Galaxy can kneel? Show-off son of a bitch.", "Marines just crawl, dammit. Fuck."],
+    ["Oorah, sir. Ready the fuck to serve.", "Once a Marine, always a Marine, goddammit.", "Gung ho as fuck, sir.", "Pain is just weakness leaving the body. Fuck yeah.", "Hard fucking chargers, brother."]
+  ];
+  const tpl = document.getElementById("sol-tpl"), scene = document.getElementById("scene"), rocks = document.getElementById("rocks"), talk = document.getElementById("talk");
+  const READ = t => 500 + 50 * t.length;                 // how long a line stays up so it can be read
+  function mkBub(el){ const o = el.querySelector(".bub"); if (o) o.remove(); const b = document.createElement("div"); b.className = "bub"; talk.appendChild(b); return b; }
+  function mkSol(id){
+    const el = tpl.content.firstElementChild.cloneNode(true); el.classList.add(id); document.body.appendChild(el);
+    const gc = document.createElement("canvas"); gc.className = "gore"; gc.width = 64; gc.height = 112; gc.style.width = "64px"; gc.style.height = "112px"; el.appendChild(gc);
+    return { id, el, gc: gc.getContext("2d"), bub: mkBub(el), x: 0, y: 0, tx: 0, dir: 1, state: "away", flip: false, cb: null };
+  }
+  const A = mkSol("a"), B = mkSol("b"), S = [A, B];
+  /* permanent marks (bullet holes, blood pools, splatter) live on a canvas: no DOM growth, no lag */
+  const cv = document.getElementById("decals"), dctx = cv.getContext("2d");
+  function sizeCv(){ const d = Math.min(devicePixelRatio || 1, 2); cv.width = Math.round(innerWidth * d); cv.height = Math.round(innerHeight * d); dctx.setTransform(d, 0, 0, d, 0, 0); }
+  sizeCv(); addEventListener("resize", sizeCv);
+  const clearDecals = () => dctx.clearRect(0, 0, innerWidth, innerHeight);
+  function decalHole(x, y){ dctx.fillStyle = "rgba(110,92,62,.45)"; dctx.beginPath(); dctx.ellipse(x, y, 7, 3.4, 0, 0, 6.283); dctx.fill();
+    dctx.fillStyle = "#2a2014"; dctx.beginPath(); dctx.ellipse(x, y, 4.6, 2.2, 0, 0, 6.283); dctx.fill(); }
+  const RR = (a, b) => a + Math.random() * (b - a);
+  function blot(x, y, r){ if (nearMarine(x, y)) return; const g = dctx.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, "rgba(124,13,13,.95)"); g.addColorStop(.65, "rgba(96,10,10,.85)"); g.addColorStop(1, "rgba(70,8,8,0)");
+    dctx.fillStyle = g; dctx.beginPath(); dctx.arc(x, y, r, 0, 6.283); dctx.fill(); }
+  let rockG = null, sil = null;
+  { const sv = tpl.content.querySelector("svg").cloneNode(true);                 // the Marine's outline, so blood only sticks to his body
+    const sh = sv.querySelector("ellipse"); if (sh) sh.remove(); sv.querySelectorAll(".radio-g").forEach(e => e.remove());
+    sv.setAttribute("width", "64"); sv.setAttribute("height", "112");
+    const im = new Image(); im.onload = () => { sil = im; }; im.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(new XMLSerializer().serializeToString(sv)); }
+  const nearMarine = (x, y) => S.some(m => m.state !== "away" && x > m.x - 14 && x < m.x + 78 && y > m.y - 14 && y < m.y + 96);   // above the boots: no stray blood in the air around them
+  function goreOn(ctx, ox, oy, w, h, x, y, k, reg){       // blood thrown from (x,y) lands on an object (Marine / rock), in its own coordinates
+    const cx = ox + w / 2, cy = oy + h / 2, d = Math.hypot(x - cx, y - cy), maxd = 470; if (d > maxd) return 0;
+    const f = 1 - d / maxd; let n = k * f * f * 14; n = Math.floor(n) + (Math.random() < n % 1 ? 1 : 0); n = Math.min(n, 22); if (n <= 0) return 0;
+    const ang = Math.atan2(y - cy, x - cx);
+    for (let i = 0; i < n; i++) {
+      const lx = Math.min(Math.max(w / 2 + Math.cos(ang) * w * .22 + RR(-w * .34, w * .34), reg[0]), reg[1]), ly = Math.min(Math.max(h / 2 + Math.sin(ang) * h * .18 + RR(-h * .4, h * .4), reg[2]), reg[3]);
+      const r = RR(1.2, 3.8) * (.7 + Math.min(k, 3) * .25);
+      const g = ctx.createRadialGradient(lx, ly, 0, lx, ly, r); g.addColorStop(0, "rgba(130,12,12,.95)"); g.addColorStop(.7, "rgba(100,10,10,.85)"); g.addColorStop(1, "rgba(70,8,8,0)");
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(lx, ly, r, 0, 6.283); ctx.fill();
+      if (Math.random() < .35) { ctx.strokeStyle = "rgba(105,10,10,.85)"; ctx.lineWidth = RR(.9, 1.8); ctx.lineCap = "round"; ctx.beginPath(); ctx.moveTo(lx, ly); ctx.lineTo(lx + RR(-1, 1), ly + RR(5, 15) * (.6 + k * .2)); ctx.stroke(); }  // a drip
+    }
+    if (reg.sil && sil) { ctx.globalCompositeOperation = "destination-in"; ctx.drawImage(sil, 0, 0, 64, 112); ctx.globalCompositeOperation = "source-over"; }   // keep only what is on his body
+    return n;
+  }
+  function splash(x, y, k){
+    S.forEach(s => {
+      if (s.state === "away") return;
+      const n = goreOn(s.gc, s.x, s.y, 64, 112, x, y, k, { 0: 16, 1: 46, 2: 12, 3: 102, sil: true });
+      if (n > 0 && Math.random() < .55) decalSplat(s.x + 32 + RR(-14, 14), s.y + 104 + RR(-3, 2), RR(6, 14), RR(3, 6));   // and a little pooling at his boots
+    });
+    if (rockG) goreOn(rockG.ctx, rockG.x, rockG.y, 150, 60, x, y, k, { 0: 6, 1: 144, 2: 8, 3: 56 });
+  }
+  const dmgSet = new Set();
+  let cardsFell = 0;
+  function restoreDamage(){ cardsFell = 0; dmgSet.forEach(el => { if (el.__anim) { el.__anim.cancel(); el.__anim = null; } el.__fell = false; if (el.__sv === null) el.removeAttribute("style"); else el.setAttribute("style", el.__sv); el.__lv = 0; }); dmgSet.clear(); }
+  function scorch(x, y, r){ const g = dctx.createRadialGradient(x, y, r * .1, x, y, r); g.addColorStop(0, "rgba(16,11,7,.6)"); g.addColorStop(.6, "rgba(30,20,12,.3)"); g.addColorStop(1, "rgba(30,20,12,0)");
+    dctx.fillStyle = g; dctx.beginPath(); dctx.ellipse(x, y, r, r * .75, 0, 0, 6.283); dctx.fill(); }
+  function hang(el, b, opts){                                // a row/box works loose, sways on one corner, then drops off the page
+    if (!dmgSet.has(el)) { el.__sv = el.getAttribute("style"); dmgSet.add(el); }
+    el.__fell = true; el.__lv = 9; const left = Math.random() < .5, sg = left ? 1 : -1;
+    el.style.position = "relative"; el.style.zIndex = String(opts.z); el.style.transformOrigin = left ? "0% 0%" : "100% 0%";
+    const fall = Math.max(420, innerHeight - b.top + 160), dx = RR(-70, 70), rot = sg * RR(35, 75);
+    el.__anim = el.animate([
+      { transform: "rotate(0deg)", easing: "ease-in-out" },
+      { transform: "rotate(" + sg * opts.a * .7 + "deg)", offset: .14, easing: "ease-in-out" },
+      { transform: "rotate(" + -sg * opts.a * .5 + "deg)", offset: .3, easing: "ease-in-out" },
+      { transform: "rotate(" + sg * opts.a + "deg)", offset: .46, easing: "ease-in-out" },
+      { transform: "translate(" + Math.round(dx * .08) + "px,4px) rotate(" + sg * opts.a * 1.3 + "deg)", offset: .56, easing: "ease-in" },
+      { transform: "translate(" + Math.round(dx) + "px," + Math.round(fall) + "px) rotate(" + Math.round(rot) + "deg)" }
+    ], { duration: opts.dur + RR(0, 500), delay: opts.delay, fill: "forwards" });
+  }
+  function damage(x, y, r){                                // explosions blow the page's words and buttons apart (restored when the show ends)
+    let debris = 0;
+    document.querySelectorAll("a,button,h1,h2,h3,.card-h,p,label,input,select").forEach(el => {
+      if (el.closest("#scene,#rocks,.sol,#decals")) return;
+      const b = el.getBoundingClientRect(); if (b.width < 4 || b.height < 4) return;
+      const ddx = Math.max(b.left - x, 0, x - b.right), ddy = Math.max(b.top - y, 0, y - b.bottom), d = Math.hypot(ddx, ddy); if (d >= r) return;
+      const f = 1 - d / r, lvl = f > .5 ? 3 : f > .22 ? 2 : 1;
+      if (el.__fell) return;
+      if (f > .3 && el.matches(".card a.tile") && (f > .55 || Math.random() < .55)) { hang(el, b, { z: 60, a: 8, dur: 2100, delay: RR(0, 450) * (1.3 - f) }); return; }      // cells come loose, sway, fall
+      if ((el.__lv || 0) >= lvl) return;
+      if (!dmgSet.has(el)) { el.__sv = el.getAttribute("style"); dmgSet.add(el); }
+      el.__lv = lvl;
+      const ang = Math.atan2(b.top + b.height / 2 - y, b.left + b.width / 2 - x), base = el.__sv || "", inl = getComputedStyle(el).display === "inline" ? "display:inline-block;" : "";
+      let st;
+      if (lvl === 3) {
+        const dist = RR(60, 240) * (.5 + f);
+        st = inl + "transition:transform .45s cubic-bezier(.1,.7,.3,1),opacity .6s;transform:translate(" + Math.round(Math.cos(ang) * dist) + "px," + Math.round(Math.sin(ang) * dist - RR(10, 60)) + "px) rotate(" + Math.round(RR(-220, 220)) + "deg) scale(" + RR(.5, 1).toFixed(2) + ");opacity:" + (Math.random() < .6 ? 0 : RR(.1, .4).toFixed(2)) + ";filter:brightness(.2);";
+        const t = (el.textContent || "").trim().slice(0, 5);
+        if (t && debris < 40 && b.width < 520) {
+          debris++; const g = document.createElement("div"); g.className = "gib"; g.textContent = t;
+          g.style.left = Math.round(b.left + b.width / 2) + "px"; g.style.top = Math.round(b.top + b.height / 2) + "px"; g.style.font = "700 12px monospace"; g.style.color = "#2a2014";
+          g.style.setProperty("--dx", Math.round(Math.cos(ang) * RR(40, 200)) + "px"); g.style.setProperty("--up", -Math.round(RR(40, 130)) + "px"); g.style.setProperty("--fall", Math.round(RR(10, 40)) + "px"); g.style.setProperty("--rot", Math.round(RR(-500, 500)) + "deg");
+          scene.appendChild(g); later(() => g.remove(), 6000);
+        }
+      } else if (lvl === 2) st = inl + "transition:transform .35s ease-out,filter .3s;transform:translate(" + Math.round(RR(-8, 8)) + "px," + Math.round(RR(-3, 10)) + "px) rotate(" + Math.round(RR(-9, 9)) + "deg);filter:brightness(.28) sepia(.5);";
+      else st = "transition:filter .3s;filter:brightness(.6) sepia(.3);";
+      el.setAttribute("style", base + (base && !base.trim().endsWith(";") ? ";" : "") + st);
+    });
+    if (r >= 200) document.querySelectorAll(".card").forEach(cd => {              // a few whole boxes tear loose too
+      if (cardsFell >= 2 || cd.__fell) return;
+      const b = cd.getBoundingClientRect(); if (b.bottom < 0 || b.top > innerHeight) return;
+      const d = Math.hypot(Math.max(b.left - x, 0, x - b.right), Math.max(b.top - y, 0, y - b.bottom));
+      if (d < r * .55 && Math.random() < .5) { cardsFell++; hang(cd, b, { z: 80, a: 5, dur: 3000, delay: RR(500, 1200) }); }
+    });
+  }
+  function decalSplat(x, y, w, h){ const r = (w + h) / 4 + 1; blot(x, y, r); if (Math.random() < .6) { const a = RR(0, 6.283), d = r * RR(1.2, 2.4); blot(x + Math.cos(a) * d, y + Math.sin(a) * d * .85, r * .35 + .6); } }
+  function decalSpray(x, y, rmax, n, ns = 7){                    // droplets thrown in every direction, radial streaks, no sideways smear
+    dctx.fillStyle = "rgba(100,10,10,.9)"; dctx.strokeStyle = "rgba(96,10,10,.85)"; dctx.lineCap = "round";
+    for (let i = 0; i < n; i++) { const a = RR(0, 6.283), d = rmax * Math.pow(Math.random(), .6), r = RR(.8, 3.6);
+      if (nearMarine(x + Math.cos(a) * d, y + Math.sin(a) * d * .85)) continue;
+      dctx.beginPath(); dctx.arc(x + Math.cos(a) * d, y + Math.sin(a) * d * .85, r, 0, 6.283); dctx.fill(); }
+    for (let i = 0; i < ns; i++) { const a = RR(0, 6.283), l = RR(14, rmax * .8), w = RR(1.6, 3.8), x1 = x + Math.cos(a) * l, y1 = y + Math.sin(a) * l * .85;
+      dctx.lineWidth = w; dctx.beginPath(); dctx.moveTo(x + Math.cos(a) * 6, y + Math.sin(a) * 6 * .85); dctx.lineTo(x1, y1); dctx.stroke();
+      dctx.beginPath(); dctx.arc(x1, y1, w * .9, 0, 6.283); dctx.fill(); } }
+  function decalCrater(x, y, r){
+    let g = dctx.createRadialGradient(x, y, r * .3, x, y, r * 1.9); g.addColorStop(0, "rgba(18,12,8,.85)"); g.addColorStop(.6, "rgba(40,28,18,.45)"); g.addColorStop(1, "rgba(40,28,18,0)");
+    dctx.fillStyle = g; dctx.beginPath(); dctx.ellipse(x, y, r * 1.9, r * 1.25, 0, 0, 6.283); dctx.fill();
+    dctx.fillStyle = "#b39a6b"; dctx.beginPath(); dctx.ellipse(x, y, r * 1.12, r * .74, 0, 0, 6.283); dctx.fill();            // raised rim
+    g = dctx.createRadialGradient(x, y + r * .08, 0, x, y + r * .08, r); g.addColorStop(0, "#150e08"); g.addColorStop(.7, "#2c1e12"); g.addColorStop(1, "#4a3620");
+    dctx.fillStyle = g; dctx.beginPath(); dctx.ellipse(x, y + r * .05, r, r * .64, 0, 0, 6.283); dctx.fill();
+    dctx.fillStyle = "rgba(60,44,26,.8)"; for (let i = 0; i < 34; i++) { const a = RR(0, 6.283), d = r * RR(1.15, 2.1); dctx.beginPath(); dctx.arc(x + Math.cos(a) * d, y + Math.sin(a) * d * .7, RR(1, 3.4), 0, 6.283); dctx.fill(); }
+  }
+  function decalPool(x, y, r){ blot(x, y, r); for (let i = 0; i < 7; i++) { const a = RR(0, 6.283), d = r * RR(.4, 1.1); blot(x + Math.cos(a) * d, y + Math.sin(a) * d * .85, r * RR(.3, .6)); } }
+  let L = null, mx = innerWidth / 2, my = innerHeight / 2, inside = false, token = 0, idleT = null, last = 0, raf = 0, timers = [];
+
+  const later = (fn, ms) => timers.push(setTimeout(fn, ms));
+  function cancelShow(){ document.querySelectorAll(".moabbomb,.mflash").forEach(e => e.remove()); token++; timers.forEach(clearTimeout); timers = []; scene.textContent = ""; rocks.textContent = ""; [...talk.children].forEach(e => { if (!e.classList.contains("bub")) e.remove(); }); rockG = null; restoreDamage(); clearDecals(); S.forEach(s => { s.gc.clearRect(0, 0, 64, 112); s.cb = null; s.noCrouch = false; s.bub.classList.remove("on"); }); }
+  function setC(s, c){ s.el.className = "sol " + s.id + (s.flip ? " flip" : "") + " " + c; }
+  function face(s, d){ s.flip = d < 0; s.el.classList.toggle("flip", s.flip); }
+  function clipBox(s){                                    // hide the part of a Marine that is still "behind" his box
+    const b = s.box; if (!b) { if (s.el.style.clipPath) s.el.style.clipPath = ""; return; }
+    if (s.x > b.right || s.x + W < b.left) { s.box = null; s.el.style.clipPath = ""; return; }
+    const l = Math.round(b.left - s.x), t = Math.round(b.top - s.y), r = Math.round(b.right - s.x), bt = Math.round(b.bottom - s.y);
+    s.el.style.clipPath = 'path(evenodd,"M-600 -600H900V900H-600Z M' + l + " " + t + "H" + r + "V" + bt + "H" + l + 'Z")';
+  }
+  function place(s){ s.el.style.transform = "translate(" + Math.round(s.x) + "px," + Math.round(s.y) + "px)"; placeBub(s); }
+  function placeBub(s){                                   // the Marines' bubbles live in the top layer and follow them
+    if (!s.bub.classList.contains("on")) return;
+    const w = s.bw || 100, cx = Math.min(Math.max(s.x + W / 2, 6 + w / 2), innerWidth - 6 - w / 2);
+    const y = s.below ? s.y + H + 6 : s.y - 6 + (s.el.classList.contains("crouch") ? 38 : 0);
+    s.bub.style.transform = "translate(" + Math.round(cx) + "px," + Math.round(y) + "px) translate(-50%," + (s.below ? "0" : "-100%") + ")";
+  }
+  function all(fn){ S.forEach(fn); }
+  function say(s, t){
+    all(o => { o.el.classList.remove("talk"); o.bub.classList.remove("on"); });
+    s.below = s.y < 80; s.bub.textContent = t; s.bub.classList.add("on");
+    s.bw = s.bub.offsetWidth; placeBub(s);
+  }
+  function arm(){ clearTimeout(idleT); if (inside) idleT = setTimeout(summon, IDLE_MS); }
+
+  function summon(){
+    if (!inside || A.state !== "away" || B.state !== "away") return;
+    document.documentElement.classList.add("nocur");          // hide the mouse while the show runs
+    const mxx = Math.min(Math.max(mx, 0), innerWidth), myy = Math.min(Math.max(my, 0), innerHeight);
+    const away = mxx < 110 ? 1 : -1;                         // B stands on the far side of A from the cursor
+    A.tx = away > 0 ? mxx + 14 - W/2 : mxx - 14 - W/2;   // run all the way to the cursor
+    B.tx = A.tx + away * GAP;
+    const lo = Math.min(A.tx, B.tx), hi = Math.max(A.tx, B.tx);
+    const sh = lo < 4 ? 4 - lo : (hi > innerWidth - W - 4 ? innerWidth - W - 4 - hi : 0);
+    A.tx += sh; B.tx += sh;
+    const y0 = Math.min(Math.max(myy + 34 - H, 6), innerHeight - H - 6);
+    const fromLeft = (A.tx + B.tx) / 2 + W / 2 < innerWidth / 2, dir = fromLeft ? 1 : -1;
+    const base = fromLeft ? -W - 10 : innerWidth + 10;
+    const lead = (A.tx * dir >= B.tx * dir) ? A : B, trail = lead === A ? B : A;
+    lead.x = base; trail.x = base - dir * GAP * 1.3;
+    // each Marine walks out from behind a different box on the page (random each time); no usable box -> walks in from off-screen
+    const boxes = [...document.querySelectorAll(".card")].map(e => e.getBoundingClientRect())
+      .filter(r => r.width > 140 && r.top < y0 + 20 && r.bottom > y0 + H && r.left > -5 && r.right < innerWidth + 5 &&
+                   !(lo - 20 < r.right && hi + W + 20 > r.left));          // never the box the cursor is over
+    for (let i = boxes.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [boxes[i], boxes[j]] = [boxes[j], boxes[i]]; }
+    all(s => { delete s.el.dataset.zyn; s.y = y0; s.box = null; s.el.style.clipPath = ""; });
+    [A, B].forEach((s, k) => {
+      const bx = boxes[k];
+      if (!bx) return;
+      s.box = bx; const d = (s.tx > bx.left + bx.width / 2) ? 1 : -1;
+      s.x = d > 0 ? bx.right - W - 6 - Math.random() * bx.width * .45 : bx.left + 6 + Math.random() * bx.width * .45;
+      s.dir = d;
+    });
+    all(s => { if (!s.box) s.dir = dir; face(s, s.dir); s.state = "in"; s.el.style.display = "block"; setC(s, "walk run"); place(s); clipBox(s); });
+    last = performance.now(); cancelAnimationFrame(raf); raf = requestAnimationFrame(tick);
+  }
+
+  function onArrive(){
+    const sc = SCRIPTS[Math.floor(Math.random() * SCRIPTS.length)];
+    { // the rock is there from the start, off to the side the creatures will come from
+      const pc0 = (A.x + B.x) / 2 + W / 2, side0 = pc0 > innerWidth / 2 ? -1 : 1;
+      const rx0 = Math.min(Math.max(pc0 + side0 * 150, 85), innerWidth - 85);
+      L = { pc: pc0, side: side0, rx: rx0, ground: A.y + 108 }; makeRock(rx0, L.ground);
+    }
+    later(() => all(s => s.el.classList.add("salute")), 250);
+    let tb = 900;
+    later(() => say(A, sc[0]), tb); tb += READ(sc[0]);
+    later(() => { face(A, B.x > A.x ? 1 : -1); face(B, A.x > B.x ? 1 : -1); all(s => s.el.classList.remove("salute")); say(B, sc[1]); }, tb); tb += READ(sc[1]);
+    later(() => say(A, sc[2]), tb); tb += READ(sc[2]);
+    later(() => say(B, sc[3]), tb); tb += READ(sc[3]);
+    later(() => say(A, sc[4]), tb); tb += READ(sc[4]);
+    later(skit, tb + 200);                                // then the skit starts
+  }
+
+  const SIDE = {x:0};
+  function crSVG(robe, trim, wrap){
+    return '<svg viewBox="0 0 30 36" width="30" height="36"><path d="M3 36L6.5 15Q15 5 23.5 15L27 36Z" fill="'+robe+'"/>' +
+      '<path d="M3 36L4.2 31H25.8L27 36Z" fill="'+trim+'"/><path class="hd" d="M6.5 15Q15 5 23.5 15L22 21Q15 24 8 21Z" fill="'+wrap+'"/>' +
+      '<path class="st" d="M10 19Q15 14 20 19L20 23H10Z" fill="#a01212"/><ellipse class="st" cx="15" cy="18.5" rx="4" ry="1.8" fill="#d23a2a"/>' +
+      '<ellipse class="hd" cx="16" cy="15.5" rx="6.2" ry="5.2" fill="#17100a"/>' +
+      '<circle class="hd" cx="14" cy="15" r="2.1" fill="#ffcf4a" opacity=".35"/><circle class="hd" cx="19" cy="15" r="2.1" fill="#ffcf4a" opacity=".35"/>' +
+      '<circle class="hd" cx="14" cy="15" r="1.2" fill="#ffe27a"/><circle class="hd" cx="19" cy="15" r="1.2" fill="#ffe27a"/>' +
+      '<path d="M8 24L22 28" stroke="#3a2b1a" stroke-width="2.2"/><rect x="21" y="24" width="7" height="3" rx="1.2" fill="'+wrap+'" transform="rotate(20 24 25)"/></svg>';
+  }
+  const ROBES = [["#a9824f","#7a5a33","#d8c08c"],["#b86b3c","#7e4524","#e0b27a"],["#8f8a5a","#625e38","#d6cc98"],["#c09a63","#8c6a3a","#ece0b4"]];
+  function mkCreature(i){
+    const c = document.createElement("div"); c.className = "cr";
+    const r = ROBES[i % ROBES.length];
+    c._robe = r; c.innerHTML = '<div class="cf"><div class="ff">' + crSVG(r[0], r[1], r[2]) + '</div></div>';
+    return c;
+  }
+  function moveTo(node, px, py, secs){
+    node.style.transition = "transform " + secs + "s linear";
+    node.style.transform = "translate(" + Math.round(px) + "px," + Math.round(py) + "px)";
+  }
+  function startAt(node, px, py){ node.style.transition = "none"; node.style.transform = "translate(" + Math.round(px) + "px," + Math.round(py) + "px)"; void node.offsetWidth; }
+
+
+  function makeRock(pc, ground){
+    const r = document.createElement("div"); r.className = "rock";
+    r.style.transform = "translate(" + Math.round(pc - 75) + "px," + Math.round(ground + 4 - 60) + "px)";
+    r.innerHTML = '<svg viewBox="0 0 150 60"><ellipse cx="75" cy="58" rx="74" ry="4" fill="#000" opacity=".2"/>' +
+      '<path d="M2 58Q6 30 30 20Q50 4 82 6Q114 4 132 22Q150 34 148 58Z" fill="#8f8672" stroke="#5c5443" stroke-width="2"/>' +
+      '<path d="M30 20Q50 4 82 6Q114 4 132 22Q110 14 82 16Q52 14 30 20Z" fill="#b2a88f" opacity=".8"/>' +
+      '<path d="M90 16L100 32L94 46M52 24L60 38" stroke="#5c5443" stroke-width="1.6" fill="none" opacity=".7"/>' +
+      '<path d="M2 58Q6 40 20 32L24 58Z" fill="#6e6652" opacity=".55"/></svg>';
+    const gc = document.createElement("canvas"); gc.className = "gore"; gc.width = 150; gc.height = 60; gc.style.width = "150px"; gc.style.height = "60px"; r.appendChild(gc);
+    const gx = gc.getContext("2d"); gx.clip(new Path2D("M2 58Q6 30 30 20Q50 4 82 6Q114 4 132 22Q150 34 148 58Z"));
+    rockG = { ctx: gx, x: pc - 75, y: ground + 4 - 60 };
+    rocks.appendChild(r);
+  }
+
+  function speak(c, text, ms){                              // a creature's bubble lives in the top layer and follows him
+    const t = document.createElement("div"); t.className = "cbub"; t.textContent = text; talk.appendChild(t); c._bub = t;
+    const w = t.offsetWidth;
+    (function follow(){
+      if (!t.isConnected || !c.isConnected) { t.remove(); return; }
+      const r = c.getBoundingClientRect(), cx = Math.min(Math.max(r.left + r.width / 2, 6 + w / 2), innerWidth - 6 - w / 2);
+      t.style.transform = "translate(" + Math.round(cx) + "px," + Math.round(r.top - 5) + "px) translate(-50%,-100%)";
+      requestAnimationFrame(follow);
+    })();
+    later(() => t.remove(), ms);
+  }
+  function skit(){
+    if (A.state !== "here" || B.state !== "here") return;
+    const { pc, side, rx, ground } = L;
+    all(s => { face(s, side); s.el.classList.remove("salute"); });
+    const N = 85, crs = [], ctl = { spawn: true, moab: false };
+    const C = { x: rx, y: ground - 30 };
+    const Rmax = Math.min(rx - 40, innerWidth - rx - 40, C.y - 50, innerHeight - 70 - C.y);
+    const R = Math.max(135, Math.min(235, Rmax));           // the ring of monsters: a near-perfect circle
+    const angs = Array.from({ length: N }, (_, i) => (i + (Math.random() - .5) * 0.9) * 2 * Math.PI / N), w1 = Math.random() * 6.28, w2 = Math.random() * 6.28;
+    const wob = a => 1 + 0.12 * Math.sin(2 * a + w1) + 0.08 * Math.sin(3 * a + w2);
+    for (let i = N - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [angs[i], angs[j]] = [angs[j], angs[i]]; }
+    /* ---- the dialogue clock: every line stays up long enough to read ---- */
+    const SCR = [
+      ["single", B, "Single contact, sir. Little bastard’s just walking right up to us."],
+      ["hold", A, "Hold your fire. Let’s see what the fuck he wants."],
+      ["scout", null, "", 3500],
+      ["what", A, "What the fuck did he say?"],
+      ["idk", B, "Idk… something about fucking your mom."],
+      ["mad", A, "The fuck did you just say about my mom?!", 2900],
+      ["holy", B, "Holy shit, sir!"],
+      ["mom", A, "Nobody talks shit about my fucking mom."],
+      ["buddies", B, "Uh… sir? I think his buddies heard that."],
+      ["close", B, "Sir, they’re closing in. Permission to open fire?"],
+      ["neg", A, "Negative! Hold your fire, Marine. Not yet."],
+      ["holdon", B, "Hold on… got a little something for these assholes.", 4300],
+      ["creed", A, "Is that fucking Creed?!"],
+      ["near", B, "They’re getting really fucking close."],
+      ["sir", A, "Sir!?", 1300],
+      ["pillow", B, "Give me a sec, gotta throw in a lip pillow first."],
+      ["dots", B, "....", 1700],
+      ["do", B, "Let’s fucking do this."],
+      ["lead", A, "Eat lead, you ugly bastards!"]
+    ], TL = {};
+    { let t = 3700; SCR.forEach(([k, who, text, hold]) => { TL[k] = t; t += hold || READ(text); }); TL.fire = TL.lead; }
+    TL.stab = TL.mad + 1300;
+    const SPAWN = [0]; for (let i = 1; i < N; i++) SPAWN.push(TL.stab + 2300 + (i - 1) * 190);
+    const P = (ang, r) => ({ x: C.x + Math.cos(ang) * r - 15, y: C.y + Math.sin(ang) * r - 22 });
+
+    function spawn(i){                                     // the horde: around the full circle, walking in
+      if (!ctl.spawn) return;
+      const ang = (i < N ? angs[i] : Math.random() * 6.283) + (Math.random() - .5) * 0.12, rr = R * wob(ang) * (0.88 + Math.random() * 0.26), clampP = q => ({ x: Math.min(Math.max(q.x, 0), innerWidth - 30), y: Math.min(Math.max(q.y, -10), innerHeight - 60) });
+      const c = mkCreature(i); c._i = i; scene.appendChild(c); crs.push(c);
+      let t = R; while (true) { const q = P(ang, t); if (q.x < -60 || q.x > innerWidth + 30 || q.y < -70 || q.y > innerHeight + 30) break; t += 20; }
+      const st = P(ang, t), fin = clampP(P(ang, rr)), wd = i < N ? Math.max(8, (t - rr) / 28) : Math.max(5.5, (t - rr) / 42);
+      c._fx = fin.x; c._fy = fin.y;
+      c.querySelector(".ff").classList.toggle("flip", Math.cos(ang) >= 0);            // face the rock
+      c.classList.add("walk"); startAt(c, st.x, st.y);
+      moveTo(c, fin.x, fin.y, wd);
+      later(() => { if (c.classList.contains("walk")) { c.classList.remove("walk"); c.classList.add("chat"); } }, wd * 1000 + 100);
+    }
+    for (let i = 1; i < N; i++) later(() => spawn(i), SPAWN[i]);
+    let nxt = N;                                           // ...and they keep coming until the bombs start falling
+    later(function more(){ if (!ctl.spawn) return; spawn(nxt++); later(more, 330); }, SPAWN[N - 1] + 400);
+
+    /* ---- act 1: one little guy walks right up to the Marines ---- */
+    const mid = (A.x + B.x) / 2 + W / 2, away = -side, sx = Math.min(Math.max(mid + away * 190, 70), innerWidth - 70);
+    let scout = null;
+    later(() => {
+      const c = mkCreature(0); c._i = 0; scene.appendChild(c); crs.push(c); scout = c;
+      c.querySelector(".ff").classList.toggle("flip", away > 0);
+      c.classList.add("walk"); startAt(c, away > 0 ? innerWidth + 20 : -50, ground - 52);
+      moveTo(c, sx - 15, ground - 52, 5.0);
+      (function seen(){ const r = c.getBoundingClientRect(); if (r.right > 0 && r.left < innerWidth) say(A, "…what is that?"); else later(seen, 60); })();   // only once he is actually on screen
+      later(() => { if (c.classList.contains("walk")) { c.classList.remove("walk"); c.classList.add("chat"); } }, 5100);
+    }, 1800);
+    let ST = null;
+    later(() => { ST = strike(crs, N, ground, rx, side, C, R, ctl); }, 5000);
+    SCR.forEach(([k, who, text]) => { if (who) later(() => say(who, text), TL[k]); });
+    later(() => speak(scout, "Ootsa mi kanuk tiki-wa, mama-ka fuka!", 3300), TL.scout);
+    later(() => {                                          // A storms over to him
+      if (!scout) return;
+      const dir = (scout._cx || sx) > A.x + W / 2 ? 1 : -1;
+      A.tx = (scout._cx || sx) - dir * 58 - W / 2; A.dir = A.tx > A.x ? 1 : -1; face(A, A.dir);
+      A.noCrouch = true; A.state = "mv"; A.el.classList.remove("idle", "salute"); A.el.classList.add("walk", "run");
+      last = performance.now(); cancelAnimationFrame(raf); raf = requestAnimationFrame(tick);
+    }, TL.mad + 500);
+    later(() => { if (ST && scout) ST.stab(A, scout); }, TL.stab);          // knife: head comes off
+    [[1600, 2], [4200, 9], [6800, 17], [9200, 24]].forEach(([t, k]) => later(() => { if (crs[k] && !crs[k]._dead) speak(crs[k], "Kanuk! Mama-ka kanuk!", 2400); }, TL.stab + 2300 + t));
+
+    /* ---- the moment before the shooting: B pulls out a speaker and hits play ---- */
+    let spk = null;
+    const capSay = txt => { if (!spk) return; const cap = document.createElement("div"); cap.className = "cap"; cap.textContent = txt;
+      cap.style.left = Math.round(spk._x + 23) + "px"; cap.style.top = Math.round(spk._y - 62) + "px"; talk.appendChild(cap); later(() => cap.remove(), 6100); };
+    function walkTo(s, tx, cb){                            // a Marine jogs to a spot, then cb()
+      const tk = token;
+      s.tx = tx; s.dir = tx > s.x ? 1 : -1; face(s, s.dir); s.state = "mv"; s.el.classList.remove("idle", "salute"); s.el.classList.add("walk", "run");
+      s.cb = () => { if (tk === token && cb) cb(); };
+      last = performance.now(); cancelAnimationFrame(raf); raf = requestAnimationFrame(tick);
+    }
+    later(() => {                                          // B walks over to the rock, sets the speaker down in front of it, hits play, walks back
+      const bx0 = B.x; B.noCrouch = true;
+      walkTo(B, rx - side * 95 - W / 2, () => {
+        face(B, side);
+        const hx = B.x + W / 2 + side * 24, gx = rx - side * 48, gy = ground + 70;
+        spk = document.createElement("div"); spk.className = "spk";
+        spk.innerHTML = '<svg width="26" height="18" viewBox="0 0 26 18"><rect x="1" y="1" width="24" height="16" rx="4" fill="#23272b" stroke="#566069"/><circle cx="9" cy="9" r="5" fill="#101214" stroke="#6b737c"/><circle cx="9" cy="9" r="2" fill="#2e353b"/><circle cx="19" cy="6" r="1.6" fill="#8a949c"/><circle class="pb" cx="19" cy="12" r="1.8"/></svg>';
+        spk._x = gx - 23; spk._y = gy - 32; ctl.spk = spk;
+        startAt(spk, hx - 23, B.y + 56); rocks.appendChild(spk); void spk.offsetWidth;
+        spk.style.transition = "transform .45s cubic-bezier(.3,.7,.4,1)"; spk.style.transform = "translate(" + Math.round(spk._x) + "px," + Math.round(spk._y) + "px)";
+        later(() => {                                      // hit play: light on, sound coming out, caption
+          spk.classList.add("on"); capSay("Creed Music Plays");
+          const EM = ["\uD83D\uDD0A", "\uD83C\uDFB5", "\uD83C\uDFB6", "\uD83D\uDD0A", "\uD83C\uDFB6"];
+          (function emit(k){                               // notes keep floating up until the speaker is destroyed
+            if (!spk.isConnected) return;
+            const n = document.createElement("div"); n.className = "note"; n.textContent = EM[k % EM.length];
+            n.style.left = Math.round(spk._x + 12 + Math.random() * 20) + "px"; n.style.top = Math.round(spk._y - 10) + "px"; n.style.setProperty("--nx", Math.round((Math.random() - .3) * 50) + "px");
+            rocks.appendChild(n); later(() => n.remove(), 2400); later(() => emit(k + 1), 520);
+          })(0);
+        }, 950);
+        later(() => walkTo(B, bx0, () => face(B, side)), 2450);   // back to the other Marine
+      });
+    }, TL.holdon + 1000);
+    later(() => { if (spk) spk.classList.add("hi"); capSay("Creed Intensifies"); }, TL.dots + 1000);
+    later(() => { B.el.dataset.zyn = "1"; }, TL.pillow + 1500);      // white Zyn goes in
+    /* ---- act 2: the Marines fire long bursts at the closest monster, and each runs dry on his own ---- */
+    const onScreen = c => c._cx !== undefined && c._cx > 10 && c._cx < innerWidth - 10 && c._cy > 10 && c._cy < innerHeight - 10;
+    const targeted = new Set(), CYC = 13, SH = TL.fire - 22200;    // shooting starts after the whole "hold your fire" bit
+    const RELOAD = { a: 5, b: 6 }, GREN = { a: [2, 8], b: [3, 10] };
+    [A, B].forEach((m, j) => {
+      for (let i = 0; i < CYC; i++) later(() => {
+        if (!ST) return;
+        if (i === RELOAD[m.id]) { say(m, "Reloading!"); ST.reload(m); return; }                    // new clip
+        if (GREN[m.id].includes(i)) { if (ST.grenade(m)) { say(m, i % 2 ? "Frag out, motherfuckers!" : "Grenade! Get some!"); return; } }
+        const mx = m.x + W / 2, my = m.y + 56, pool = ST.alive().filter(c => onScreen(c) && !targeted.has(c)); if (!pool.length) return;
+        let c = pool[0], best = 1e9; pool.forEach(o => { const d = Math.hypot(o._cx - mx, o._cy - my); if (d < best) { best = d; c = o; } });
+        targeted.add(c);
+        const n = 6 + Math.floor(Math.random() * 3);        // 6-8 rounds into every one of them
+        for (let k = 0; k < n; k++) { later(() => ST.fire(m, c), k * 88); later(() => ST.hit(c), k * 88 + 110); }
+        later(() => { ST.kill(c); targeted.delete(c); }, n * 88 + 160);
+      }, 22200 + SH + i * 1000 + j * 330 + Math.round(Math.random() * 120));
+    });
+    later(() => say(B, "They’re fucking everywhere, sir. We’re surrounded!"), 32800 + SH);
+    later(() => say(A, "Click… fuck, I’m out!"), 36700 + SH);          // each runs dry independently, nearly together
+    later(() => say(B, "I’m out too, sir!"), 38600 + SH);
+    later(() => {                                          // both break for the rock
+      A.noCrouch = B.noCrouch = false;
+      const lo = A.x < B.x ? A : B, hi = lo === A ? B : A;
+      lo.tx = rx - W / 2 - 29; hi.tx = rx - W / 2 + 29;
+      all(s => { s.dir = s.tx > s.x ? 1 : -1; face(s, s.dir); s.state = "mv"; s.el.classList.remove("idle", "salute"); s.el.classList.add("walk", "run"); });
+      last = performance.now(); cancelAnimationFrame(raf); raf = requestAnimationFrame(tick);
+    }, 39600 + SH);
+    later(() => all(s => s.el.classList.remove("shake")), 40700 + SH);
+    later(() => say(A, "We need air support now, goddamn it!"), 41000 + SH);
+    later(() => { A.el.classList.add("radio"); say(A, "Danger close! We’re pinned down and dry! Requesting fucking air support!"); }, 43800 + SH);
+    later(() => say(B, "Hurry the fuck up, sir!"), 48400 + SH);
+    later(() => { if (B.bub.textContent === "Hurry the fuck up, sir!") B.bub.classList.remove("on"); }, 48400 + SH + 2200);
+    later(() => ST.launch(), 49100 + SH);  // the A-10s come around and execute the rest
+  }
+
+  function c5SVG(flip){
+    return '<svg viewBox="0 0 250 86" width="340" height="117">' +
+      '<path d="M20 5H6V0h34v5H26l22 29H18z" fill="#80857c"/>' +
+      '<path d="M16 36L44 30H196Q214 22 232 36Q246 42 232 48Q214 56 196 54H56Q30 54 16 46Z" fill="#9aa093"/>' +
+      '<path d="M196 30Q206 18 222 30Z" fill="#8a9084"/><path d="M204 28Q211 22 218 28Z" fill="#9fc3d6"/>' +
+      '<path d="M78 52H160Q168 66 154 66H84Q70 66 78 52Z" fill="#7f857a"/>' +
+      '<path d="M92 36L158 31L182 36L112 44Z" fill="#6f7569"/>' +
+      '<g fill="#59604f"><rect x="112" y="46" width="22" height="9" rx="4.5"/><rect x="142" y="46" width="22" height="9" rx="4.5"/></g>' +
+      '<g fill="#6a7160"><rect x="104" y="42" width="18" height="7" rx="3.5"/><rect x="134" y="41" width="18" height="7" rx="3.5"/></g>' +
+      '<path d="M40 40H210" stroke="#7a8073" stroke-width="1"/><circle cx="214" cy="39" r="1.8" fill="#2b321e"/>' +
+      '<text x="166" y="49" font-size="23" textLength="56" lengthAdjust="spacingAndGlyphs" fill="#0f1b3a" stroke="#0f1b3a" stroke-width="1" stroke-linejoin="round" font-style="italic" font-weight="900" font-family="\'Snell Roundhand\',\'Apple Chancery\',\'Brush Script MT\',\'Segoe Script\',\'Lucida Handwriting\',cursive"' + (flip ? ' transform="translate(388 0) scale(-1 1)"' : '') + '>Fred</text></svg>';
+  }
+  function plane(inner, dirR, w, h, py, secs, delayMs, extra){
+    const p = document.createElement("div"); p.className = "plane";
+    p.innerHTML = '<div class="ff' + (dirR ? "" : " flip") + '">' + inner + '</div>' + (extra || "");
+    scene.appendChild(p);
+    const sx = dirR ? -w - 20 : innerWidth + 20, ex = dirR ? innerWidth + 20 : -w - 20;
+    startAt(p, sx, py);
+    later(() => moveTo(p, ex, py, secs), delayMs);
+    return { sx, ex };
+  }
+
+
+  function a10SVG(){
+    return '<svg viewBox="0 0 120 44" width="120" height="44">' +
+      '<path d="M6 22L2 4h12l10 16z" fill="#4e5547"/><path d="M0 17h20v3H0z" fill="#434a3d"/>' +
+      '<path d="M4 25L30 20H80Q104 21 118 26L104 31H30Z" fill="#6d745f"/>' +
+      '<path d="M18 13h26q4 4 0 8H18z" fill="#4a5044"/><circle cx="44" cy="17" r="3.4" fill="#2e332b"/>' +
+      '<path d="M78 21Q90 9 100 22Z" fill="#9fc3d6"/>' +
+      '<path d="M42 29h50l-6 6H46z" fill="#565d4b"/><path d="M52 35h14v4H52zM70 35h12v3H70z" fill="#454b3f"/>' +
+      '<path d="M104 29h16" stroke="#2b2f27" stroke-width="2"/>' +
+      '<path class="flash" d="M121 28l14-4-5 4 5 4z" fill="#ffd36a"/></svg>';
+  }
+  function strike(crs, N, ground, rx, side, C, R, ctl){
+    /* A-10 makes repeated passes (alternating direction), aiming at the nearest target ahead of it, until every creature is down */
+    const PW = 120, D = 2.4, py = Math.max(10, ground - 330), mine = token;
+    let finished = false, bombing = false, done = false, lumps = [], hitSaid = false;
+    const mk = (cls, px, py2) => { const e = document.createElement("div"); e.className = cls; e.style.left = Math.round(px) + "px"; e.style.top = Math.round(py2) + "px"; scene.appendChild(e); return e; };
+    const GIB = {
+      head: r => '<svg width="16" height="16"><circle cx="8" cy="7.5" r="7" fill="' + r[0] + '"/><ellipse cx="9" cy="8" rx="4.6" ry="4" fill="#17100a"/><circle cx="8" cy="7.5" r="1.1" fill="#ffe27a"/><circle cx="11.2" cy="7.5" r="1.1" fill="#ffe27a"/><ellipse cx="8" cy="14.5" rx="5.5" ry="2" fill="#a01212"/></svg>',
+      arm:  r => '<svg width="8" height="20"><rect x="1" y="1" width="6" height="15" rx="3" fill="' + r[0] + '"/><rect x="1" y="12" width="6" height="3" fill="' + r[1] + '"/><circle cx="4" cy="1.8" r="2.2" fill="#2b2118"/><ellipse cx="4" cy="17.5" rx="3.6" ry="2.4" fill="#a01212"/></svg>',
+      leg:  r => '<svg width="9" height="18"><rect x="1.5" y="1" width="6" height="12" rx="2" fill="' + r[1] + '"/><rect x="0.5" y="11" width="8" height="5" rx="2" fill="#2b1f12"/><ellipse cx="4.5" cy="1.4" rx="3.6" ry="2" fill="#a01212"/></svg>',
+      chunk: r => '<svg width="20" height="16"><path d="M1 12L4 3Q10 0 16 3L19 12Z" fill="' + r[0] + '"/><path d="M1 12L2 9H18L19 12Z" fill="' + r[1] + '"/><path d="M2 12Q6 16 10 13Q14 16 18 12Z" fill="#a01212"/></svg>'
+    };
+    function refresh(){                                    // one batched layout read per frame (no per-bullet layout thrash)
+      for (const c of crs) if (!c._dead) { const r = c.getBoundingClientRect(); c._cx = r.left + r.width / 2; c._cy = r.top + r.height / 2; }
+    }
+    function allDead(){
+      if (finished) return; finished = true;
+      later(() => say(A, "Good effects on target! Fuck yeah!"), 700);
+      later(() => say(B, "Oorah! Hell fucking yeah!"), 3300);
+      later(() => say(A, "Remind me to buy that pilot a goddamn beer, brother."), 5400);
+      later(() => all(s => s.el.classList.remove("crouch", "radio")), 3400);   // stand back up
+      later(flyover, 6200);
+    }
+    function kill(c, head){
+      if (c._dead) return;
+      if (c._cx === undefined) refresh();
+      c._dead = true;
+      { const r0 = c.getBoundingClientRect(); c.style.transition = "none"; c.style.transform = "translate(" + Math.round(r0.left) + "px," + Math.round(r0.top) + "px)"; }
+      const x = c._cx, y = c._cy + 16, dr = Math.random() < .5;
+      splash(x, y - 10, head ? 2.6 : 1);
+      c.classList.remove("rush", "chat", "walk"); c.classList.add("dead", dr ? "dr" : "dl"); if (head) c.classList.add("nohead");
+      c._lo = dr ? x - 12 : x - 40; c._hi = dr ? x + 40 : x + 12; c._by = y - 8;      // where the body ends up lying
+      if (c._bub) c._bub.remove();
+      const mist = mk("puff", x, y - 8); later(() => mist.remove(), 700);
+      for (let d = 0; d < (head ? 10 : 30); d++) {                       // blood spray
+        const dr2 = mk("drop", x, y - 12 - Math.random() * 18), sz = 3 + Math.random() * 5;
+        dr2.style.width = dr2.style.height = sz + "px"; dr2.style.margin = -sz / 2 + "px";
+        dr2.style.setProperty("--dx", Math.round((Math.random() - .5) * 150) + "px");
+        dr2.style.setProperty("--dy", -Math.round(18 + Math.random() * 58) + "px");
+        later(() => dr2.remove(), 700);
+      }
+      const r0 = c._robe || ["#a9824f", "#7a5a33", "#d8c08c"], made = [];
+      (head ? [["head", 8, 16]] : N > 50 ? [["head", 8, 16], ["arm", 10, 20], ["arm", 10, 20], ["leg", 9, 18], ["chunk", 10, 16]] : [["head", 8, 16], ["arm", 10, 20], ["arm", 10, 20], ["leg", 9, 18], ["leg", 9, 18], ["chunk", 10, 16], ["chunk", 10, 16]]).forEach(([t, hw, h]) => {
+        const g = mk("gib", x, y - 22); g.innerHTML = GIB[t](r0); g.style.margin = -h / 2 + "px 0 0 -" + hw + "px";
+        const dx = (Math.random() < .5 ? -1 : 1) * (35 + Math.random() * 120), fall = 20 + Math.random() * 10;
+        g.style.setProperty("--dx", Math.round(dx) + "px"); g.style.setProperty("--up", -Math.round(60 + Math.random() * 70) + "px");
+        g.style.setProperty("--fall", Math.round(fall) + "px");
+        g.style.setProperty("--rot", Math.round((Math.random() < .5 ? -1 : 1) * (300 + Math.random() * 600)) + "deg");
+        g._born = performance.now(); g._lx = x + dx; g._ly = y - 22 + fall; lumps.push(g); made.push(g);
+        later(() => decalSplat(x + dx, y + Math.random() * 8, 6 + Math.random() * 8, 4 + Math.random() * 3), 800);
+      });
+      later(() => decalPool(x, y, 9), 0); later(() => decalPool(x, y, 16), 300); later(() => decalPool(x, y, 22), 650);   // pool grows under the body
+      decalSpray(x, y, head ? 55 : 80, head ? 18 : 26);                            // spatter in all directions
+      if (head) for (let k = 0; k < 14; k++) later(() => {   // blood fountains out of the neck stump
+        for (let q = 0; q < 3; q++) { const dr3 = mk("drop", x, y - 26), sz = 3 + Math.random() * 4; dr3.style.width = dr3.style.height = sz + "px"; dr3.style.margin = -sz / 2 + "px";
+          dr3.style.setProperty("--dx", Math.round((Math.random() - .5) * 60) + "px"); dr3.style.setProperty("--dy", -Math.round(40 + Math.random() * 70) + "px"); later(() => dr3.remove(), 700); }
+      }, k * 70);
+      later(() => { made.forEach(g => { g._gone = true; g.remove(); }); c.remove(); }, 9000);
+      if (!ctl.spawn && ctl.moab && crs.every(o => o._dead)) allDead();
+    }
+    function chew(x, y, n, bigger){
+      if (scene.childElementCount > 260) n = Math.min(n, 3);                        // blood mist, spray and bits flying from a bullet chewing a lump
+      const m = mk("mist", x, y); later(() => m.remove(), 600);
+      for (let d = 0; d < n; d++) {
+        const dr = mk("drop", x, y), sz = 2 + Math.random() * 4;
+        dr.style.width = dr.style.height = sz + "px"; dr.style.margin = -sz / 2 + "px";
+        dr.style.setProperty("--dx", Math.round((Math.random() - .5) * 70) + "px");
+        dr.style.setProperty("--dy", -Math.round(10 + Math.random() * 34) + "px");
+        later(() => dr.remove(), 700);
+      }
+      if (scene.childElementCount > 260) return;
+      for (let k = 0; k < (bigger ? 3 : 2); k++) {
+        const g = mk("gib", x, y - 4); g.innerHTML = GIB.chunk(["#8a1a14", "#5a0e0b", "#d8c08c"]); g.style.scale = ".38"; g.style.margin = "-8px 0 0 -10px";
+        const dx = (Math.random() < .5 ? -1 : 1) * (14 + Math.random() * 50), fall = 8 + Math.random() * 8;
+        g.style.setProperty("--dx", Math.round(dx) + "px"); g.style.setProperty("--up", -Math.round(26 + Math.random() * 40) + "px");
+        g.style.setProperty("--fall", Math.round(fall) + "px");
+        g.style.setProperty("--rot", Math.round((Math.random() < .5 ? -1 : 1) * (200 + Math.random() * 400)) + "deg");
+        g._born = performance.now(); g._lx = x + dx; g._ly = y - 4 + fall; lumps.push(g); later(() => { g._gone = true; g.remove(); }, 10500);
+      }
+      decalSplat(x + (Math.random() - .5) * 30, y + 10, 4 + Math.random() * 6, 3);
+    }
+    function impact(ix, iy){
+      if (Math.abs(ix - rx) < 82 && iy > ground - 62) {    // rounds hit the rock: sparks, no hole
+        const sp = mk("spark", ix, iy - 14); sp.innerHTML = "<span></span><span></span>"; later(() => sp.remove(), 400); return;
+      }
+      let lump = false;
+      for (const c of crs) {                               // rounds chew into bodies that are already down
+        if (!c._dead || c._by === undefined || !c.isConnected) continue;
+        if (ix > c._lo - 4 && ix < c._hi + 4 && Math.abs(iy - c._by) < 24) {
+          lump = true; chew(ix, c._by - 2, 9, true);
+          const ff = c.querySelector(".ff"); ff.classList.remove("jolt"); void ff.offsetWidth; ff.classList.add("jolt");
+        }
+      }
+      const now = performance.now();
+      for (const g of lumps) {                             // ...and obliterate landed body parts
+        if (g._gone || now - g._born < 1100) continue;
+        if (Math.abs(ix - g._lx) < 12 && Math.abs(iy - g._ly) < 16) { lump = true; chew(g._lx, g._ly, 7, false); g._gone = true; g.remove(); }
+      }
+      if (lumps.length > 60) lumps = lumps.filter(g => !g._gone);
+      if (lump) return;
+      let killed = false;
+      for (const c of crs) if (!c._dead && c._cx !== undefined && Math.hypot(ix - c._cx, iy - c._cy) < 46) { kill(c); killed = true; }
+      if (!killed && Math.abs(iy - ground) < 30) decalHole(ix, iy);
+    }
+    function vaporize(c){                                   // creature turned to red mist, no body, no parts
+      if (c._dead) return; c._dead = true;
+      const x = c._cx, y = c._cy; c.remove(); if (c._bub) c._bub.remove(); splash(x, y, .8);
+      for (let m = 0; m < 3; m++) { const e = mk("mist", x + RR(-14, 14), y + RR(-14, 14)); later(() => e.remove(), 700); }
+      decalSpray(x, y, 55, 30, 0); decalSplat(x, y, 16, 14);
+    }
+    function dropBomb(tc){
+      if (tc._dead) return;
+      const bx = tc._cx, by = tc._cy;
+      const bm = document.createElement("div"); bm.style.cssText = "position:fixed;left:0;top:0;z-index:5;will-change:transform";
+      bm.innerHTML = '<svg width="18" height="40" viewBox="0 0 18 40"><path d="M9 0Q16 6 15 24L9 30L3 24Q2 6 9 0Z" fill="#3b4036"/><path d="M3 24L0 34H6ZM15 24L18 34H12Z" fill="#2a2e26"/><rect x="7" y="2" width="4" height="22" fill="#59604f" opacity=".6"/></svg>';
+      startAt(bm, bx - 9, -60); scene.appendChild(bm); void bm.offsetWidth;
+      bm.style.transition = "transform .95s cubic-bezier(.5,0,1,.8)"; bm.style.transform = "translate(" + Math.round(bx - 9) + "px," + Math.round(by - 30) + "px)";
+      later(() => {
+        bm.remove(); splash(bx, by, 3); damage(bx, by, 240); scorch(bx, by, 170);
+        const fl = mk("nuke", bx, by); const sk = mk("shock", bx, by); later(() => { fl.remove(); sk.remove(); }, 1000);
+        for (let k = 0; k < 4; k++) { const d = mk("dust", bx + RR(-50, 50), by + RR(-20, 20)); later(() => d.remove(), 1700); }
+        for (const c of crs) if (!c._dead && c._cx !== undefined && Math.hypot(c._cx - bx, c._cy - by) < 75) vaporize(c);      // anything in the blast becomes mist
+        for (const c of crs) if (c._dead && c._by !== undefined && c.isConnected && Math.hypot((c._lo + c._hi) / 2 - bx, c._by - by) < 120) { c.remove(); c._by = undefined; }
+        for (const g of lumps) if (!g._gone && Math.hypot(g._lx - bx, g._ly - by) < 120) { g._gone = true; g.remove(); }
+        decalPool(bx, by + 6, 40); decalPool(bx + RR(-22, 22), by + RR(-8, 12), 28); decalPool(bx + RR(-22, 22), by + RR(-8, 12), 24);   // a big, ordinary blood pile
+        decalSpray(bx, by, 120, 100, 0);                   // droplets only, no streaks
+        for (let k = 0; k < 24; k++) {                     // lots of little bits of monster
+          const g = mk("gib", bx, by - 10); g.innerHTML = GIB.chunk(k % 3 ? ["#8a1a14", "#5a0e0b", "#d8c08c"] : ["#a9824f", "#7a5a33", "#d8c08c"]);
+          const sc = RR(.28, .6); g.style.scale = String(sc); g.style.margin = "-8px 0 0 -10px";
+          const dx = (Math.random() < .5 ? -1 : 1) * RR(20, 190), fall = RR(8, 40);
+          g.style.setProperty("--dx", Math.round(dx) + "px"); g.style.setProperty("--up", -Math.round(RR(50, 130)) + "px");
+          g.style.setProperty("--fall", Math.round(fall) + "px"); g.style.setProperty("--rot", Math.round((Math.random() < .5 ? -1 : 1) * RR(300, 900)) + "deg");
+          later(() => decalSplat(bx + dx, by - 10 + fall, 4 + Math.random() * 4, 3), 800);
+          later(() => g.remove(), 9000);
+        }
+        for (let k = 0; k < 30; k++) {
+          const dr = mk("drop", bx, by), sz = 2 + Math.random() * 5; dr.style.width = dr.style.height = sz + "px"; dr.style.margin = -sz / 2 + "px";
+          const a = RR(0, 6.283), d = RR(40, 200); dr.style.setProperty("--dx", Math.round(Math.cos(a) * d) + "px"); dr.style.setProperty("--dy", Math.round(Math.sin(a) * d * .8 - 50) + "px");
+          later(() => dr.remove(), 800);
+        }
+        all(s => s.el.classList.add("shake")); later(() => all(s => s.el.classList.remove("shake")), 600);
+        if (!ctl.spawn && ctl.moab && crs.every(o => o._dead)) allDead();
+      }, 980);
+    }
+    function blowSpeaker(){                                // a bomb takes out the speaker: the music stops
+      const sp = ctl.spk; if (!sp || !sp.isConnected) return;
+      const x = sp._x + 23, y = sp._y + 16;
+      const mkR = cls => { const e = document.createElement("div"); e.className = cls; e.style.left = Math.round(x) + "px"; e.style.top = Math.round(y) + "px"; rocks.appendChild(e); return e; };
+      sp.remove();
+      const fl = mkR("gnuke"), sk = mkR("gshock"), fl2 = mkR("gnuke"); fl2.style.marginLeft = "-30px"; later(() => { fl.remove(); sk.remove(); fl2.remove(); }, 900);
+      const d = mk("dust", x, y); later(() => d.remove(), 1700);
+      scorch(x, y + 8, 50); splash(x, y, 1.2);
+      all(s => s.el.classList.add("shake")); later(() => all(s => s.el.classList.remove("shake")), 600);
+    }
+    function dropMoab(){                                   // the big green one: it falls slowly, then its shockwave takes out everything still standing
+      refresh();
+      const live = crs.filter(c => !c._dead && c._cx !== undefined), far = live.filter(c => Math.hypot(c._cx - C.x, c._cy - C.y) > R * .55), pool = far.length ? far : live;
+      const tc = pool.length ? pool[Math.floor(Math.random() * pool.length)] : null, bx = Math.round(innerWidth * .74), by = Math.round(innerHeight * .8);   // always from the top left to the bottom right
+      const bm = document.createElement("div"); bm.className = "moabbomb"; bm.style.cssText = "position:fixed;left:0;top:0;z-index:120;will-change:transform;transform-origin:35px 130px;pointer-events:none";
+      bm.innerHTML = '<svg width="70" height="260" viewBox="0 0 70 260"><defs><linearGradient id="moabG" x1="0" x2="1"><stop offset="0" stop-color="#0f4015"/><stop offset=".3" stop-color="#46b640"/><stop offset=".55" stop-color="#2f952f"/><stop offset="1" stop-color="#0c3612"/></linearGradient><linearGradient id="moabF" x1="0" x2="1"><stop offset="0" stop-color="#6d767b"/><stop offset=".5" stop-color="#c2cacf"/><stop offset="1" stop-color="#5d666b"/></linearGradient><clipPath id="moabC"><path d="M17 46H53V150Q53 205 35 252Q17 205 17 150Z"/></clipPath></defs><path d="M27 44L5 8L14 4L31 34Z" fill="url(#moabF)"/><path d="M43 44L65 8L56 4L39 34Z" fill="url(#moabF)"/><path d="M30 40L19 14L23 12L34 34Z" fill="#8a949a"/><path d="M40 40L51 14L47 12L36 34Z" fill="#8a949a"/><path d="M24 48L28 24H42L46 48Z" fill="url(#moabF)"/><rect x="31" y="14" width="8" height="12" fill="#7b858a"/><path d="M17 46H53V150Q53 205 35 252Q17 205 17 150Z" fill="url(#moabG)" stroke="#0d3a12" stroke-width="1.5"/><g clip-path="url(#moabC)"><rect x="0" y="226" width="70" height="40" fill="#e4c43a"/><rect x="0" y="226" width="70" height="3" fill="#b99a22"/><rect x="21" y="62" width="4.5" height="96" rx="2.2" fill="#2a8a2a" opacity=".8"/><rect x="22" y="62" width="1.6" height="96" rx=".8" fill="#9fe58a" opacity=".7"/><rect x="45" y="62" width="4" height="96" rx="2" fill="#0d3a12" opacity=".5"/><rect x="17" y="52" width="36" height="2" fill="#0d3a12" opacity=".55"/><rect x="17" y="182" width="36" height="2" fill="#0d3a12" opacity=".5"/></g><text transform="translate(35 118) rotate(90)" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="900" font-size="19" letter-spacing="1.5" fill="#f4f7f1" stroke="#e0e6dc" stroke-width=".4">MOAB</text></svg>';
+      const Wd = innerWidth, S0 = { x: -130, y: -130 };     // it comes in from the top corner on the far side, at one constant speed
+      const L0 = Math.hypot(bx - S0.x, by - S0.y), ux = (bx - S0.x) / L0, uy = (by - S0.y) / L0, E0 = { x: bx - ux * 130, y: by - uy * 130 };
+      const phi = Math.atan2(-ux, uy) * 180 / Math.PI, pose = (x, y) => "translate(" + Math.round(x - 35) + "px," + Math.round(y - 130) + "px) rotate(" + phi.toFixed(2) + "deg)";
+      const mxm = 130 * Math.abs(ux) + 35 * Math.abs(uy), mym = 130 * Math.abs(uy) + 35 * Math.abs(ux);   // half-extent of the tilted bomb
+      let f0 = 1; for (let f = 0; f <= 1; f += .01) { const x = S0.x + (E0.x - S0.x) * f, y = S0.y + (E0.y - S0.y) * f; if (x > mxm && x < Wd - mxm && y > mym) { f0 = f; break; } }
+      const DUR = Math.round(Math.min(Math.max(4700 / Math.max(1 - f0, .2), 5500), 9500)), TV = Math.round(f0 * DUR);      // TV = the moment the whole bomb is on screen
+      bm.style.transform = pose(S0.x, S0.y); document.body.appendChild(bm);      // body level, above the Marines and rock (text bubbles stay above it)
+      void bm.offsetWidth;
+      bm.style.transition = "transform " + DUR + "ms linear"; bm.style.transform = pose(E0.x, E0.y);
+      later(() => { say(A, "My god, it\u2019s beautiful."); later(() => say(B, "It looks like my favorite green crayon."), 2000); }, TV);
+      later(() => {
+        bm.remove(); ctl.moab = true;
+        const fl = mk("moabfl", bx, by), fl2 = mk("moabfl", bx, by); fl2.style.animationDelay = ".14s";
+        const ring = '<svg width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48"/></svg>';
+        const mw = mk("mwave", bx, by), mw2 = mk("mwave", bx, by); mw.innerHTML = mw2.innerHTML = ring; mw2.style.animationDelay = ".16s"; mw2.classList.add("thin");
+        const sf = document.createElement("div"); sf.className = "mflash"; document.body.appendChild(sf);          // the whole screen goes white
+        const mw3 = mk("mwave", bx, by), mw4 = mk("mwave", bx, by); mw3.innerHTML = mw4.innerHTML = ring; mw3.classList.add("fat"); mw4.classList.add("glow"); mw3.style.animationDelay = ".08s";
+        later(() => { fl.remove(); fl2.remove(); mw.remove(); mw2.remove(); mw3.remove(); mw4.remove(); sf.remove(); }, 1800);
+        for (let k = 0; k < 6; k++) { const d = mk("dust", bx + RR(-90, 90), by + RR(-30, 30)); later(() => d.remove(), 1700); }
+        splash(bx, by, 3); damage(bx, by, 480); scorch(bx, by, 260); decalPool(bx, by + 6, 48); decalSpray(bx, by, 160, 120, 0);
+        all(s => s.el.classList.add("shake")); later(() => all(s => s.el.classList.remove("shake")), 1600);
+        crs.filter(c => !c._dead && c._cx !== undefined).forEach(c => {          // the wave runs outward; every monster dies as it passes
+          const u = 1 - Math.pow(1 - Math.min(Math.hypot(c._cx - bx, c._cy - by) / 1700, .999), 1 / 1.7);
+          later(() => vaporize(c), Math.round(1400 * u));
+        });
+        later(() => { refresh(); crs.filter(c => !c._dead).forEach(vaporize); if (!ctl.spawn && ctl.moab && crs.every(o => o._dead)) allDead(); }, 1700);   // anything the wave missed
+      }, DUR);
+    }
+    function callBomb(){
+      bombing = true; ctl.spawn = false;                  // no more reinforcements
+      const w = document.createElement("div"); w.style.cssText = "position:fixed;left:0;top:0;z-index:6";
+      w.style.transform = "translate(" + Math.round(Math.min(Math.max(C.x, 160), innerWidth - 160)) + "px,70px)";
+      w.innerHTML = '<div class="pbub" style="white-space:nowrap">Fuck it — bomb those bastards!</div>'; talk.appendChild(w); later(() => w.remove(), 3200);
+      later(blowSpeaker, 3300);                            // during the bombing run
+      const left = crs.filter(c => !c._dead && c._cx !== undefined), nb = Math.min(left.length, 14);
+      const nn = Math.max(nb - 1, 0);                       // the last "bomb" is the MOAB
+      left.slice(0, nn).forEach((c, i) => later(() => dropBomb(c), 1500 + i * 380));
+      later(dropMoab, 1500 + nn * 380 + 700);
+    }
+    /* three A-10s fly straight lines (any direction) near-tangent to the ring; guns fire dead ahead only */
+    const RANGE = 230;
+    let passes = 0; const lp = [0, 0, 0];
+    (function rl(){ if (mine !== token || done) return; refresh(); requestAnimationFrame(rl); })();
+    function runPass(lane){
+      if (mine !== token || finished) { done = true; return; }
+      if (bombing) return;
+      if (lp.every(n => n >= 4)) { callBomb(); return; }   // every plane has made 4 passes and some are still alive: bomb the rest
+      lp[lane]++;
+      if (passes >= 48) { ctl.spawn = false; ctl.moab = true; crs.forEach(c => kill(c)); return; }    // safety net
+      passes++;
+      const alive = crs.filter(c => !c._dead && c._cx !== undefined);
+      const tg = alive.length ? alive[Math.floor(Math.random() * alive.length)] : null;
+      const phi = tg ? Math.atan2(tg._cy - C.y, tg._cx - C.x) : Math.random() * 6.283;
+      const rt = tg ? Math.hypot(tg._cx - C.x, tg._cy - C.y) : R, d = Math.max(130, rt - Math.random() * 16);       // line stays well clear of the Marines at the centre
+      const sg = Math.random() < .5 ? 1 : -1;
+      const ux = -Math.sin(phi) * sg, uy = Math.cos(phi) * sg, qx = C.x + Math.cos(phi) * d, qy = C.y + Math.sin(phi) * d;
+      const Lh = Math.hypot(innerWidth, innerHeight) / 2 + 160;
+      let ang = Math.atan2(uy, ux) * 180 / Math.PI; const fl = ux < 0; if (fl) ang += 180;
+      const p = document.createElement("div"); p.className = "plane";
+      p.innerHTML = '<div class="ff' + (fl ? " flip" : "") + '">' + a10SVG() + '</div>';
+      p.style.transformOrigin = "60px 22px"; scene.appendChild(p);
+      const t0 = performance.now(), DUR = 3200, ALT = 52; let lastShot = 0;
+      (function frame(now){
+        if (mine !== token || !p.isConnected) return;
+        const f = Math.min((now - t0) / DUR, 1), t = -Lh + 2 * Lh * f, cx = qx + ux * t, cy = qy + uy * t;
+        p.style.transition = "none"; p.style.transform = "translate(" + Math.round(cx - 60) + "px," + Math.round(cy - 22 - ALT) + "px) rotate(" + ang.toFixed(1) + "deg)";
+        if (!finished && !bombing && f < 1 && Math.hypot(cx - C.x, cy - C.y) < R + 90 && now - lastShot > 45) {
+          lastShot = now;
+          const nx = cx + ux * 58, ny = cy + uy * 58 + 3;
+          const cone = (x, y) => { const al = (x - nx) * ux + (y - ny) * uy, la = Math.abs((x - nx) * uy - (y - ny) * ux); return al > 170 && al < 430 && la < 130 ? al : -1; };
+          let ix, iy, tgt = null, best = 1e9;
+          for (const c of crs) { if (c._dead || c._cx === undefined) continue; const al = cone(c._cx, c._cy); if (al > 0 && al < best) { best = al; tgt = c; } }
+          if (tgt) { ix = tgt._cx + (Math.random() * 14 - 7); iy = tgt._cy + (Math.random() * 12 - 6); }
+          else {
+            const bodies = crs.filter(c => c._dead && c._by !== undefined && c.isConnected && cone((c._lo + c._hi) / 2, c._by) > 0);
+            if (bodies.length && Math.random() < .7) { const c = bodies[Math.floor(Math.random() * bodies.length)]; ix = (c._lo + c._hi) / 2 + (Math.random() * 30 - 15); iy = c._by + (Math.random() * 8 - 4); }
+            else { ix = nx + ux * (230 + Math.random() * 90); iy = Math.max(ny + 40, ground + (Math.random() * 10 - 4)); }
+          }
+          const b = document.createElement("div"); b.className = "trc";
+          const a2 = Math.atan2(iy - (ny - ALT), ix - nx) * 180 / Math.PI;
+          const sy0 = ny - ALT; b.style.transform = "translate(" + Math.round(nx) + "px," + Math.round(sy0) + "px) rotate(" + a2.toFixed(1) + "deg)"; scene.appendChild(b);
+          void b.offsetWidth; b.style.transition = "transform .2s linear";
+          b.style.transform = "translate(" + Math.round(ix) + "px," + Math.round(iy) + "px) rotate(" + a2.toFixed(1) + "deg)";
+          setTimeout(() => { b.remove(); if (mine === token) impact(ix, iy); }, 210);
+        }
+        if (f < 1) requestAnimationFrame(frame); else { p.remove(); later(() => runPass(lane), 150); }
+      })(t0);
+    }
+    function fire(sol, c){                                  // a Marine fires a round at a creature: muzzle flash + tracer
+      if (c._cx === undefined) refresh();
+      const dir = c._cx > sol.x + W / 2 ? 1 : -1; face(sol, dir);
+      const mx = sol.x + W / 2 + dir * 30, my = sol.y + 62, tx = c._cx + (Math.random() * 10 - 5), ty = c._cy + (Math.random() * 10 - 5);
+      const sp = mk("spark", mx, my); sp.innerHTML = "<span></span><span></span>"; later(() => sp.remove(), 250);
+      const b = document.createElement("div"), ag = Math.atan2(ty - my, tx - mx) * 180 / Math.PI; b.className = "trc";
+      b.style.transform = "translate(" + Math.round(mx) + "px," + Math.round(my) + "px) rotate(" + ag.toFixed(1) + "deg)"; scene.appendChild(b);
+      void b.offsetWidth; b.style.transition = "transform .12s linear";
+      b.style.transform = "translate(" + Math.round(tx) + "px," + Math.round(ty) + "px) rotate(" + ag.toFixed(1) + "deg)";
+      setTimeout(() => b.remove(), 140);
+    }
+    function reload(m){                                    // old clip drops out, new one goes in
+      const dir = m.flip ? -1 : 1, gx = m.x + W / 2 + dir * 26, gy = m.y + 62;
+      const mg = mk("mag", gx, gy); later(() => mg.remove(), 700);
+      later(() => { const sp = mk("spark", gx, gy); sp.innerHTML = "<span></span>"; later(() => sp.remove(), 250); }, 520);
+    }
+    function grenade(m){                                    // lob a frag at the thickest clump of monsters
+      const al = crs.filter(c => !c._dead && c._cx !== undefined && c._cx > 20 && c._cx < innerWidth - 20 && c._cy > 20 && c._cy < innerHeight - 20);
+      if (!al.length) return false;
+      const mx = m.x + W / 2, my = m.y + 50; let tc = null, bs = -1;
+      for (const c of al) { const dd = Math.hypot(c._cx - mx, c._cy - my); if (dd < 110 || dd > 560) continue; let n = 0; for (const o of al) if (Math.hypot(o._cx - c._cx, o._cy - c._cy) < 95) n++; if (n > bs) { bs = n; tc = c; } }
+      if (!tc) return false;
+      const tx = tc._cx, ty = tc._cy, dir = tx > mx ? 1 : -1; face(m, dir);
+      const sx = mx + dir * 22, o = mk("gren", 0, 0); o.style.left = Math.round(sx) + "px"; o.style.top = Math.round(my) + "px";
+      const inn = document.createElement("div"); inn.innerHTML = '<svg width="10" height="12" viewBox="0 0 10 12"><rect x="2.5" y="0" width="5" height="3" fill="#3b4036"/><ellipse cx="5" cy="7.5" rx="4.5" ry="4.5" fill="#55603f"/><path d="M3 5Q5 3 7 5" stroke="#8a946e" fill="none"/></svg>'; o.appendChild(inn);
+      const dur = 780;
+      o.animate([{ transform: "translateX(0px)" }, { transform: "translateX(" + Math.round(tx - sx) + "px)" }], { duration: dur, easing: "linear", fill: "forwards" });
+      inn.animate([{ transform: "translateY(0px) rotate(0deg)", easing: "ease-out" }, { transform: "translateY(-95px) rotate(260deg)", easing: "ease-in", offset: .45 }, { transform: "translateY(" + Math.round(ty - my) + "px) rotate(560deg)" }], { duration: dur, fill: "forwards" });
+      later(() => {
+        o.remove();
+        const fl = mk("gnuke", tx, ty), sk = mk("gshock", tx, ty); later(() => { fl.remove(); sk.remove(); }, 800);
+        for (let k = 0; k < 3; k++) { const d = mk("dust", tx + RR(-30, 30), ty + RR(-12, 12)); later(() => d.remove(), 1700); }
+        const hit = crs.filter(c => !c._dead && c._cx !== undefined && Math.hypot(c._cx - tx, c._cy - ty) < 95);
+        hit.forEach((c, i) => later(() => kill(c), i * 35));
+        for (const c of crs) if (c._dead && c._by !== undefined && c.isConnected && Math.hypot((c._lo + c._hi) / 2 - tx, c._by - ty) < 80) { c.remove(); c._by = undefined; }
+        for (const g of lumps) if (!g._gone && Math.hypot(g._lx - tx, g._ly - ty) < 80) { g._gone = true; g.remove(); }
+        const sc = dctx.createRadialGradient(tx, ty + 14, 4, tx, ty + 14, 46); sc.addColorStop(0, "rgba(20,14,8,.5)"); sc.addColorStop(1, "rgba(20,14,8,0)");
+        dctx.fillStyle = sc; dctx.beginPath(); dctx.ellipse(tx, ty + 14, 46, 28, 0, 0, 6.283); dctx.fill();
+        splash(tx, ty, 1.2); decalSpray(tx, ty + 10, 70, 40, 0); damage(tx, ty, 120); scorch(tx, ty, 70);
+      }, dur + 10);
+      return true;
+    }
+    function hit(c){                                        // a round lands: little blood puff, the creature flinches
+      if (c._dead || c._cx === undefined) return;
+      splash(c._cx, c._cy, .18);
+      const m = mk("mist", c._cx + RR(-6, 6), c._cy + RR(-8, 8)); later(() => m.remove(), 450);
+      for (let d = 0; d < 3; d++) { const dr = mk("drop", c._cx, c._cy), sz = 2 + Math.random() * 3; dr.style.width = dr.style.height = sz + "px"; dr.style.margin = -sz / 2 + "px";
+        dr.style.setProperty("--dx", Math.round((Math.random() - .5) * 46) + "px"); dr.style.setProperty("--dy", -Math.round(8 + Math.random() * 24) + "px"); later(() => dr.remove(), 600); }
+      const ff = c.querySelector(".ff"); ff.classList.remove("jolt"); void ff.offsetWidth; ff.classList.add("jolt");
+    }
+    function stab(m, c){                                   // a Marine knifes a creature: swing, then the head comes off
+      if (c._cx === undefined) refresh();
+      const dir = c._cx > m.x + W / 2 ? 1 : -1; face(m, dir);
+      const k = mk("knife", m.x + W / 2 + dir * 26, m.y + 58); k.style.setProperty("--s", dir); k.style.scale = dir < 0 ? "-1 1" : "1 1";
+      k.innerHTML = '<svg width="32" height="9" viewBox="0 0 32 9"><path d="M0 2.5h9v4H0z" fill="#3a2a1a"/><path d="M9 1L32 4.5L9 8Z" fill="#d6dadc"/></svg>'; later(() => k.remove(), 420);
+      later(() => kill(c, true), 170);
+    }
+    return { kill, fire, stab, hit, reload, grenade, alive: () => crs.filter(c => !c._dead), launch(){ [0, 1100, 2200].forEach((dl, ln) => later(() => runPass(ln), dl)); } };   // three planes, staggered
+  }
+
+  function flyover(){
+    const dirR = Math.random() < .5, W5 = 340, secs = 7;
+    const py = Math.min(Math.max(A.y - 200, 70), Math.max(70, innerHeight - 290));
+    plane(c5SVG(!dirR), dirR, W5, 117, py, secs, 30, '<div class="pbub">sup</div>');
+    later(() => all(s => { s.el.classList.remove("radio"); s.el.classList.add("salute"); }), 2500);   // both salute the Galaxy
+    later(() => {                                                 // then they wander off topic
+      all(s => s.el.classList.remove("salute"));
+      face(A, B.x > A.x ? 1 : -1); face(B, A.x > B.x ? 1 : -1);
+      say(A, "I wonder if the shoppette is open at Ramstein\u2026");
+    }, 4600);
+    later(() => say(B, "I could go for a Tornado real bad."), 8000);
+    later(() => say(A, "Semper Fi\u2026 and Semper Tornado."), 11200);
+  }
+
+  function tick(now){
+    const dt = Math.min((now - last) / 1000, .05); last = now; let busy = false;
+    all(s => {
+      if (s.state === "in") {
+        s.x += s.dir * WALK * dt; busy = true;
+        if ((s.dir > 0 && s.x >= s.tx) || (s.dir < 0 && s.x <= s.tx)) {
+          s.x = s.tx; s.state = "here"; face(s, mx > s.x + W/2 ? 1 : -1); setC(s, "idle");
+          if (A.state === "here" && B.state === "here") onArrive();
+        }
+        place(s); clipBox(s);
+      } else if (s.state === "mv") {
+        s.x += s.dir * RUN * dt; busy = true;
+        if ((s.dir > 0 && s.x >= s.tx) || (s.dir < 0 && s.x <= s.tx)) {
+          s.x = s.tx; s.state = "here"; face(s, s.noCrouch ? s.dir : L.side);
+          s.el.classList.remove("walk", "run"); s.el.classList.add("idle"); if (!s.noCrouch) s.el.classList.add("crouch", "shake");
+          if (s.cb) { const f = s.cb; s.cb = null; f(); }
+        }
+        place(s);
+      } else if (s.state === "out") {
+        s.x += s.dir * RUN * dt; busy = true;
+        if (s.x < -W - 20 || s.x > innerWidth + 20) { s.state = "away"; s.el.style.display = "none"; setC(s, ""); }
+        else place(s);
+      }
+    });
+    if (busy) raf = requestAnimationFrame(tick);
+  }
+
+  function dismiss(){
+    cancelShow(); document.documentElement.classList.remove("nocur");
+    let any = false;
+    all(s => { s.box = null; s.el.style.clipPath = ""; });
+    all(s => {
+      if (s.state === "in" || s.state === "here" || s.state === "mv") {
+        s.dir = (s.x + W/2 < innerWidth / 2) ? -1 : 1;
+        face(s, s.dir); s.state = "out"; setC(s, "walk run"); any = true;
+      }
+    });
+    if (any) { last = performance.now(); cancelAnimationFrame(raf); raf = requestAnimationFrame(tick); }
+  }
+
+  function activity(){ dismiss(); arm(); }
+  function leave(){ inside = false; clearTimeout(idleT); dismiss(); }          // mouse left the window: no soldiers
+  addEventListener("mousemove", e => { mx = e.clientX; my = e.clientY; inside = true; activity(); }, { passive: true });
+  document.addEventListener("mouseout", e => { if (!e.relatedTarget) leave(); });
+  document.documentElement.addEventListener("mouseleave", leave);
+  addEventListener("blur", leave);
+  ["mousedown", "wheel", "keydown"].forEach(t => addEventListener(t, activity, { passive: true }));
+})();
+</script>
+</body>
+</html>
