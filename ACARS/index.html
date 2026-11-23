@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>312th Airlift ACARS V116</title>
+<title>312th Airlift ACARS V117</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=B612+Mono:wght@400;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -135,7 +135,7 @@ svg.pl.fly{transform:rotate(90deg)}
 }
 
 
-/* V116: the grey ACARS hardware box around the message form (ACARS theme only). The side keys are for looks and do nothing. */
+/* V117: the grey ACARS hardware box around the message form (ACARS theme only). The side keys are for looks and do nothing. */
 .hw{position:relative}
 .hw .hw-screw,.hw .hw-plate,.hw .hw-k,.hw .pslot{display:none}
 .hw-b{display:block}
@@ -152,7 +152,7 @@ html[data-theme=acars] .hw .hw-k{display:block; position:relative; pointer-event
 .hw-k i{position:absolute; left:0; top:0; width:14px; height:10px; margin-top:-5px; border-radius:2px; background:linear-gradient(#62666b,#3b3e42); border:1px solid #17181a; box-shadow:inset 0 1px 0 #81858a, 0 2px 0 #0b0c0d}
 html[data-theme=acars] .hw .sheet{margin-top:0; padding:10px 8px}
 
-/* V116: in the ACARS theme the form is the ACARS screen itself: black glass, green letters */
+/* V117: in the ACARS theme the form is the ACARS screen itself: black glass, green letters */
 html[data-theme=acars] .hw .sheet{
   --g:#39f08a; --gd:#1fa35c; --gf:#0b1912; --gk:#040608;
   background:var(--gk); color:var(--g); color-scheme:dark; border:2px solid #14181c; border-radius:8px;
@@ -177,7 +177,7 @@ html[data-theme=acars] .hw .sheet .btn.alt:hover:not(:disabled){background:var(-
 html[data-theme=acars] .hw .sheet .say{color:var(--g)}
 html[data-theme=acars] .hw .sheet .say.bad{color:#ffb000}
 
-/* V116: all black. The box is black, the sections below are black screens with green letters, and only the printouts stay white. */
+/* V117: all black. The box is black, the sections below are black screens with green letters, and only the printouts stay white. */
 html[data-theme=acars] .hw{
   background:#000;
   box-shadow:0 0 0 2px #202224, 0 14px 28px rgba(0,0,0,.6), inset 0 2px 0 #1c1e20, inset 0 -2px 0 #000;
@@ -197,13 +197,13 @@ html[data-theme=acars] body>.sheet .btn.alt{background:var(--gk); color:var(--g)
 html[data-theme=acars] body>.sheet .btn.alt:hover:not(:disabled){background:#0b1912}
 html[data-theme=acars] body>.sheet .older{color:var(--g); border-color:var(--g)}
 
-/* V116: text boxes are the same black as the screen, with a very faint green outline */
+/* V117: text boxes are the same black as the screen, with a very faint green outline */
 html[data-theme=acars] .hw .sheet input,html[data-theme=acars] .hw .sheet textarea{
   background:var(--gk); border:1px solid rgba(57,240,138,.22); border-radius:4px;
 }
 html[data-theme=acars] .hw .sheet input:focus,html[data-theme=acars] .hw .sheet textarea:focus{border-color:rgba(57,240,138,.5)}
 
-/* V116: Print now, Schedule and Clear/Home share one line; the message box starts four lines tall and stretches as you type */
+/* V117: Print now, Schedule and Clear/Home share one line; the message box starts four lines tall and stretches as you type */
 .sheet .actions{flex-wrap:nowrap; align-items:stretch; gap:6px}
 .sheet .actions .btn{flex:1 1 auto; min-width:0; white-space:nowrap; padding:11px 4px; font-size:calc(min(16px, calc((100vw - 166px) / 16.2)) * var(--fit, 1))}
 .sheet .actions .chip{flex:0 0 auto; white-space:nowrap; padding:11px 8px; border-radius:3px; border-width:2px; font-size:calc(min(16px, calc((100vw - 166px) / 16.2)) * var(--fit, 1))}
@@ -369,7 +369,7 @@ li.job small{display:block; color:var(--fade)}
 .pvote.on{background:var(--ink); color:var(--paper)}
 html[data-theme=acars] body>.sheet .pvote{background:var(--gk); color:var(--g); border-color:var(--g)}
 html[data-theme=acars] body>.sheet .pvote.on{background:var(--g); color:var(--gk)}
-/* V116: hearts instead of arrows (no downvotes), and receipts that use the whole screen on a computer */
+/* V117: hearts instead of arrows (no downvotes), and receipts that use the whole screen on a computer */
 .hrt{color:#e0245e; font-size:1.1em; line-height:1}
 .pvote.on,.vote.heart.on,.pvote.on:hover:not(:disabled),.vote.heart.on:hover:not(:disabled){background:#e0245e !important; border-color:#e0245e !important; color:#fff !important}
 .pvote.on .hrt,.vote.heart.on .hrt{color:#fff}
@@ -554,7 +554,7 @@ html[data-theme=acars] body>.sheet .pvote.on{background:var(--g); color:var(--gk
 <body>
 <h1 id="title">312th Airlift ACARS</h1>
 <p class="tag">Need scheduling now?</p>
-<div class="statusrow"><span id="status" class="status" hidden></span><span class="status ver">V116</span><button type="button" class="status installbtn" id="installBtn" hidden>Install app</button></div>
+<div class="statusrow"><span id="status" class="status" hidden></span><span class="status ver">V117</span><button type="button" class="status installbtn" id="installBtn" hidden>Install app</button></div>
 <div class="installhelp" id="installhelp" hidden><b>Install this as an app</b><p id="installHow"></p><button type="button" class="chip quiet" id="installLater">Not now</button></div>
 
 <div class="connhelp" id="connhelp" role="alert" hidden>
@@ -587,7 +587,7 @@ html[data-theme=acars] body>.sheet .pvote.on{background:var(--g); color:var(--gk
 
 <div class="hw">
   <i class="screw hw-screw tl"></i><i class="screw hw-screw tr"></i><button type="button" class="screw hw-screw bl" id="devbtn" aria-label="Open Dev tools" title="Dev tools"></button><i class="screw hw-screw br"></i>
-  <div class="plate hw-plate"><span>ACARS</span><span class="pv">V116</span></div>
+  <div class="plate hw-plate"><span>ACARS</span><span class="pv">V117</span></div>
   <div class="hw-b">
   <div class="hw-k" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
 <section class="sheet">
@@ -774,7 +774,7 @@ const PATCH_URI = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWgAAAFxAQAAAAB
 document.querySelectorAll("img.ppatch2").forEach(i => { i.src = HEADER2_URI; });
 let apiBase = "";   // empty = the server that served this page; otherwise a remote printer server
 // The printer server a visitor reaches when they open the plain site link. If your Tailscale address ever changes, change this one line.
-const DEFAULT_SERVER = "https://acars-pi.tail522b7a.ts.net";
+const DEFAULT_SERVER = "https://acars-pi-1.tail522b7a.ts.net";
 const servedByPrinterMac = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname) || /\.ts\.net$/i.test(location.hostname);
 const fallbackServer = () => servedByPrinterMac ? "" : DEFAULT_SERVER;      // on the Mac's own address the page already is the server
 try {
@@ -947,7 +947,7 @@ const read = () => {
   return t;
 };
 
-const ART_PICS = {header2:HEADER2_URI, rule:RULE_URI, formation:FORM_URI, header:HEADER_URI, patch:PATCH_URI};     // header and patch: receipts printed by V116 to V116
+const ART_PICS = {header2:HEADER2_URI, rule:RULE_URI, formation:FORM_URI, header:HEADER_URI, patch:PATCH_URI};     // header and patch: receipts printed by V117 to V117
 const photoUrls = new Map();                       // photo id -> a picture URL made in this browser, so each photo is fetched once
 async function photoSrc(id){
   if (photoUrls.has(id)) return photoUrls.get(id);

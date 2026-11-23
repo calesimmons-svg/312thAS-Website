@@ -1,7 +1,7 @@
 /* 312th Airlift ACARS: the service worker that makes the page installable as an app.
    - The page itself always comes from the network first, so a new version shows up as soon as you are online. The saved copy is only used when there is no connection.
    - The printer server (any /api/ address, or any other website) is never touched: those requests go straight through, so prints and PINs are never cached or delayed. */
-const VERSION = "V116";
+const VERSION = "V117";
 const CACHE = "acars-" + VERSION;
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./apple-touch-icon.png", "./icon-192.png", "./icon-512.png", "./icon-maskable.png"];
 
