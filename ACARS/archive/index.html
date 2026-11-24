@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>312th Airlift ACARS Archive v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=B612+Mono:wght@400;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#050805;--glow:#39ff7a;--dim:#1d8f47;--line:#12361f;--paper:#f6f4ee;--ink:#17131a;--warn:#ffb347}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--glow);font:15px/1.5 "B612 Mono","IBM Plex Mono","Courier New",monospace}
+header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding:12px 16px}
+.top{max-width:1200px;margin:0 auto;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+h1{font:700 clamp(16px,4.6vw,22px)/1.1 "B612 Mono",monospace;margin:0;letter-spacing:.04em;flex:1 1 220px}
+h1 small{display:block;font-weight:400;font-size:11px;color:var(--dim);margin-top:4px;letter-spacing:.08em}
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+input[type=search]{background:#0b140d;color:var(--glow);border:1px solid var(--dim);border-radius:4px;padding:8px 10px;font:inherit;font-size:14px;min-width:0;width:200px}
+input[type=search]::placeholder{color:#1d8f47aa}
+.seg{display:inline-flex;border:1px solid var(--dim);border-radius:4px;overflow:hidden}
+.seg button{background:transparent;color:var(--dim);border:0;padding:8px 11px;font:inherit;font-size:13px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--glow);color:#021008;font-weight:700}
+.seg button:focus-visible,input:focus-visible,.more:focus-visible{outline:2px solid var(--glow);outline-offset:2px}
+main{max-width:1200px;margin:0 auto;padding:16px}
+.count{color:var(--dim);font-size:12px;margin:0 0 12px;letter-spacing:.06em}
+#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;align-items:start}
+.slip{background:var(--paper);color:var(--ink);font:13px/1.35 "IBM Plex Mono","Courier New",monospace;padding:14px 14px 12px;border-radius:2px;box-shadow:0 2px 0 #000,0 0 0 1px #0004;position:relative}
+.slip::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:6px;background:linear-gradient(-45deg,transparent 4px,var(--paper) 0) 0 0/10px 6px,linear-gradient(45deg,transparent 4px,var(--paper) 0) 0 0/10px 6px;opacity:.0}
+.slip .meta{display:flex;justify-content:space-between;gap:8px;font-size:11px;color:#6b6470;border-bottom:1px dashed #b9b4bd;padding-bottom:6px;margin-bottom:8px}
+.slip .ln{white-space:pre-wrap;word-break:break-word;min-height:1.35em}
+.slip .ln.to{font-weight:600;font-size:15px}
+.slip .ln.small{text-align:center;font-size:11px;color:#6b6470}
+.slip .ln.head{font-weight:600}
+.slip img{display:block;width:100%;height:auto;image-rendering:pixelated;background:#fff}
+.slip .foot{margin-top:8px;font-size:11px;color:#6b6470;display:flex;justify-content:space-between}
+.empty,.err{border:1px solid var(--dim);padding:16px;border-radius:4px;max-width:640px}
+.err{border-color:var(--warn);color:var(--warn)}
+.more{display:block;margin:22px auto 8px;background:transparent;color:var(--glow);border:1px solid var(--glow);padding:11px 22px;font:700 14px "B612 Mono",monospace;cursor:pointer;border-radius:4px}
+.more[hidden]{display:none}
+.more:hover{background:var(--glow);color:#021008}
+footer{max-width:1200px;margin:24px auto 40px;padding:0 16px;color:var(--dim);font-size:12px;line-height:1.7}
+footer b{color:var(--glow);font-weight:700}
+a{color:var(--glow)}
+@media (max-width:520px){input[type=search]{width:100%}.tools{width:100%}}
+</style>
+</head>
+<body>
+<header><div class="top">
+  <h1>ARCHIVE<small>312TH AIRLIFT ACARS · EVERY PRINT, KEPT</small></h1>
+  <div class="tools">
+    <input id="q" type="search" placeholder="Search prints" aria-label="Search prints" autocomplete="off">
+    <span class="seg" role="group" aria-label="Show"><button data-k="" aria-pressed="true">All</button><button data-k="text" aria-pressed="false">Text</button><button data-k="photo" aria-pressed="false">Pictures</button></span>
+    <span class="seg" role="group" aria-label="Order"><button data-o="new" aria-pressed="true">Newest</button><button data-o="old" aria-pressed="false">Oldest</button></span>
+  </div>
+</div></header>
+<main>
+  <p class="count" id="count" aria-live="polite">Loading…</p>
+  <div id="grid"></div>
+  <button class="more" id="more" hidden>Load more</button>
+</main>
+<footer id="foot"></footer>
+<script>
+/* The archive's Worker address. Set once after the Worker is deployed. */
+const API = "https://acars-archive.WORKERS_SUBDOMAIN.workers.dev";
+const PAGE = 30;
+let kind = "", order = "new", q = "", offset = 0, total = 0, busy = false, seq = 0;
+const $ = id => document.getElementById(id);
+const grid = $("grid"), more = $("more"), count = $("count");
+
+function fmt(at){
+  const m = /^(\d{4})-(\d\d)-(\d\d)T(\d\d):(\d\d)/.exec(at || ""); if (!m) return at || "";
+  const d = new Date(+m[1], m[2]-1, +m[3], +m[4], +m[5]);
+  return d.toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"}) + "  " + d.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"});
+}
+function slip(p){
+  const a = document.createElement("article"); a.className = "slip";
+  const meta = document.createElement("div"); meta.className = "meta";
+  const l = document.createElement("span"); l.textContent = fmt(p.at);
+  const r = document.createElement("span"); r.textContent = p.up ? "♥ " + p.up : "";
+  meta.append(l, r); a.append(meta);
+  if (p.photo) {
+    const label = document.createElement("div"); label.className = "ln head"; label.textContent = p.to || "Picture"; a.append(label);
+    const im = document.createElement("img"); im.loading = "lazy"; im.alt = (p.to || "Picture") + " print";
+    im.src = API + "/image/" + encodeURIComponent(p.photo);
+    im.onerror = () => { im.replaceWith(Object.assign(document.createElement("div"), {className:"ln small", textContent:"(picture no longer available)"})); };
+    a.append(im);
+  } else if (p.lines && p.lines.length) {
+    p.lines.forEach(x => { const d = document.createElement("div"); d.className = "ln " + (x.s === "to" ? "to" : x.s === "small" ? "small" : x.s === "head" ? "head" : ""); d.textContent = x.s === "to" ? "TO: " + x.t : x.t; a.append(d); });
+  } else {
+    const d = document.createElement("div"); d.className = "ln"; d.textContent = (p.to ? "TO: " + p.to + "\n" : "") + (p.msg || ""); a.append(d);
+  }
+  if (p.from && !p.photo) { const f = document.createElement("div"); f.className = "foot"; f.textContent = "FROM: " + p.from; a.append(f); }
+  return a;
+}
+function problem(msg){ count.textContent = ""; grid.replaceChildren(Object.assign(document.createElement("div"), {className:"err", textContent: msg})); more.hidden = true; }
+
+async function load(reset){
+  if (API.includes("WORKERS_SUBDOMAIN")) { problem("The archive isn't connected yet. The site owner still needs to set the archive address."); return; }
+  if (busy) return; busy = true; const my = ++seq;
+  if (reset) { offset = 0; grid.replaceChildren(); count.textContent = "Loading…"; more.hidden = true; }
+  try {
+    const u = new URL(API + "/prints"); u.searchParams.set("limit", PAGE); u.searchParams.set("offset", offset); u.searchParams.set("order", order);
+    if (kind) u.searchParams.set("kind", kind); if (q) u.searchParams.set("q", q);
+    const r = await fetch(u); if (!r.ok) throw new Error(r.status);
+    const d = await r.json(); if (my !== seq) return;
+    total = d.total; d.prints.forEach(p => grid.append(slip(p))); offset += d.prints.length;
+    count.textContent = total ? "Showing " + offset + " of " + total : "";
+    if (!total) grid.replaceChildren(Object.assign(document.createElement("div"), {className:"empty", textContent: q ? "Nothing matches that search." : "No prints copied yet. They show up a few minutes after the first sync."}));
+    more.hidden = offset >= total;
+  } catch (e) { if (my === seq) problem("Couldn't load the archive right now. Try again in a minute."); }
+  busy = false;
+}
+async function status(){
+  if (API.includes("WORKERS_SUBDOMAIN")) return;
+  try {
+    const s = await (await fetch(API + "/status")).json();
+    const ago = s.last_sync ? Math.max(0, Math.round((Date.now() - Date.parse(s.last_sync)) / 60000)) : null;
+    $("foot").innerHTML = "";
+    const line = document.createElement("div");
+    line.textContent = s.prints + " prints and " + s.images + " pictures kept (" + s.image_mb + " MB of 500 MB). " +
+      (ago === null ? "Not synced yet." : "Last copied from the printer " + (ago < 1 ? "just now" : ago + " min ago") + ".") +
+      (s.history_complete ? "" : " Still copying older history.") + (s.last_error ? " Last problem: " + s.last_error : "");
+    $("foot").append(line);
+  } catch (_) {}
+}
+document.querySelectorAll("[data-k]").forEach(b => b.onclick = () => { kind = b.dataset.k; document.querySelectorAll("[data-k]").forEach(x => x.setAttribute("aria-pressed", x === b)); load(true); });
+document.querySelectorAll("[data-o]").forEach(b => b.onclick = () => { order = b.dataset.o; document.querySelectorAll("[data-o]").forEach(x => x.setAttribute("aria-pressed", x === b)); load(true); });
+let t; $("q").addEventListener("input", e => { clearTimeout(t); t = setTimeout(() => { q = e.target.value.trim(); load(true); }, 300); });
+more.onclick = () => load(false);
+load(true); status();
+</script>
+</body>
+</html>
