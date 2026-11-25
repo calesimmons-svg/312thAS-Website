@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow, noarchive">
-<title>312th Airlift ACARS Archive v1</title>
+<title>312th Airlift ACARS Archive v2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=B612+Mono:wght@400;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -63,7 +63,7 @@ a{color:var(--glow)}
 <footer id="foot"></footer>
 <script>
 /* The archive's Worker address. Set once after the Worker is deployed. */
-const API = "https://acars-archive.WORKERS_SUBDOMAIN.workers.dev";
+const API = "https://acars-archive.cale-simmons.workers.dev";
 const PAGE = 30;
 let kind = "", order = "new", q = "", offset = 0, total = 0, busy = false, seq = 0;
 const $ = id => document.getElementById(id);
