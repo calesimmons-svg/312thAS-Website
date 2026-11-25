@@ -1,10 +1,18 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow, noarchive">
-<title>312th Airlift ACARS Archive v2</title>
+<meta name="theme-color" content="#050805">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="ACARS">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<title>312th Airlift ACARS Archive v5</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=B612+Mono:wght@400;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -22,7 +30,7 @@ input[type=search]::placeholder{color:#1d8f47aa}
 .seg{display:inline-flex;border:1px solid var(--dim);border-radius:4px;overflow:hidden}
 .seg button{background:transparent;color:var(--dim);border:0;padding:8px 11px;font:inherit;font-size:13px;cursor:pointer}
 .seg button[aria-pressed=true]{background:var(--glow);color:#021008;font-weight:700}
-.seg button:focus-visible,input:focus-visible,.more:focus-visible{outline:2px solid var(--glow);outline-offset:2px}
+.seg button:focus-visible,input:focus-visible,select:focus-visible,.more:focus-visible,.abtn:focus-visible,summary:focus-visible{outline:2px solid var(--glow);outline-offset:2px}
 main{max-width:1200px;margin:0 auto;padding:16px}
 .count{color:var(--dim);font-size:12px;margin:0 0 12px;letter-spacing:.06em}
 #grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;align-items:start}
@@ -43,12 +51,37 @@ main{max-width:1200px;margin:0 auto;padding:16px}
 footer{max-width:1200px;margin:24px auto 40px;padding:0 16px;color:var(--dim);font-size:12px;line-height:1.7}
 footer b{color:var(--glow);font-weight:700}
 a{color:var(--glow)}
+
+/* ---- Alerts panel ---- */
+.alerts{border:1px solid var(--dim);border-radius:4px;margin:0 0 16px;max-width:640px;background:#08110a}
+.alerts summary{cursor:pointer;padding:10px 12px;font-weight:700;font-size:14px;list-style:none;display:flex;justify-content:space-between;gap:10px;align-items:center}
+.alerts summary::-webkit-details-marker{display:none}
+.alerts summary .st{font-weight:400;font-size:12px;color:var(--dim)}
+.alerts summary .st.on{color:var(--glow)}
+.abody{padding:4px 12px 14px;border-top:1px solid var(--line)}
+.arow{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin:10px 0}
+.arow>label,.arow>.lbl{flex:0 0 100%;font-size:12px;color:var(--dim);letter-spacing:.04em}
+.arow[hidden]{display:none}
+.alerts input[type=text],.alerts input[type=tel],.alerts input[type=email],.alerts input[type=number],.alerts select{background:#0b140d;color:var(--glow);border:1px solid var(--dim);border-radius:4px;padding:8px 10px;font:inherit;font-size:14px;min-width:0;flex:1 1 150px}
+.alerts input[type=number]{flex:0 0 90px}
+.alerts input::placeholder{color:#1d8f47aa}
+.alerts .chk{display:flex;gap:8px;align-items:center;font-size:13px;flex:1 1 100%}
+.alerts .chk input{width:16px;height:16px;accent-color:var(--glow)}
+.abtns{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.abtn{background:transparent;color:var(--glow);border:1px solid var(--glow);padding:9px 14px;font:700 13px "B612 Mono",monospace;cursor:pointer;border-radius:4px}
+.abtn.primary{background:var(--glow);color:#021008}
+.abtn:hover{background:var(--glow);color:#021008}
+.abtn[hidden]{display:none}
+.amsg{margin:12px 0 0;font-size:12px;color:var(--dim);line-height:1.6;min-height:1.6em}
+.amsg.ok{color:var(--glow)}
+.amsg.bad{color:var(--warn)}
 @media (max-width:520px){input[type=search]{width:100%}.tools{width:100%}}
+@supports (padding:max(0px)){header{padding-top:max(12px,env(safe-area-inset-top))}footer{padding-bottom:env(safe-area-inset-bottom)}}
 </style>
 </head>
 <body>
 <header><div class="top">
-  <h1>ARCHIVE<small>312TH AIRLIFT ACARS · EVERY PRINT, KEPT</small></h1>
+  <h1>ARCHIVE<small>312TH AIRLIFT ACARS · EVERY PRINT, KEPT · v5</small></h1>
   <div class="tools">
     <input id="q" type="search" placeholder="Search prints" aria-label="Search prints" autocomplete="off">
     <span class="seg" role="group" aria-label="Show"><button data-k="" aria-pressed="true">All</button><button data-k="text" aria-pressed="false">Text</button><button data-k="photo" aria-pressed="false">Pictures</button></span>
@@ -56,7 +89,76 @@ a{color:var(--glow)}
   </div>
 </div></header>
 <main>
-  <p class="count" id="count" aria-live="polite">Loading…</p>
+  <details class="alerts" id="appbadge">
+    <summary><span>📲 Home-screen app &amp; icon badge</span><span class="st" id="pstate">...</span></summary>
+    <div class="abody">
+      <p class="amsg" id="pinfo"></p>
+      <div class="abtns">
+        <button type="button" class="abtn primary" id="pEnable" hidden>Turn on badge &amp; notifications</button>
+        <button type="button" class="abtn" id="pTest" hidden>Send test</button>
+        <button type="button" class="abtn" id="pDisable" hidden>Turn off</button>
+      </div>
+      <p class="amsg" id="pmsg" aria-live="polite"></p>
+    </div>
+  </details>
+  <details class="alerts" id="alerts">
+    <summary><span>🔔 Alerts for new posts</span><span class="st" id="astate">OFF</span></summary>
+    <div class="abody">
+      <div class="arow">
+        <span class="lbl">Notify via</span>
+        <span class="seg" role="group" aria-label="Notify via"><button type="button" data-via="text" aria-pressed="true">📱 Text</button><button type="button" data-via="email" aria-pressed="false">✉️ Email</button></span>
+      </div>
+      <div class="arow" id="textRow">
+        <label for="aPhone">Phone number and carrier</label>
+        <input id="aPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="10-digit mobile number">
+        <select id="aCarrier" aria-label="Carrier">
+          <option value="tmomail.net">T-Mobile</option>
+          <option value="vtext.com">Verizon (gateway ends Mar 31, 2027)</option>
+          <option disabled>AT&amp;T / Cricket: gateway shut down, use Email</option>
+        </select>
+      </div>
+      <div class="arow" id="emailRow" hidden>
+        <label for="aEmail">Email address</label>
+        <input id="aEmail" type="email" autocomplete="email" placeholder="you@example.com">
+      </div>
+      <div class="arow">
+        <label for="aTo">Only posts addressed TO (blank = everything)</label>
+        <input id="aTo" type="text" placeholder="e.g. Scheduling, All, Mandy" autocomplete="off">
+      </div>
+      <div class="arow">
+        <label for="aKey">Only if the post mentions (blank = anything)</label>
+        <input id="aKey" type="text" placeholder="e.g. MOB, popcorn" autocomplete="off">
+      </div>
+      <div class="arow">
+        <label class="chk"><input type="checkbox" id="aPhotos" checked> Include picture prints</label>
+      </div>
+      <div class="arow">
+        <label for="aDays">How long do you want these alerts?</label>
+        <select id="aDays">
+          <option value="1">1 day</option>
+          <option value="2">2 days</option>
+          <option value="3">3 days</option>
+          <option value="7" selected>7 days</option>
+          <option value="14">2 weeks</option>
+          <option value="30">1 month</option>
+          <option value="60">2 months</option>
+        </select>
+      </div>
+      <div class="arow">
+        <label for="aMax">Max alerts per day</label>
+        <input id="aMax" type="number" min="1" max="20" value="5">
+      </div>
+      <div class="abtns">
+        <button type="button" class="abtn primary" id="aSave">Save Alert</button>
+        <button type="button" class="abtn" id="aTest">📱 Send Test Text</button>
+        <button type="button" class="abtn" id="aStop">⏸ Stop Alerts</button>
+        <button type="button" class="abtn" id="aClear">Clear</button>
+      </div>
+      <p class="amsg" id="amsg" aria-live="polite"></p>
+      <p class="amsg">Alerts are sent from this browser, so they only go out while this page is open. Your settings are saved in this browser only. Save Alert restarts the clock and only counts posts that arrive after you save.</p>
+    </div>
+  </details>
+  <p class="count" id="count" aria-live="polite"></p>
   <div id="grid"></div>
   <button class="more" id="more" hidden>Load more</button>
 </main>
@@ -65,7 +167,7 @@ a{color:var(--glow)}
 /* The archive's Worker address. Set once after the Worker is deployed. */
 const API = "https://acars-archive.cale-simmons.workers.dev";
 const PAGE = 30;
-let kind = "", order = "new", q = "", offset = 0, total = 0, busy = false, seq = 0;
+let kind = "", order = "new", q = "", offset = 0, total = 0, busy = false, seq = 0, lastShownAt = null;
 const $ = id => document.getElementById(id);
 const grid = $("grid"), more = $("more"), count = $("count");
 
@@ -106,9 +208,11 @@ async function load(reset){
     const r = await fetch(u); if (!r.ok) throw new Error(r.status);
     const d = await r.json(); if (my !== seq) return;
     total = d.total; d.prints.forEach(p => grid.append(slip(p))); offset += d.prints.length;
+    if (reset && order === "new" && !q && !kind && d.prints[0]) lastShownAt = d.prints[0].at;
     count.textContent = total ? "Showing " + offset + " of " + total : "";
     if (!total) grid.replaceChildren(Object.assign(document.createElement("div"), {className:"empty", textContent: q ? "Nothing matches that search." : "No prints copied yet. They show up a few minutes after the first sync."}));
     more.hidden = offset >= total;
+    if (reset && window.onGridShown) window.onGridShown();
   } catch (e) { if (my === seq) problem("Couldn't load the archive right now. Try again in a minute."); }
   busy = false;
 }
@@ -130,6 +234,269 @@ document.querySelectorAll("[data-o]").forEach(b => b.onclick = () => { order = b
 let t; $("q").addEventListener("input", e => { clearTimeout(t); t = setTimeout(() => { q = e.target.value.trim(); load(true); }, 300); });
 more.onclick = () => load(false);
 load(true); status();
+
+/* =====================================================================
+   Alerts for new posts (same approach as Kiteboarding Wind Watch)
+   - Runs in the browser, only while this page is open.
+   - Settings are saved per browser in localStorage.
+   - The page POSTs {to, subject, body} as text/plain to a Google Apps
+     Script web app, which sends through MailApp. Texts go to the carrier
+     email gateway (number@tmomail.net). Texts are plain ASCII.
+   ===================================================================== */
+const ALERT_ENDPOINT = "PASTE_APPS_SCRIPT_URL_HERE";   /* the Apps Script web app /exec URL */
+const CFG_KEY = "acarsAlertConfig_v1", SEEN_KEY = "acarsAlertSeen_v1", SENT_KEY = "acarsAlertSent_v1";
+const POLL_MS = 60000, DAY_MS = 86400000;
+let aVia = "text", aPolling = false;
+
+function lsGet(k, d){ try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (_) { return d; } }
+function lsSet(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch (_) {} }
+function lsDel(k){ try { localStorage.removeItem(k); } catch (_) {} }
+
+function ascii(s){
+  return String(s == null ? "" : s)
+    .replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[–—]/g, "-")
+    .normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[^\x20-\x7E]/g, " ").replace(/\s+/g, " ").trim();
+}
+function todayKey(){ const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); }
+function sentToday(){ const s = lsGet(SENT_KEY, {}); return s.d === todayKey() ? (s.n || 0) : 0; }
+function bumpSent(){ lsSet(SENT_KEY, {d: todayKey(), n: sentToday() + 1}); }
+
+function aMsg(text, cls){ const m = $("amsg"); m.textContent = text || ""; m.className = "amsg" + (cls ? " " + cls : ""); }
+function formCfg(){
+  let phone = $("aPhone").value.replace(/\D/g, ""); if (phone.length === 11 && phone[0] === "1") phone = phone.slice(1);
+  return {
+    via: aVia, phone, carrier: $("aCarrier").value, email: $("aEmail").value.trim(),
+    to: $("aTo").value.trim(), key: $("aKey").value.trim(), photos: $("aPhotos").checked,
+    days: parseInt($("aDays").value, 10) || 7,
+    max: Math.max(1, Math.min(20, parseInt($("aMax").value, 10) || 5))
+  };
+}
+function recipient(c){
+  if (c.via === "email") return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(c.email) ? c.email : null;
+  return c.phone.length === 10 ? c.phone + "@" + c.carrier : null;
+}
+async function sendAlert(to, subject, body){
+  if (ALERT_ENDPOINT.includes("PASTE_")) throw new Error("The alert sender isn't set up yet (ALERT_ENDPOINT).");
+  const r = await fetch(ALERT_ENDPOINT, {method: "POST", headers: {"Content-Type": "text/plain;charset=utf-8"}, body: JSON.stringify({to, subject, body})});
+  let j = null; try { j = await r.json(); } catch (_) {}
+  if (!r.ok || (j && j.ok === false)) throw new Error((j && j.error) || ("HTTP " + r.status));
+}
+
+function aMatch(p, c){
+  if (p.photo && !c.photos) return false;
+  const terms = (c.to || "").toLowerCase().split(",").map(s => s.trim()).filter(Boolean);
+  if (terms.length && !terms.some(s => (p.to || "").toLowerCase().includes(s))) return false;
+  const k = (c.key || "").toLowerCase().trim();
+  if (k && !((p.to || "") + " " + (p.from || "") + " " + (p.msg || "")).toLowerCase().includes(k)) return false;
+  return true;
+}
+function describe(p){
+  if (p.photo) return "new picture print" + (p.to ? " (" + p.to + ")" : "");
+  return "TO " + (p.to || "?") + ": " + (p.msg || "") + (p.from ? " -" + p.from : "");
+}
+function buildText(hits){
+  const last = hits[hits.length - 1];
+  const s = hits.length === 1 ? "ACARS " + describe(last) : "ACARS: " + hits.length + " new posts. Latest " + describe(last);
+  return ascii(s).slice(0, 150);
+}
+
+async function fetchLatest(){
+  const u = new URL(API + "/prints"); u.searchParams.set("limit", "15"); u.searchParams.set("order", "new");
+  const r = await fetch(u); if (!r.ok) throw new Error(r.status);
+  return (await r.json()).prints || [];
+}
+function mergeSeen(ids, old){ return ids.concat(old || []).filter((v, i, a) => a.indexOf(v) === i).slice(0, 200); }
+
+async function aPoll(){
+  const cfg = lsGet(CFG_KEY, null);
+  if (!cfg || !cfg.on || aPolling) return;
+  if (Date.now() >= cfg.end) { stopAlerts("Alerts ended: your time limit is up. Save Alert to start again."); return; }
+  aPolling = true;
+  try {
+    const prints = await fetchLatest();
+    const seen = lsGet(SEEN_KEY, null);
+    const fresh = seen ? prints.filter(p => !seen.includes(p.id)) : [];
+    const hits = fresh.filter(p => aMatch(p, cfg)).reverse();   /* oldest first */
+    let failed = [];
+    if (hits.length) {
+      const to = recipient(cfg);
+      if (sentToday() >= cfg.max) { aMsg("Daily limit of " + cfg.max + " reached. Skipped " + hits.length + " new post(s).", "bad"); }
+      else if (to) {
+        try { await sendAlert(to, "312 ACARS", buildText(hits)); bumpSent(); aMsg("Alert sent at " + new Date().toLocaleTimeString(undefined, {hour:"numeric", minute:"2-digit"}) + " for " + hits.length + " new post(s).", "ok"); }
+        catch (e) { failed = hits; aMsg("Couldn't send the alert: " + e.message + " Will retry.", "bad"); }
+      }
+    }
+    const failedIds = failed.map(p => p.id);
+    lsSet(SEEN_KEY, mergeSeen(prints.map(p => p.id).filter(id => !failedIds.includes(id)), seen));
+    if (fresh.length && order === "new" && !q && !kind && offset <= PAGE) { load(true); status(); }
+  } catch (_) { /* network blip: try again next poll */ }
+  aPolling = false; aRender();
+}
+
+function aRender(){
+  const cfg = lsGet(CFG_KEY, null), st = $("astate");
+  if (cfg && cfg.on) {
+    st.textContent = "ON until " + new Date(cfg.end).toLocaleString(undefined, {month:"short", day:"numeric", hour:"numeric", minute:"2-digit"});
+    st.className = "st on";
+  } else { st.textContent = "OFF"; st.className = "st"; }
+  $("aTest").textContent = aVia === "email" ? "✉️ Send Test Email" : "📱 Send Test Text";
+  $("textRow").hidden = aVia !== "text"; $("emailRow").hidden = aVia !== "email";
+  document.querySelectorAll("[data-via]").forEach(b => b.setAttribute("aria-pressed", b.dataset.via === aVia));
+}
+function stopAlerts(note){
+  const cfg = lsGet(CFG_KEY, null);
+  if (cfg) { cfg.on = false; lsSet(CFG_KEY, cfg); }
+  aMsg(note || "Alerts stopped.", note ? "bad" : ""); aRender();
+}
+function fillForm(c){
+  aVia = c.via === "email" ? "email" : "text";
+  $("aPhone").value = c.phone || ""; if (c.carrier) $("aCarrier").value = c.carrier;
+  $("aEmail").value = c.email || ""; $("aTo").value = c.to || ""; $("aKey").value = c.key || "";
+  $("aPhotos").checked = c.photos !== false; $("aDays").value = String(c.days || 7); $("aMax").value = c.max || 5;
+}
+
+document.querySelectorAll("[data-via]").forEach(b => b.onclick = () => { aVia = b.dataset.via; aRender(); });
+
+$("aSave").onclick = async () => {
+  const c = formCfg(), to = recipient(c);
+  if (!to) { aMsg(c.via === "email" ? "Enter a valid email address." : "Enter your 10-digit phone number.", "bad"); return; }
+  try {
+    const prints = await fetchLatest();
+    lsSet(SEEN_KEY, prints.map(p => p.id));          /* only posts after this moment count */
+  } catch (_) { aMsg("Couldn't reach the archive to start. Try again.", "bad"); return; }
+  const now = Date.now();
+  lsSet(CFG_KEY, Object.assign(c, {on: true, start: now, end: now + c.days * DAY_MS}));
+  const where = c.via === "email" ? c.email : "(***) ***-" + c.phone.slice(-4);
+  aMsg("Saved. Watching for new posts and alerting " + where + " for " + $("aDays").selectedOptions[0].text + ". Keep this page open." +
+       (ALERT_ENDPOINT.includes("PASTE_") ? " Note: the alert sender isn't set up yet, so nothing will send." : ""), "ok");
+  aRender();
+};
+$("aTest").onclick = async () => {
+  const c = formCfg(), to = recipient(c);
+  if (!to) { aMsg(c.via === "email" ? "Enter a valid email address first." : "Enter your 10-digit phone number first.", "bad"); return; }
+  aMsg("Sending test...");
+  try { await sendAlert(to, "312 ACARS", "312 ACARS test. Alerts are working. New posts will text you here."); aMsg("Test sent. It can take a minute to arrive.", "ok"); }
+  catch (e) { aMsg("Test failed: " + e.message, "bad"); }
+};
+$("aStop").onclick = () => stopAlerts();
+$("aClear").onclick = () => {
+  lsDel(CFG_KEY); lsDel(SEEN_KEY); lsDel(SENT_KEY);
+  fillForm({}); $("aDays").value = "7"; aVia = "text"; aMsg("Cleared. Nothing is saved in this browser."); aRender();
+};
+
+(function initAlerts(){
+  const c = lsGet(CFG_KEY, null);
+  if (c) { fillForm(c); if (c.on) $("alerts").open = false; }
+  aRender();
+  setInterval(aPoll, POLL_MS);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) aPoll(); });
+  aPoll();
+})();
+
+/* =====================================================================
+   v5: installable app + number on the home-screen icon
+   - Add to Home Screen makes this a standalone app (manifest.webmanifest + sw.js).
+   - When a new print lands, the archive Worker sends a push. The service worker
+     counts the prints you haven't seen, shows a notification and sets the icon badge.
+   - Opening the app marks everything seen and clears the badge.
+   ===================================================================== */
+const VAPID_PUBLIC = "BFCBEE_fYFkq3qo81S1L7cu-Vd1pnvfM5I4E0jQcxuQfMAXWn4wF2W2H181Qlc1PEF7fgV59NSjK80V3T7V_Uow";
+const STATE_CACHE = "arch-state-v1";   /* not "acars-": the main ACARS app deletes caches with that prefix */
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+let swReg = null;
+
+async function stSet(k, v){ try { await (await caches.open(STATE_CACHE)).put("/__state/" + k, new Response(JSON.stringify(v))); } catch (_) {} }
+function urlB64(s){ const b = (s + "=".repeat((4 - s.length % 4) % 4)).replace(/-/g, "+").replace(/_/g, "/"); return Uint8Array.from(atob(b), c => c.charCodeAt(0)); }
+function pMsg(text, cls){ const m = $("pmsg"); m.textContent = text || ""; m.className = "amsg" + (cls ? " " + cls : ""); }
+
+async function markSeen(){
+  let at = lastShownAt;
+  if (!at) { try { const d = await (await fetch(API + "/prints?limit=1&order=new", {cache: "no-store"})).json(); at = d.prints && d.prints[0] && d.prints[0].at; } catch (_) {} }
+  if (at) await stSet("lastSeen", {at});
+  try { if (navigator.clearAppBadge) await navigator.clearAppBadge(); } catch (_) {}
+  try { if (swReg) (await swReg.getNotifications()).forEach(n => n.close()); } catch (_) {}
+}
+window.onGridShown = () => { if (!document.hidden) markSeen(); };
+
+async function pRender(){
+  const st = $("pstate"), info = $("pinfo"), en = $("pEnable"), ds = $("pDisable"), ts = $("pTest");
+  en.hidden = ds.hidden = ts.hidden = true;
+  const supported = "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
+  if (!supported) {
+    st.textContent = "INSTALL"; st.className = "st";
+    info.textContent = isIOS
+      ? "To get a number on the icon: open this page in Safari, tap the Share button, choose Add to Home Screen, then open ACARS from your Home Screen and come back to this panel. Needs iOS 16.4 or newer."
+      : "This browser can't do push notifications. On iPhone, add this page to your Home Screen first.";
+    return;
+  }
+  if (Notification.permission === "denied") {
+    st.textContent = "BLOCKED"; st.className = "st";
+    info.textContent = "Notifications are blocked for this app. On iPhone: Settings > Notifications > ACARS > Allow Notifications, then come back.";
+    return;
+  }
+  let sub = null; try { const reg = swReg || await navigator.serviceWorker.getRegistration(); sub = reg && await reg.pushManager.getSubscription(); } catch (_) {}
+  if (sub && Notification.permission === "granted") {
+    st.textContent = "ON"; st.className = "st on";
+    info.textContent = "On. When a new print lands you get a notification, and the icon shows how many prints arrived since you last opened the app.";
+    ds.hidden = ts.hidden = false;
+  } else {
+    st.textContent = "OFF"; st.className = "st";
+    info.textContent = "Get a notification and a number on the app icon whenever a new print lands. This works with the app closed.";
+    en.hidden = false;
+  }
+}
+
+$("pEnable").onclick = async () => {
+  pMsg("Asking...");
+  try {
+    const perm = await Notification.requestPermission();       /* must be the first thing after the tap */
+    if (perm !== "granted") { pMsg("Permission wasn't granted.", "bad"); pRender(); return; }
+    const reg = await navigator.serviceWorker.ready; swReg = reg;
+    let sub = await reg.pushManager.getSubscription();
+    if (!sub) sub = await reg.pushManager.subscribe({userVisibleOnly: true, applicationServerKey: urlB64(VAPID_PUBLIC)});
+    const r = await fetch(API + "/push/subscribe", {method: "POST", headers: {"Content-Type": "text/plain;charset=utf-8"}, body: JSON.stringify({endpoint: sub.endpoint})});
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || j.ok === false) throw new Error(j.error || ("HTTP " + r.status));
+    await markSeen();
+    pMsg("Turned on. Tap Send test to check it.", "ok");
+  } catch (e) { pMsg("Couldn't turn it on: " + e.message, "bad"); }
+  pRender();
+};
+$("pTest").onclick = async () => {
+  pMsg("Sending test...");
+  try {
+    const reg = swReg || await navigator.serviceWorker.ready;
+    const sub = await reg.pushManager.getSubscription(); if (!sub) throw new Error("not subscribed");
+    const r = await fetch(API + "/push/test", {method: "POST", headers: {"Content-Type": "text/plain;charset=utf-8"}, body: JSON.stringify({endpoint: sub.endpoint})});
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || j.ok === false) throw new Error(j.error || ("HTTP " + r.status));
+    pMsg("Test sent. A notification should show up in a few seconds.", "ok");
+  } catch (e) { pMsg("Test failed: " + e.message, "bad"); }
+};
+$("pDisable").onclick = async () => {
+  try {
+    const reg = swReg || await navigator.serviceWorker.ready;
+    const sub = await reg.pushManager.getSubscription();
+    if (sub) {
+      await fetch(API + "/push/unsubscribe", {method: "POST", headers: {"Content-Type": "text/plain;charset=utf-8"}, body: JSON.stringify({endpoint: sub.endpoint})}).catch(() => {});
+      await sub.unsubscribe();
+    }
+    try { if (navigator.clearAppBadge) await navigator.clearAppBadge(); } catch (_) {}
+    pMsg("Turned off.");
+  } catch (e) { pMsg("Couldn't turn it off: " + e.message, "bad"); }
+  pRender();
+};
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js").then(r => { swReg = r; pRender(); }).catch(() => pRender());
+  navigator.serviceWorker.addEventListener("message", e => { if (e.data === "push" && !document.hidden) load(true).then(status); });
+} else pRender();
+let hiddenAt = 0;
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) { hiddenAt = Date.now(); return; }
+  if (Date.now() - hiddenAt > 30000) { load(true); status(); } else markSeen();   /* short trips away keep your scroll position */
+});
+pRender();
 </script>
 </body>
 </html>

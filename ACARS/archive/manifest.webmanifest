@@ -1,0 +1,16 @@
+{
+  "id": "./",
+  "name": "312th Airlift ACARS Archive",
+  "short_name": "ACARS",
+  "description": "Every print from the 312th Airlift ACARS printer, kept.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#050805",
+  "theme_color": "#050805",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
