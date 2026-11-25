@@ -1,9 +1,9 @@
-/* 312th Airlift ACARS Archive: service worker (v5)
+/* 312th Airlift ACARS Archive: service worker (v6)
    - Keeps the app shell so it opens instantly / offline.
    - Receives a push from the archive Worker whenever a new print lands, counts the
      unread prints, shows a notification and puts the number on the home-screen icon. */
 const API = "https://acars-archive.cale-simmons.workers.dev";
-const SHELL = "arch-shell-v5";   /* prefix "arch-", NOT "acars-": the main ACARS app's service worker deletes every "acars-*" cache that is not its own */
+const SHELL = "arch-shell-v6";   /* prefix "arch-", NOT "acars-": the main ACARS app's service worker deletes every "acars-*" cache that is not its own */
 const FILES = ["./", "index.html", "manifest.webmanifest", "apple-touch-icon.png", "icon-192.png", "icon-512.png"];
 const STATE = "arch-state-v1";   /* shared with the page: the time of the newest print you have seen */
 
